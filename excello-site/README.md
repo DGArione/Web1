@@ -192,3 +192,23 @@ Because the full-frame set is ~150 MB, the repository no longer carries a commit
   `prefers-reduced-motion` and on repeat visits in the same tab.
 
 The full build is now ~200 MB of frames; download the branch ZIP rather than a committed file.
+
+---
+
+## Update: full editorial redesign (everything below the hero)
+
+The hero is unchanged. Everything else moved to a distinctive, premium editorial system.
+
+- **New type system.** Display set in **Fraunces** (an optical serif with real character and gorgeous
+  italics) and UI/body in **Archivo** (an architectural grotesque), replacing the earlier
+  Cormorant/Manrope pairing. Tokens `--font-serif` / `--font-sans` in `css/style.css`.
+- **Refined palette.** Deeper ink, warmer paper, a more restrained bronze accent.
+- **Editorial details.** Section heads now carry a hairline rule that draws in on scroll with an
+  index label; the services list uses oversized Fraunces titles with italic index numbers; the stats
+  are monumental Fraunces numerals; the marquee alternates solid italic and outline (stroked) words;
+  the closing call-to-action sets one word as an outline accent.
+- **Premium finish.** A fine film-grain overlay for tactile depth and a slim bronze scroll-progress
+  bar at the top of the viewport.
+
+All of this is layered in `css/style.css` (see the "REDESIGN" addendum) plus small additions to
+`js/main.js`; the HTML structure is unchanged, so the animations and sequences all still apply.

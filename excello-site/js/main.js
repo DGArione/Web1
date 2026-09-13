@@ -474,6 +474,18 @@
       });
     }
 
+    /* ---- Redesign: scroll-progress bar + drawn section rules ---------- */
+    (function () {
+      var sb = document.createElement("div");
+      sb.className = "scrollbar"; sb.innerHTML = "<i></i>";
+      body.appendChild(sb);
+      var sbi = sb.querySelector("i");
+      ScrollTrigger.create({ start: 0, end: "max", onUpdate: function (self) { gsap.set(sbi, { scaleX: self.progress }); } });
+    })();
+    document.querySelectorAll(".section__head").forEach(function (h) {
+      ScrollTrigger.create({ trigger: h, start: "top 82%", once: true, onEnter: function () { h.classList.add("is-drawn"); } });
+    });
+
     /* Pinned sections must be refreshed before anything below them, so order
        every trigger by its position on the page before measuring. */
     ScrollTrigger.sort();
