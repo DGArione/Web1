@@ -390,8 +390,11 @@
         ctx.drawImage(img, x, y, w, h);
       }
       function redraw() { paint(Math.round(progress * (count - 1))); }
+      var need = (mode === "hero") ? Math.min(count, 72) : 0, priorityLoaded = 0;
+      if (mode === "hero") window.__heroReady = 0;
       function onFrame(i) {
         loaded++;
+        if (mode === "hero" && i < need) { priorityLoaded++; window.__heroReady = priorityLoaded / need; }
         if (loaderNum) loaderNum.textContent = Math.round(loaded / count * 100);
         if (i === 0 && !ready) { ready = true; sizeCanvas(); redraw(); }
         if (loaded >= count && loaderWrap) loaderWrap.classList.add("is-done");
@@ -490,17 +493,43 @@
     }
     sessionStorage.setItem("excello-loaded", "1");
     if (lenis) lenis.stop();
-    var count = { v: 0 };
     var countEl = document.getElementById("preCount");
-    var tl = gsap.timeline({
-      onComplete: function () { pre.remove(); if (lenis) lenis.start(); done(); }
-    });
-    tl.to(pre.querySelectorAll(".preloader__word span"), { y: 0, duration: 1.1, stagger: 0.05, ease: "power4.out" }, 0.1)
-      .to(count, { v: 100, duration: 1.6, ease: "power2.inOut", onUpdate: function () { countEl.textContent = Math.round(count.v); } }, 0.1)
-      .to("#preLine", { width: "100%", duration: 1.6, ease: "power2.inOut" }, 0.1)
-      .to(pre.querySelectorAll(".preloader__word span"), { y: "-110%", duration: 0.7, stagger: 0.03, ease: "power4.in" }, "+=0.15")
-      .to([countEl, "#preLine"], { opacity: 0, duration: 0.3 }, "<")
-      .to(pre, { yPercent: -100, duration: 1, ease: "power4.inOut" }, "-=0.2");
+    var bar = document.getElementById("preBar");
+    var roll = document.getElementById("preRoll");
+    var words = roll ? roll.children.length : 0;
+
+    /* Intro */
+    gsap.set(pre.querySelectorAll(".preloader__word span"), { y: "110%" });
+    gsap.to(pre.querySelectorAll(".preloader__word span"), { y: 0, duration: 1, stagger: 0.05, ease: "power4.out", delay: 0.1 });
+    gsap.from(pre.querySelectorAll(".preloader__top span, .preloader__roll, .preloader__bottom"), { autoAlpha: 0, y: 12, duration: 0.8, stagger: 0.08, ease: "power3.out", delay: 0.2 });
+
+    /* Progress: follows real hero-frame loading (falls back to time on other pages) */
+    var start = performance.now(), shown = 0, finished = false;
+    function tick(now) {
+      var el = now - start;
+      var heroReady = (typeof window.__heroReady === "number") ? window.__heroReady : null;
+      var timeFloor = Math.min(1, el / 1600);
+      /* fill toward 90% on time, then let real load complete the last 10% */
+      var target = heroReady != null ? Math.max(heroReady, Math.min(timeFloor, 0.9)) : timeFloor;
+      shown += (target - shown) * 0.09;
+      var pct = Math.round(shown * 100);
+      if (countEl) countEl.textContent = pct;
+      if (bar) gsap.set(bar, { scaleX: shown });
+      if (roll && words) gsap.set(roll, { y: -(Math.min(words - 1, Math.floor(shown * words)) * 1.5) + "em" });
+      var ready = pct >= 99 && (heroReady == null ? el > 1400 : (heroReady >= 1 || el > 8000));
+      if (!ready) { requestAnimationFrame(tick); return; }
+      if (finished) return; finished = true;
+      outro();
+    }
+    function outro() {
+      if (countEl) countEl.textContent = 100;
+      if (bar) gsap.set(bar, { scaleX: 1 });
+      var tl = gsap.timeline({ onComplete: function () { pre.remove(); if (lenis) lenis.start(); done(); } });
+      tl.to(pre.querySelectorAll(".preloader__word span"), { y: "-115%", duration: 0.7, stagger: 0.03, ease: "power4.in" }, 0)
+        .to(pre.querySelectorAll(".preloader__top, .preloader__roll, .preloader__bottom"), { autoAlpha: 0, y: -10, duration: 0.5, ease: "power2.in" }, 0)
+        .to(pre, { yPercent: -100, duration: 1, ease: "power4.inOut" }, "-=0.15");
+    }
+    requestAnimationFrame(tick);
   }
 
   /* ---------------------------------------------------------------------

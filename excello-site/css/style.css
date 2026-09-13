@@ -825,3 +825,28 @@ body.is-dark .sky { color: var(--ink); }
 .section__head { margin-bottom: clamp(28px, 3.5vw, 56px); }
 .section__head .h-1 { margin-top: 12px; }
 .cta .h-display { margin: 18px auto 30px; }
+
+/* ==========================================================================
+   ADDENDUM 4 — advanced preloader (real load progress)
+   ========================================================================== */
+.preloader__inner {
+  position: relative; width: 100%; height: 100%;
+  display: grid; grid-template-rows: auto 1fr auto;
+  padding: clamp(22px, 4vw, 44px) var(--gutter);
+}
+.preloader__top { display: flex; justify-content: space-between; align-items: center;
+  font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(248,244,236,0.6); }
+.preloader__center { align-self: center; display: flex; flex-direction: column; align-items: center; gap: clamp(14px, 2vw, 26px); }
+.preloader .preloader__word { font-size: clamp(2.6rem, 12vw, 9rem); letter-spacing: 0.12em; }
+.preloader__roll { height: 1.5em; overflow: hidden; font-family: var(--font-sans);
+  font-size: 11px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--bronze-2); }
+.preloader__roll span { display: block; will-change: transform; }
+.preloader__roll b { display: block; height: 1.5em; line-height: 1.5em; font-weight: 500; text-align: center; }
+.preloader__bottom { display: flex; align-items: baseline; gap: clamp(20px, 4vw, 48px); }
+.preloader__bar { position: relative; flex: 1; height: 1px; background: rgba(248,244,236,0.22); overflow: hidden; align-self: center; }
+.preloader__bar i { position: absolute; inset: 0; transform: scaleX(0); transform-origin: left; background: var(--bronze-2); }
+/* override the old absolute count/line */
+.preloader .preloader__count { position: static; right: auto; bottom: auto;
+  display: flex; align-items: baseline; gap: 1px; font-family: var(--font-serif);
+  font-size: clamp(2.4rem, 6vw, 4.4rem); font-weight: 300; line-height: 1; font-variant-numeric: tabular-nums; }
+.preloader__count em { font-size: 0.38em; font-style: normal; color: var(--bronze-2); }

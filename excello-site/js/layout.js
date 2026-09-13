@@ -32,11 +32,21 @@
 
   var top =
     '<div class="preloader" id="preloader">' +
+    '<div class="preloader__inner">' +
+    '<div class="preloader__top"><span>Excello Developers</span><span>Design &amp; Build</span></div>' +
+    '<div class="preloader__center">' +
     '<div class="preloader__word">' +
     "EXCELLO".split("").map(function (c) { return "<span>" + c + "</span>"; }).join("") +
     "</div>" +
-    '<div class="preloader__count"><span id="preCount">0</span></div>' +
-    '<div class="preloader__line"><i id="preLine"></i></div>' +
+    '<div class="preloader__roll"><span id="preRoll">' +
+    ["Architecture","Construction","Interiors","Real Estate","Branding"].map(function (w) { return "<b>" + w + "</b>"; }).join("") +
+    "</span></div>" +
+    "</div>" +
+    '<div class="preloader__bottom">' +
+    '<div class="preloader__bar"><i id="preBar"></i></div>' +
+    '<div class="preloader__count"><span id="preCount">0</span><em>%</em></div>' +
+    "</div>" +
+    "</div>" +
     "</div>" +
     '<div class="cursor" id="cursor"><span class="cursor__label">View</span></div>' +
     '<header class="header" id="header">' +

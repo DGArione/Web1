@@ -170,3 +170,25 @@ Because the full-frame set is ~150 MB, the repository no longer carries a commit
 
 - **Download ZIP:** https://codeload.github.com/sameera-gamage/Web/zip/refs/heads/claude/website-clone-gsap-animations-zxupx1
 - Or on the branch page, use the green **Code → Download ZIP** button.
+
+---
+
+## Update: new upscaled hero video + advanced preloader
+
+- **New hero sequence.** The supplied 30s / 1280×720 clip is now the hero. Every frame (720 at
+  24 fps) was extracted and **upscaled to 1920×1080** with a Lanczos scaler plus light sharpening:
+
+  ```
+  ffmpeg -i hero.mp4 -vf "scale=1920:1080:flags=lanczos,unsharp=5:5:0.8:5:5:0.0" -q:v 6 img/hero-seq/f_%03d.jpg
+  ```
+
+  It scrubs on Lenis smooth scroll through a long pinned hero (`data-seq-end="+=300%"`), so all 720
+  frames get room to play smoothly. `img/hero-seq/` is ~103 MB.
+- **Advanced preloader.** Rebuilt as a real loading screen tied to actual hero-frame downloads
+  (`window.__heroReady`), not a fixed timer: a top wordmark row, the EXCELLO logotype rising in,
+  a cycling discipline word (Architecture → Construction → …), a real progress bar and a large
+  percentage counter that eases to 100 as the first frames arrive, then a curtain wipe reveals the
+  hero. It falls back to a timed fill on pages without the hero, and is skipped under
+  `prefers-reduced-motion` and on repeat visits in the same tab.
+
+The full build is now ~200 MB of frames; download the branch ZIP rather than a committed file.
