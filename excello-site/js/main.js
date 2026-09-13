@@ -294,22 +294,6 @@
       });
     });
 
-    /* Services list: floating image follows the cursor */
-    var floater = document.querySelector(".service-float");
-    if (floater && finePointer) {
-      var fx = gsap.quickTo(floater, "x", { duration: 0.6, ease: "power3" });
-      var fy = gsap.quickTo(floater, "y", { duration: 0.6, ease: "power3" });
-      var imgs = floater.querySelectorAll("img");
-      document.querySelectorAll(".service").forEach(function (row, i) {
-        row.addEventListener("mouseenter", function () {
-          imgs.forEach(function (im, j) { im.classList.toggle("is-active", i === j); });
-          gsap.to(floater, { opacity: 1, scale: 1, duration: 0.5, ease: "power3.out" });
-        });
-        row.addEventListener("mouseleave", function () { gsap.to(floater, { opacity: 0, scale: 0.9, duration: 0.4 }); });
-        row.addEventListener("mousemove", function (e) { fx(e.clientX + 40); fy(e.clientY); });
-      });
-    }
-
     /* Process: pinned image swaps per step */
     document.querySelectorAll(".process").forEach(function (p) {
       var imgs = p.querySelectorAll(".process__sticky img");
