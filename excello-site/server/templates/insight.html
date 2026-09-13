@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>{{TITLE}} — Excello Insights</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <script src="/js/layout.js"></script>
+  <main>
+    <article class="detail detail--article">
+      <section class="detail__intro container">
+        <a class="detail__back link" href="/insights">← All insights</a>
+        <p class="label detail__kicker" data-reveal>{{KICKER}}</p>
+        <h1 class="h-1 detail__title" data-split>{{TITLE}}</h1>
+        <p class="lede detail__excerpt" data-reveal>{{EXCERPT}}</p>
+      </section>
+      <section class="container">
+        <div class="media media--parallax media--clip media--ratio-wide detail__cover" data-parallax="10">{{COVER}}</div>
+      </section>
+      <section class="section container detail__article">
+        <div class="detail__prose detail__prose--wide">{{BODY}}</div>
+      </section>
+      <section class="section container cta">
+        <p class="label" data-reveal>Continue</p>
+        <h2 class="h-display" data-split>Read more <em>insights</em></h2>
+        <div class="cta__row" data-reveal><a class="btn btn--solid" href="/insights" data-magnetic>Back to insights <svg class="arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 13 13 1M4 1h9v9"/></svg></a></div>
+      </section>
+    </article>
+  </main>
+  <script src="/js/vendor/gsap.min.js"></script>
+  <script src="/js/vendor/ScrollTrigger.min.js"></script>
+  <script src="/js/vendor/SplitText.min.js"></script>
+  <script src="/js/vendor/lenis.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>

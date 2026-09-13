@@ -1,0 +1,61 @@
+[
+  {
+    "id": "seed-one-team-one-roof",
+    "order": 0,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "one-team-one-roof",
+    "title": "Why we build under one roof",
+    "category": "Perspective",
+    "date": "September 2026",
+    "cover": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=2000&q=80",
+    "excerpt": "How an integrated development model keeps quality intact from the first sketch to the final handover.",
+    "body": "Quality, we believe, is a matter of control. When the same team designs, engineers, builds and manages a project, nothing is lost in the gaps between disciplines.\n\nExcello operates as both developer and construction manager. That means a single point of accountability across the whole lifecycle, from concept and design through procurement and construction to handover and management. It is slower to set up and harder to run, and it is the reason our buildings hold their standard.",
+    "gallery": []
+  },
+  {
+    "id": "seed-designing-for-tropical-light",
+    "order": 1,
+    "createdAt": 1789328684770,
+    "updatedAt": 1789328684770,
+    "published": true,
+    "slug": "designing-for-tropical-light",
+    "title": "Designing for the tropical light",
+    "category": "Design",
+    "date": "August 2026",
+    "cover": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2000&q=80",
+    "excerpt": "In a climate this generous with daylight, shade is the real luxury.",
+    "body": "Sri Lanka gives an architect an abundance of light. The craft is in shaping it: deep reveals, screens and verandahs that keep interiors cool while framing the view.\n\nWe design around the path of the sun before we design around the plan, so that every room earns its daylight without paying for it in heat.",
+    "gallery": []
+  },
+  {
+    "id": "seed-solar-living-at-aathavan",
+    "order": 2,
+    "createdAt": 1789328683770,
+    "updatedAt": 1789328683770,
+    "published": true,
+    "slug": "solar-living-at-aathavan",
+    "title": "Solar-powered living at Aathavan",
+    "category": "Sustainability",
+    "date": "July 2026",
+    "cover": "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=2000&q=80",
+    "excerpt": "A whole complex on solar, and what that means for the people who live there.",
+    "body": "At Aathavan the entire complex runs on solar power. For residents that translates into lower monthly bills and a hedge against rising utility costs, without asking anyone to change how they live.\n\nSustainability, done well, is invisible. It shows up as a smaller bill and a quieter conscience, not as a compromise.",
+    "gallery": []
+  },
+  {
+    "id": "seed-the-making-of-sea-esta",
+    "order": 3,
+    "createdAt": 1789328682770,
+    "updatedAt": 1789328682770,
+    "published": true,
+    "slug": "the-making-of-sea-esta",
+    "title": "The making of Sea Esta",
+    "category": "Project diary",
+    "date": "June 2026",
+    "cover": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=2000&q=80",
+    "excerpt": "Sixteen villas, one beach, and the discipline of building beside the sea.",
+    "body": "Building beside the ocean is a test of detailing. Salt, wind and light are unforgiving, and every junction has to be drawn with that in mind.\n\nSea Esta gave each of its sixteen villas a clear line to the water while protecting the fabric of the buildings against the coast that makes them so desirable."
+  }
+]

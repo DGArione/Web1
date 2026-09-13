@@ -1,0 +1,14 @@
+{
+  "name": "excello-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Excello Developers website + content backend (projects & insights)",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "multer": "^2.3.0"
+  }
+}

@@ -3,21 +3,25 @@
 (function () {
   document.documentElement.classList.add("js");
 
-  var page = (location.pathname.split("/").pop() || "index.html").toLowerCase();
+  var path = location.pathname.replace(/index\.html$/, "").toLowerCase();
   var links = [
-    { href: "index.html", label: "Home", num: "01" },
-    { href: "about.html", label: "About", num: "02" },
-    { href: "services.html", label: "Services", num: "03" },
-    { href: "projects.html", label: "Projects", num: "04" },
-    { href: "contact.html", label: "Contact", num: "05" }
+    { href: "/", label: "Home", num: "01", match: ["/", "/index.html"] },
+    { href: "/about.html", label: "About", num: "02", match: ["/about.html"] },
+    { href: "/services.html", label: "Services", num: "03", match: ["/services.html"] },
+    { href: "/projects", label: "Projects", num: "04", match: ["/projects", "/projects.html", "/project/"] },
+    { href: "/insights", label: "Insights", num: "05", match: ["/insights", "/insights.html", "/insight/"] },
+    { href: "/contact.html", label: "Contact", num: "06", match: ["/contact.html"] }
   ];
+  function isActive(l) {
+    return l.match.some(function (m) { return m.slice(-1) === "/" && m !== "/" ? path.indexOf(m) === 0 : path === m; });
+  }
 
   var arrow =
     '<svg class="arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 13 13 1M4 1h9v9"/></svg>';
 
   var navHtml = links
     .map(function (l) {
-      var active = page === l.href ? " is-active" : "";
+      var active = isActive(l) ? " is-active" : "";
       return '<a class="nav__link' + active + '" href="' + l.href + '" data-magnetic>' + l.label + "</a>";
     })
     .join("");
@@ -50,9 +54,9 @@
     "</div>" +
     '<div class="cursor" id="cursor"><span class="cursor__label">View</span></div>' +
     '<header class="header" id="header">' +
-    '<a class="brand" href="index.html" aria-label="Excello home"><span class="brand__word">EXCELLO</span><span class="brand__sub">Design &amp; Build</span></a>' +
+    '<a class="brand" href="/" aria-label="Excello home"><span class="brand__word">EXCELLO</span><span class="brand__sub">Design &amp; Build</span></a>' +
     '<nav class="nav" aria-label="Primary">' + navHtml + "</nav>" +
-    '<a class="btn" href="contact.html" data-magnetic>Start a project ' + arrow + "</a>" +
+    '<a class="btn" href="/contact.html" data-magnetic>Start a project ' + arrow + "</a>" +
     '<button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>' +
     "</header>" +
     '<div class="menu" id="menu" aria-hidden="true">' +
