@@ -212,3 +212,19 @@ The hero is unchanged. Everything else moved to a distinctive, premium editorial
 
 All of this is layered in `css/style.css` (see the "REDESIGN" addendum) plus small additions to
 `js/main.js`; the HTML structure is unchanged, so the animations and sequences all still apply.
+
+---
+
+## Update: richer motion + redesign pass 2
+
+- **Image reveals.** Every content image (except the hero, sequences and sky) now reveals with a
+  dark cover panel that wipes upward while the image settles from a slow zoom, instead of the plain
+  clip fade.
+- **Text reveals.** Section headings animate character by character inside masked lines; lead
+  paragraphs rise word by word; body copy, labels and list items fade up. The hero heading keeps its
+  original line reveal, unchanged.
+- **Projects** gallery gained an editorial numbered index with a hairline meta rule and hover shift.
+- **Contact** form was restyled premium: large serif fields with an animated focus underline.
+- **Services / About** rows, value cards and spec cells got hover and polish passes.
+
+Footer and hero are unchanged.

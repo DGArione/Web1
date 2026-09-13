@@ -147,20 +147,26 @@
      Reveal system (runs after fonts are ready so SplitText measures right)
      --------------------------------------------------------------------- */
   function initReveals() {
-    /* Headline line reveals */
+    /* Headline reveals — hero stays on masked lines (unchanged); every other
+       heading gets a character cascade inside masked lines. */
     document.querySelectorAll("[data-split]").forEach(function (el) {
       var type = el.dataset.split || "lines";
       if (type === "words-scrub") return; /* handled by manifesto block */
-      var split = new SplitText(el, { type: "lines", mask: "lines", linesClass: "split-line" });
-      gsap.set(split.lines, { yPercent: 110 });
       var isHero = el.closest(".hero") !== null;
-      if (isHero) { el._heroLines = split.lines; return; }
-      gsap.to(split.lines, {
+      if (isHero) {
+        var hs = new SplitText(el, { type: "lines", mask: "lines", linesClass: "split-line" });
+        gsap.set(hs.lines, { yPercent: 110 });
+        el._heroLines = hs.lines;
+        return;
+      }
+      var split = new SplitText(el, { type: "lines,chars", mask: "lines", linesClass: "split-line" });
+      gsap.set(split.chars, { yPercent: 120 });
+      gsap.to(split.chars, {
         yPercent: 0,
-        duration: 1.2,
-        stagger: 0.09,
+        duration: 0.9,
+        stagger: 0.014,
         ease: "power4.out",
-        scrollTrigger: { trigger: el, start: "top 88%", once: true }
+        scrollTrigger: { trigger: el, start: "top 86%", once: true }
       });
     });
 
@@ -196,12 +202,20 @@
       });
     });
 
-    /* Clip reveals */
-    document.querySelectorAll(".media--clip").forEach(function (wrap) {
-      var img = wrap.querySelector("img");
-      var tl = gsap.timeline({ scrollTrigger: { trigger: wrap, start: "top 85%", once: true } });
-      tl.to(wrap, { clipPath: "inset(0 0 0% 0)", duration: 1.4, ease: "power4.inOut" });
-      if (img && !wrap.classList.contains("media--parallax")) tl.from(img, { scale: 1.25, duration: 1.8, ease: "power3.out" }, 0);
+    /* Image reveal — a cover panel wipes upward while the image settles from a
+       slow zoom. Applied to every content image (skips hero/sequences/sky). */
+    document.querySelectorAll("main .media").forEach(function (wrap) {
+      if (wrap.closest(".hero, [data-seq-scene], .sky, .service-float")) return;
+      var img = wrap.querySelector("img"); if (!img) return;
+      wrap.style.clipPath = "none";
+      var cover = document.createElement("span");
+      cover.className = "media__cover";
+      wrap.appendChild(cover);
+      var horiz = wrap.closest(".hscroll") !== null;
+      gsap.set(img, { scale: 1.22 });
+      var tl = gsap.timeline({ scrollTrigger: { trigger: horiz ? wrap.closest(".hscroll") : wrap, start: horiz ? "top 80%" : "top 84%", once: true } });
+      tl.to(cover, { scaleY: 0, duration: 1.15, ease: "power4.inOut" }, 0)
+        .to(img, { scale: 1, duration: 1.7, ease: "power3.out" }, 0.08);
     });
 
     /* Counters */
@@ -459,18 +473,22 @@
        copy / labels animate in too. Split headings are already handled above.
        ------------------------------------------------------------------ */
     if (!reduce) {
-      document.querySelectorAll("main .media").forEach(function (m) {
-        if (m.classList.contains("media--clip")) return;                 // already clip-revealed
-        if (m.closest(".hero, [data-seq-scene], .sky, .hscroll, .service-float")) return;
-        var img = m.querySelector("img"); if (!img) return;
-        gsap.from(img, { scale: 1.18, duration: 1.6, ease: "power3.out", scrollTrigger: { trigger: m, start: "top 88%", once: true } });
-        gsap.from(m, { autoAlpha: 0, yPercent: 6, duration: 1.1, ease: "power3.out", scrollTrigger: { trigger: m, start: "top 90%", once: true } });
+      /* Leads reveal word by word */
+      document.querySelectorAll("main .lede").forEach(function (el) {
+        if (el.closest(".hero, [data-seq-scene], .sky")) return;
+        var split = new SplitText(el, { type: "words", wordsClass: "w-rise" });
+        gsap.set(split.words, { yPercent: 115, opacity: 0 });
+        gsap.to(split.words, {
+          yPercent: 0, opacity: 1, duration: 0.9, stagger: 0.03, ease: "power3.out",
+          scrollTrigger: { trigger: el, start: "top 90%", once: true }
+        });
       });
 
-      document.querySelectorAll("main .body, main .lede, main .label, main .service__desc, main .spec__k, main .panel__loc").forEach(function (el) {
+      /* Body copy, labels and small meta fade up */
+      document.querySelectorAll("main .body, main .label, main .service__desc, main .spec__k, main .panel__loc, main .card__tag, main .svc__list li").forEach(function (el) {
         if (el.hasAttribute("data-reveal")) return;
         if (el.closest(".hero, [data-seq-scene], .sky, .footer, .menu, .preloader")) return;
-        gsap.from(el, { autoAlpha: 0, y: 18, duration: 0.9, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 92%", once: true } });
+        gsap.from(el, { autoAlpha: 0, y: 18, duration: 0.9, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 93%", once: true } });
       });
     }
 

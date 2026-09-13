@@ -975,3 +975,54 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
 
 /* ---- Sky headline in the new type --------------------------------------- */
 .sky .h-display em { font-style: italic; }
+
+/* ==========================================================================
+   ADDENDUM 6 — richer reveals + redesign pass 2
+   ========================================================================== */
+/* Cover-panel image reveal (replaces the old clip reveal) */
+.js .media--clip { clip-path: none; }
+.media__cover { position: absolute; inset: 0; z-index: 4; background: var(--ink); transform-origin: top; will-change: transform; }
+.lede .w-rise { display: inline-block; }
+
+/* ---- Projects gallery: numbered editorial index ------------------------- */
+.gallery { counter-reset: gcard; }
+.card { counter-increment: gcard; }
+.card__meta { position: relative; border-top: 1px solid var(--rule); padding-top: 14px; align-items: flex-start; }
+.card__meta::after {
+  content: counter(gcard, decimal-leading-zero);
+  position: absolute; top: 14px; right: 0;
+  font-family: var(--font-serif); font-style: italic; font-size: 13px; color: var(--bronze);
+}
+.card__tag { padding-right: 34px; }
+.card__title { transition: transform 0.6s var(--ease); display: inline-block; }
+.card:hover .card__title { transform: translateX(10px); }
+.card .media::after {
+  content: ""; position: absolute; inset: 0; z-index: 3; background: var(--ink);
+  opacity: 0; transition: opacity 0.6s var(--ease); pointer-events: none;
+}
+.card:hover .media::after { opacity: 0.12; }
+
+/* ---- Contact: premium form --------------------------------------------- */
+.contact__item a, .contact__item p { font-family: var(--font-serif); }
+.field label { font-family: var(--font-sans); font-size: 9.5px; letter-spacing: 0.24em; }
+.field input, .field textarea, .field select { font-family: var(--font-serif); font-optical-sizing: auto; font-size: 1.4rem; padding-bottom: 14px; }
+.field { position: relative; }
+.field::after { content: ""; position: absolute; left: 0; bottom: 0; height: 1px; width: 100%; background: var(--fg); transform: scaleX(0); transform-origin: left; transition: transform 0.5s var(--ease); }
+.field:focus-within::after { transform: scaleX(1); }
+.map { border: 1px solid var(--rule); }
+
+/* ---- Services detail rows: refined -------------------------------------- */
+.svc__list li span:last-child { font-family: var(--font-sans); letter-spacing: 0.14em; }
+.svc__list li { transition: padding-left 0.5s var(--ease); }
+.svc__list li:hover { padding-left: 10px; }
+
+/* ---- Values / team: refined -------------------------------------------- */
+.value { transition: background 0.6s var(--ease); }
+.value:hover { background: color-mix(in srgb, var(--bronze) 8%, transparent); }
+.value__title { font-style: italic; }
+.person .media { position: relative; }
+.person__name { margin-top: 20px; }
+
+/* ---- Spotlight / quote polish ------------------------------------------ */
+.spec { transition: background 0.5s var(--ease); }
+.spec:hover { background: color-mix(in srgb, var(--bronze) 7%, transparent); }
