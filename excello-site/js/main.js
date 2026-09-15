@@ -364,6 +364,7 @@
       var pad = parseInt(host.dataset.pad || "3", 10);
       var ext = host.dataset.ext || "jpg";
       var mode = host.dataset.seqMode || "band";
+      var rev = host.hasAttribute("data-seq-reverse");
       var canvas = host.querySelector("canvas");
       if (!canvas || !count) return;
       var ctx = canvas.getContext("2d", { alpha: false });
@@ -409,23 +410,28 @@
         ctx.stroke();
         ctx.restore();
       }
-      function redraw() { paint(Math.round(progress * (count - 1))); }
+      function frameFor(p) { return Math.round((rev ? 1 - p : p) * (count - 1)); }
+      function redraw() { paint(frameFor(progress)); }
+      var firstIdx = rev ? count - 1 : 0; /* frame shown at rest */
       var need = (mode === "hero") ? Math.min(count, 72) : 0, priorityLoaded = 0;
       if (mode === "hero") window.__heroReady = 0;
-      function onFrame(i) {
+      function onFrame(idx, k) {
         loaded++;
-        if (mode === "hero" && i < need) { priorityLoaded++; window.__heroReady = priorityLoaded / need; }
+        if (mode === "hero" && k < need) { priorityLoaded++; window.__heroReady = priorityLoaded / need; }
         if (loaderNum) loaderNum.textContent = Math.round(loaded / count * 100);
-        if (i === 0 && !ready) { ready = true; sizeCanvas(); redraw(); }
+        if (idx === firstIdx && !ready) { ready = true; sizeCanvas(); redraw(); }
         if (loaded >= count && loaderWrap) loaderWrap.classList.add("is-done");
-        if (i === cur || cur === -1) redraw();
+        if (idx === cur || cur === -1) redraw();
       }
-      for (var i = 0; i < count; i++) (function (i) {
-        var img = new Image(); frames[i] = img;
-        img.onload = function () { onFrame(i); };
-        img.onerror = function () { onFrame(i); };
-        img.src = url(i);
-      })(i);
+      /* Load in play order (reverse loads the finished frames first) so the
+         resting frame appears quickly. */
+      for (var k = 0; k < count; k++) (function (k) {
+        var idx = rev ? count - 1 - k : k;
+        var img = new Image(); frames[idx] = img;
+        img.onload = function () { onFrame(idx, k); };
+        img.onerror = function () { onFrame(idx, k); };
+        img.src = url(idx);
+      })(k);
       window.addEventListener("resize", function () { sizeCanvas(); redraw(); });
 
       if (reduce) { sizeCanvas(); if (frames[0].complete) redraw(); else frames[0].addEventListener("load", function () { ready = true; sizeCanvas(); redraw(); }); return; }
@@ -438,8 +444,13 @@
         onUpdate: function (self) {
           progress = self.progress; if (ready) redraw();
           if (mode === "hero") {
+            var p = self.progress;
             var c = scene.querySelector(".hero__content");
-            if (c) { var p = self.progress; var o = p < 0.6 ? 1 : 1 - (p - 0.6) / 0.4; gsap.set(c, { autoAlpha: Math.max(0, o), y: -50 * Math.max(0, p - 0.45) }); }
+            if (c) { var o = p < 0.6 ? 1 : 1 - (p - 0.6) / 0.4; gsap.set(c, { autoAlpha: Math.max(0, o), y: -50 * Math.max(0, p - 0.45) }); }
+            /* Clouds roll in over the middle of the scroll and part to reveal
+               the construction site: finished home -> clouds -> ground. */
+            var cl = scene.querySelector("#heroClouds");
+            if (cl) { var bell = Math.sin(Math.max(0, Math.min(1, p)) * Math.PI); gsap.set(cl, { opacity: Math.pow(bell, 0.72), scale: 1 + 0.12 * bell }); }
           }
         }
       });

@@ -1207,3 +1207,20 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
 .brand__mark { width: clamp(24px, 2.6vw, 32px); height: auto; flex: 0 0 auto; }
 .brand__text { display: flex; flex-direction: column; line-height: 1; }
 .header.is-compact .brand__mark { width: clamp(22px, 2.2vw, 28px); }
+
+/* ==========================================================================
+   ADDENDUM 12 — hero cloud transition (finished home -> clouds -> construction)
+   ========================================================================== */
+.hero__clouds { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; will-change: opacity; }
+.hero__cloud {
+  position: absolute; display: block; will-change: transform;
+  background: radial-gradient(58% 58% at 50% 50%, rgba(250, 248, 244, 0.96) 0%, rgba(250, 248, 244, 0) 72%);
+  filter: blur(16px);
+}
+.hero__cloud.hc1 { width: 44vw; height: 26vw; left: 2%;  top: 16%; animation: hcDrift 26s ease-in-out infinite; }
+.hero__cloud.hc2 { width: 50vw; height: 28vw; left: 52%; top: 8%;  animation: hcDrift 32s ease-in-out infinite reverse; }
+.hero__cloud.hc3 { width: 40vw; height: 24vw; left: 22%; top: 44%; animation: hcDrift 30s ease-in-out infinite; }
+.hero__cloud.hc4 { width: 48vw; height: 26vw; left: 60%; top: 50%; animation: hcDrift 34s ease-in-out infinite reverse; }
+.hero__cloud.hc5 { width: 36vw; height: 22vw; left: -6%; top: 62%; animation: hcDrift 28s ease-in-out infinite; }
+@keyframes hcDrift { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(4%, -3%) scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { .hero__cloud { animation: none; } }

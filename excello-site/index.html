@@ -20,8 +20,13 @@
   <main>
     <!-- HERO -->
     <section class="hero hero--seq container" data-seq-scene>
-      <div class="hero__bg seq" data-seq="img/hero-seq" data-frames="720" data-ext="webp" data-seq-mode="hero" data-seq-end="+=300%">
+      <div class="hero__bg seq" data-seq="img/hero-seq" data-frames="720" data-ext="webp" data-seq-mode="hero" data-seq-reverse data-seq-end="+=300%">
         <canvas class="seq__canvas"></canvas>
+      </div>
+      <div class="hero__clouds" id="heroClouds" aria-hidden="true">
+        <span class="hero__cloud hc1"></span><span class="hero__cloud hc2"></span>
+        <span class="hero__cloud hc3"></span><span class="hero__cloud hc4"></span>
+        <span class="hero__cloud hc5"></span>
       </div>
       <div class="hero__content">
         <p class="label hero__label" data-hero-fade>Design &amp; Build · Colombo, Sri Lanka</p>
