@@ -13,6 +13,13 @@
   var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   var body = document.body;
 
+  /* After a masked line reveal finishes, stop clipping so glyph descenders
+     and italic overhangs are never cut off. */
+  function unclip(el) {
+    el.style.overflow = "visible";
+    el.querySelectorAll("*").forEach(function (m) { m.style.overflow = "visible"; });
+  }
+
   /* ---------------------------------------------------------------------
      Image fallback: if an Unsplash placeholder fails, swap to picsum.
      --------------------------------------------------------------------- */
@@ -161,7 +168,8 @@
         duration: 0.9,
         stagger: 0.014,
         ease: "power4.out",
-        scrollTrigger: { trigger: el, start: "top 86%", once: true }
+        scrollTrigger: { trigger: el, start: "top 86%", once: true },
+        onComplete: function () { unclip(el); }
       });
     });
 
@@ -334,7 +342,7 @@
       var bg = hero.querySelector(".hero__bg img");
       if (bg) tl.to(bg, { scale: 1, duration: 2.2, ease: "power3.out" }, 0);
       hero.querySelectorAll("[data-split]").forEach(function (el, i) {
-        if (el._heroLines) tl.to(el._heroLines, { yPercent: 0, duration: 1.4, stagger: 0.1 }, 0.35 + i * 0.15);
+        if (el._heroLines) tl.to(el._heroLines, { yPercent: 0, duration: 1.4, stagger: 0.1, onComplete: function () { unclip(el); } }, 0.35 + i * 0.15);
       });
       tl.from(hero.querySelectorAll("[data-hero-fade]"), { opacity: 0, y: 24, duration: 1.2, stagger: 0.12 }, 0.7);
       tl.from(header, { yPercent: -100, opacity: 0, duration: 1, ease: "power3.out" }, 0.5);
