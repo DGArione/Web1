@@ -635,6 +635,22 @@
   })();
 
   /* ---------------------------------------------------------------------
+     Back-to-top button (appears once you scroll)
+     --------------------------------------------------------------------- */
+  (function () {
+    var toTop = document.getElementById("toTop");
+    if (!toTop) return;
+    ScrollTrigger.create({
+      start: 100,
+      onUpdate: function (self) { toTop.classList.toggle("is-visible", self.scroll() > window.innerHeight * 0.7); }
+    });
+    toTop.addEventListener("click", function () {
+      if (lenis) lenis.scrollTo(0, { duration: 1.2 });
+      else window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  })();
+
+  /* ---------------------------------------------------------------------
      Working map (Leaflet) — only where a #map-live element exists
      --------------------------------------------------------------------- */
   (function () {
@@ -642,9 +658,9 @@
     if (!el || typeof window.L === "undefined") return;
     var LATLNG = [6.8389, 79.8653]; // Mount Lavinia
     var map = window.L.map(el, { scrollWheelZoom: false, zoomControl: true, attributionControl: true }).setView(LATLNG, 12);
-    window.L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-      maxZoom: 19, subdomains: "abcd",
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    window.L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
     var icon = window.L.divIcon({ className: "", html: '<span class="map-pin"></span>', iconSize: [18, 18], iconAnchor: [9, 9] });
     window.L.marker(LATLNG, { icon: icon }).addTo(map).bindPopup("<strong>Excello Developers</strong><br>No 16, St Rita's Road, Mount Lavinia");

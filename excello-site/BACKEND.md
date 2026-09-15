@@ -73,3 +73,24 @@ admin/                 the admin panel
   marker on Mount Lavinia. Map tiles need internet access to load.
 - **Hero watermark**: the AI-video sparkle was removed from all 720 hero frames with ffmpeg's
   `delogo` filter before upscaling.
+
+---
+
+## Update: optimisation, favicon, cover emblem, header, map, back-to-top
+
+- **Optimised**: all hero and band frames converted to WebP at full 1920×1080 (every frame kept).
+  The frame payload dropped from ~197MB to ~137MB. To go lighter still, lower the WebP quality in the
+  conversion or reduce the frame rate; both keep full resolution optional.
+- **Favicon**: a brand "E" monogram (`favicon.ico`, `img/favicon.svg`, `img/apple-touch-icon.png`)
+  added to every page, template and the admin.
+- **Hero watermark**: the AI-video mark was removed from the frames (ffmpeg delogo) AND a rotating
+  brand emblem now sits over that corner as an extra cover and accent.
+- **Header** stays visible and readable: white on a soft top scrim over the hero, and a solid blurred
+  bar with dark text once scrolled.
+- **Gallery titles** are no longer clipped — panels are sized by height so the captions always show.
+- **Map**: uses OpenStreetMap tiles (no API key required).
+- **Back-to-top** button added to the floating stack; appears once you scroll.
+
+> Note: the real excello.lk content, logo, favicon and photos could not be fetched from this
+> environment (outbound access to excello.lk is blocked by policy). Send the logo/photos or grant
+> access and I'll drop in the originals; the current favicon is a brand monogram placeholder.

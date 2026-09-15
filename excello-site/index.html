@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Excello Developers — Design &amp; Build, Architecture, Interiors &amp; Real Estate in Sri Lanka</title>
   <meta name="description" content="Excello is a complete design-and-build partner in Sri Lanka: architecture, construction, interior design, land sales and business branding, delivered under one roof.">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+  <meta name="theme-color" content="#17150f">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,7 +20,7 @@
   <main>
     <!-- HERO -->
     <section class="hero hero--seq container" data-seq-scene>
-      <div class="hero__bg seq" data-seq="img/hero-seq" data-frames="720" data-seq-mode="hero" data-seq-end="+=300%">
+      <div class="hero__bg seq" data-seq="img/hero-seq" data-frames="720" data-ext="webp" data-seq-mode="hero" data-seq-end="+=300%">
         <canvas class="seq__canvas"></canvas>
       </div>
       <div class="hero__content">
@@ -33,6 +37,13 @@
           </div>
           <div class="hero__scroll" data-hero-fade><i></i> Scroll</div>
         </div>
+      </div>
+      <div class="hero__emblem" aria-hidden="true">
+        <svg class="hero__emblem__ring" viewBox="0 0 100 100">
+          <defs><path id="ecirc" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0"/></defs>
+          <text font-size="8.2" letter-spacing="2.2" fill="currentColor" font-family="Archivo, sans-serif" font-weight="600"><textPath href="#ecirc" startOffset="0">EXCELLO&#160;·&#160;DESIGN &amp; BUILD&#160;·&#160;MOUNT LAVINIA&#160;·&#160;</textPath></text>
+        </svg>
+        <svg class="hero__emblem__core" viewBox="0 0 24 24" fill="currentColor"><rect x="7.5" y="7.5" width="9" height="9" rx="1.2" transform="rotate(45 12 12)"/></svg>
       </div>
     </section>
 
@@ -195,7 +206,7 @@
     <!-- CINEMATIC BAND + overlap: the stats panel slides up over the band -->
     <div class="stack">
       <section class="seq-band is-sticky" data-seq-scene data-seq-sticky>
-        <div class="seq" data-seq="img/clip-seq" data-frames="363" data-seq-mode="band" data-seq-end="+=100%">
+        <div class="seq" data-seq="img/clip-seq" data-frames="363" data-ext="webp" data-seq-mode="band" data-seq-end="+=100%">
           <canvas class="seq__canvas"></canvas>
           <div class="seq__loader" data-seq-loader aria-hidden="true">Loading <b>0</b>%</div>
         </div>
