@@ -1094,3 +1094,63 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
 .detail__gallery .media { aspect-ratio: 16 / 11; }
 .detail__gallery:empty { display: none; }
 @media (max-width: 900px) { .detail__grid { grid-template-columns: 1fr; } .detail__gallery { grid-template-columns: 1fr; } }
+
+/* ==========================================================================
+   ADDENDUM 8 — readable sticky header, hero legibility, WhatsApp + chat, map
+   ========================================================================== */
+/* Header stays visible; turns into a readable solid bar once you scroll */
+.header { transition: background-color 0.45s var(--ease), color 0.45s var(--ease), padding 0.45s var(--ease), box-shadow 0.45s var(--ease); }
+.header.is-solid {
+  mix-blend-mode: normal;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--paper) 86%, transparent);
+  -webkit-backdrop-filter: saturate(1.2) blur(14px);
+  backdrop-filter: saturate(1.2) blur(14px);
+  border-bottom: 1px solid var(--rule);
+}
+.header.is-solid .brand__sub { opacity: 0.6; }
+.header.is-solid .nav__link::after { background: currentColor; }
+
+/* Hero text stays legible over bright frames */
+.hero__content { text-shadow: 0 1px 24px rgba(16, 16, 12, 0.32); }
+.hero--seq .hero__bg::after { background: linear-gradient(to top, rgba(16,16,12,0.82) 0%, rgba(16,16,12,0.28) 46%, rgba(16,16,12,0.34) 100%); }
+.hero__label { color: rgba(250,246,238,0.95) !important; }
+
+/* --- Floating action buttons: WhatsApp + Chat ---------------------------- */
+.fabs { position: fixed; right: clamp(16px, 2.4vw, 30px); bottom: clamp(16px, 2.4vw, 30px); z-index: 860; display: flex; flex-direction: column; gap: 14px; }
+.fab { position: relative; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; color: #fff; box-shadow: 0 12px 30px rgba(16,16,12,0.28); transition: transform 0.35s var(--ease), box-shadow 0.35s; }
+.fab:hover { transform: translateY(-3px) scale(1.05); }
+.fab svg { width: 26px; height: 26px; }
+.fab--wa { background: #25d366; }
+.fab--chat { background: var(--ink); color: var(--cream); }
+.fab__label { position: absolute; right: 68px; top: 50%; transform: translateY(-50%) translateX(6px); white-space: nowrap; background: var(--ink); color: var(--cream); font-size: 11px; letter-spacing: 0.04em; padding: 7px 12px; border-radius: 8px; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; }
+.fab:hover .fab__label { opacity: 1; transform: translateY(-50%) translateX(0); }
+.fab__dot { position: absolute; top: 2px; right: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--bronze-2); border: 2px solid var(--paper); }
+
+/* --- Chat widget --------------------------------------------------------- */
+.chat { position: fixed; right: clamp(16px, 2.4vw, 30px); bottom: calc(clamp(16px, 2.4vw, 30px) + 72px); z-index: 861; width: min(360px, calc(100vw - 32px)); background: var(--cream); color: var(--ink); border-radius: 16px; overflow: hidden; box-shadow: 0 30px 80px rgba(16,16,12,0.34); transform: translateY(16px) scale(0.96); opacity: 0; visibility: hidden; transform-origin: bottom right; transition: transform 0.4s var(--ease), opacity 0.35s, visibility 0.35s; }
+.chat.is-open { transform: translateY(0) scale(1); opacity: 1; visibility: visible; }
+.chat__head { display: flex; align-items: center; gap: 12px; padding: 16px 18px; background: var(--ink); color: var(--cream); }
+.chat__avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--bronze); display: grid; place-items: center; font-family: var(--font-serif); font-size: 18px; }
+.chat__who { font-family: var(--font-serif); font-size: 17px; line-height: 1.1; }
+.chat__status { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--bronze-2); margin-top: 2px; }
+.chat__close { margin-left: auto; width: 30px; height: 30px; display: grid; place-items: center; color: var(--cream); opacity: 0.8; font-size: 20px; }
+.chat__body { padding: 16px; height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: var(--paper); }
+.msg { max-width: 82%; padding: 10px 13px; border-radius: 13px; font-size: 13.5px; line-height: 1.5; }
+.msg--bot { background: var(--cream); border: 1px solid var(--rule); border-bottom-left-radius: 4px; align-self: flex-start; }
+.msg--me { background: var(--ink); color: var(--cream); border-bottom-right-radius: 4px; align-self: flex-end; }
+.chat__quick { display: flex; flex-wrap: wrap; gap: 7px; padding: 0 16px 12px; background: var(--paper); }
+.chat__chip { border: 1px solid var(--rule); background: var(--cream); border-radius: 999px; padding: 7px 12px; font-size: 11.5px; transition: background 0.3s, color 0.3s; }
+.chat__chip:hover { background: var(--ink); color: var(--cream); }
+.chat__foot { display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--rule); background: var(--cream); }
+.chat__input { flex: 1; border: 1px solid var(--rule); border-radius: 999px; padding: 10px 15px; font: inherit; font-size: 13px; background: var(--paper); }
+.chat__send { width: 42px; height: 42px; border-radius: 50%; background: var(--ink); color: var(--cream); display: grid; place-items: center; flex: 0 0 auto; }
+.chat__send svg { width: 16px; }
+
+/* --- Working map (Leaflet) on contact ------------------------------------ */
+.map-live { height: clamp(340px, 52vw, 620px); border: 1px solid var(--rule); border-radius: 2px; overflow: hidden; position: relative; background: var(--sand-2); }
+.map-live .leaflet-container { height: 100%; width: 100%; background: var(--sand-2); font-family: var(--font-sans); }
+.map-live .leaflet-control-attribution { font-size: 9px; background: rgba(250,246,238,0.8); }
+.map-pin { width: 18px; height: 18px; border-radius: 50%; background: var(--bronze); box-shadow: 0 0 0 6px rgba(156,122,77,0.28), 0 0 0 0 rgba(156,122,77,0.5); border: 3px solid var(--cream); animation: mapPulse 2.4s infinite; }
+@keyframes mapPulse { 0% { box-shadow: 0 0 0 6px rgba(156,122,77,0.28), 0 0 0 0 rgba(156,122,77,0.5); } 100% { box-shadow: 0 0 0 6px rgba(156,122,77,0.28), 0 0 0 26px rgba(156,122,77,0); } }
+.map-live__label { position: absolute; left: 16px; top: 16px; z-index: 500; background: var(--ink); color: var(--cream); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; padding: 8px 13px; border-radius: 6px; }

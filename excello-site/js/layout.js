@@ -85,7 +85,25 @@
     '<div class="footer__bottom"><span>&copy; ' + new Date().getFullYear() + ' Excello Developers (Pvt) Ltd. All rights reserved.</span><span>Design &amp; Build · Architecture · Interiors · Real Estate</span></div>' +
     "</footer></div>";
 
-  document.body.insertAdjacentHTML("afterbegin", top);
+  /* ---- Floating WhatsApp + chat assistant (every page) ------------------ */
+  var WA_NUMBER = "94770222000";
+  var WA_TEXT = encodeURIComponent("Hello Excello, I'd like to talk about a project.");
+  var waIcon = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 1.9a8.1 8.1 0 1 1-4.1 15.1l-.3-.2-3 .8.8-2.9-.2-.3A8.1 8.1 0 0 1 12 3.9zM8.9 7.3c-.2 0-.5.1-.7.4-.2.3-.9 1-.9 2.3s.9 2.6 1.1 2.8c.2.2 1.8 2.9 4.5 4 2.2.9 2.7.7 3.2.7.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.5-.3-1.7-.8c-.2-.1-.4-.1-.6.1l-.7.9c-.1.2-.3.2-.5.1-.7-.3-1.5-.6-2.3-1.7-.2-.3.2-.5.4-.9.1-.2.1-.3 0-.5l-.7-1.8c-.2-.5-.4-.4-.6-.4z"/></svg>';
+  var chatIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z"/><circle cx="8.5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="12" r="1" fill="currentColor" stroke="none"/></svg>';
+  var sendIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12 20 4l-6 16-2.5-6.5L4 12z"/></svg>';
+  var widgets =
+    '<div class="fabs">' +
+      '<a class="fab fab--wa" href="https://wa.me/' + WA_NUMBER + '?text=' + WA_TEXT + '" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><span class="fab__label">Chat on WhatsApp</span>' + waIcon + "</a>" +
+      '<button class="fab fab--chat" id="chatToggle" aria-label="Open chat"><span class="fab__dot"></span><span class="fab__label">Ask Excello</span>' + chatIcon + "</button>" +
+    "</div>" +
+    '<aside class="chat" id="chat" aria-label="Excello assistant">' +
+      '<div class="chat__head"><div class="chat__avatar">E</div><div><div class="chat__who">Excello Assistant</div><div class="chat__status">● Online</div></div><button class="chat__close" id="chatClose" aria-label="Close chat">&times;</button></div>' +
+      '<div class="chat__body" id="chatBody"></div>' +
+      '<div class="chat__quick" id="chatQuick"></div>' +
+      '<form class="chat__foot" id="chatForm"><input class="chat__input" id="chatInput" placeholder="Type a message…" autocomplete="off"><button class="chat__send" type="submit" aria-label="Send">' + sendIcon + "</button></form>" +
+    "</aside>";
+
+  document.body.insertAdjacentHTML("afterbegin", top + widgets);
   /* The footer must land after <main>, so wait for the document to be parsed. */
   document.addEventListener("DOMContentLoaded", function () {
     document.body.insertAdjacentHTML("beforeend", footer);

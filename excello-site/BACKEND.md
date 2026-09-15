@@ -55,3 +55,21 @@ admin/                 the admin panel
 - Uploaded images and the JSON files are the state to back up.
 - This is a lightweight single-instance backend (JSON store, in-memory sessions). It is ideal for a
   brochure site edited by a small team; for heavy concurrent editing move the store to a database.
+
+---
+
+## Update: header, WhatsApp + chat, map, watermark
+
+- **Header** now stays visible on scroll and turns into a readable solid bar (blurred paper
+  background, dark text) once you scroll past the top, so the nav is legible over any section.
+- **Hero legibility**: added a soft text shadow and a stronger gradient so the label and copy read
+  over bright frames.
+- **WhatsApp button**: floating green button links to `wa.me/94770222000` (change the number in
+  `js/layout.js`, `WA_NUMBER`).
+- **Chat assistant**: a floating chat widget with quick replies and canned answers about services,
+  Aathavan, booking and location. It's front-end only — wire the `respond()` function in
+  `js/main.js` to a real backend, an LLM, or hand off to WhatsApp.
+- **Working map**: the contact page now has a live Leaflet map (CARTO light tiles) with a pulsing
+  marker on Mount Lavinia. Map tiles need internet access to load.
+- **Hero watermark**: the AI-video sparkle was removed from all 720 hero frames with ffmpeg's
+  `delogo` filter before upscaling.

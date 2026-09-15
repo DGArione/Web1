@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="js/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -68,10 +69,15 @@
     </section>
 
     <section class="container" style="padding-bottom: clamp(80px, 12vw, 180px);">
-      <div class="map media media--parallax media--clip" data-parallax="6">
-        <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=2200&q=70" alt="Map placeholder">
-        <span class="map__pin" aria-hidden="true"></span>
-        <span class="media__caption">Mount Lavinia · Replace with an embedded map</span>
+      <div class="section__head" style="margin-bottom: 28px;">
+        <div>
+          <p class="label" data-reveal><span class="num">(03)</span>Find us</p>
+          <h2 class="h-2" data-split>On the <em>map</em></h2>
+        </div>
+      </div>
+      <div class="map-live" data-reveal>
+        <span class="map-live__label">Mount Lavinia · Sri Lanka</span>
+        <div id="map-live" style="height:100%"></div>
       </div>
     </section>
   </main>
@@ -80,6 +86,7 @@
   <script src="js/vendor/ScrollTrigger.min.js"></script>
   <script src="js/vendor/SplitText.min.js"></script>
   <script src="js/vendor/lenis.min.js"></script>
+  <script src="js/vendor/leaflet/leaflet.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

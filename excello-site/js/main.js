@@ -85,18 +85,13 @@
      Header: compact + hide on scroll down, show on scroll up
      --------------------------------------------------------------------- */
   var header = document.getElementById("header");
-  var headerHidden = false;
-  function setHeader(hidden) {
-    if (hidden === headerHidden) return;
-    headerHidden = hidden;
-    gsap.to(header, { yPercent: hidden ? -110 : 0, duration: 0.7, ease: "power3.inOut", overwrite: "auto" });
-  }
+  function setHeader() { /* header now stays visible; kept for callers */ }
   ScrollTrigger.create({
-    start: 80,
+    start: 40,
     onUpdate: function (self) {
-      header.classList.toggle("is-compact", self.scroll() > 80);
-      if (menuOpen) return;
-      setHeader(self.direction === 1 && self.scroll() > 200);
+      var s = self.scroll();
+      header.classList.toggle("is-compact", s > 60);
+      header.classList.toggle("is-solid", s > 60);
     }
   });
 
@@ -560,6 +555,101 @@
       gsap.fromTo(note, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.6 });
     });
   }
+
+  /* ---------------------------------------------------------------------
+     Chat assistant (front-end concierge; wire to a backend/WhatsApp later)
+     --------------------------------------------------------------------- */
+  (function () {
+    var toggle = document.getElementById("chatToggle");
+    var panel = document.getElementById("chat");
+    if (!toggle || !panel) return;
+    var bodyEl = panel.querySelector("#chatBody");
+    var quickEl = panel.querySelector("#chatQuick");
+    var formEl = panel.querySelector("#chatForm");
+    var inputEl = panel.querySelector("#chatInput");
+    var waHref = "https://wa.me/94770222000?text=" + encodeURIComponent("Hello Excello, I'd like to talk about a project.");
+    var greeted = false;
+
+    var QUICK = ["Our services", "Aathavan pricing", "Book a call", "Talk on WhatsApp"];
+    var REPLIES = [
+      { k: /service|do you|offer|architect|construct|interior|brand|design/i, a: "We're a design-and-build partner: architecture, construction, interior design, real estate and business branding, all under one roof. Which one are you exploring?" },
+      { k: /aathavan|price|pricing|cost|how much|rate|budget/i, a: "Aathavan by Excello starts from LKR 38 million: 44 solar-powered residences in Dehiwala, two-bed from 1,020 sq ft and three-bed from 1,380 sq ft. Shall I have our team send the brochure?" },
+      { k: /sea esta|villa/i, a: "Sea Esta is our collection of 16 sea-view villas in Mount Lavinia. I can connect you with the sales team for availability." },
+      { k: /call|meet|book|appointment|visit|consult/i, a: "Happy to arrange it. Call us on +94 77 022 2000, or leave your number on the contact page and we'll call you within one business day." },
+      { k: /whatsapp|whats app|wa\b/i, a: "__WA__" },
+      { k: /where|location|address|office|map|colombo|lavinia/i, a: "We're at No 16, St Rita's Road, Mount Lavinia, Sri Lanka. There's a live map on our contact page." },
+      { k: /email|contact|reach/i, a: "You can reach us at info@excello.lk or +94 77 022 2000. Want me to open WhatsApp?" },
+      { k: /hi|hello|hey|good (morning|evening|afternoon)/i, a: "Hello! How can we help with your project today?" },
+      { k: /thank|thanks|great|awesome/i, a: "You're most welcome. Anything else I can help with?" }
+    ];
+
+    function scrollDown() { bodyEl.scrollTop = bodyEl.scrollHeight; }
+    function add(text, who) {
+      var m = document.createElement("div");
+      m.className = "msg msg--" + who;
+      m.textContent = text;
+      bodyEl.appendChild(m);
+      scrollDown();
+      return m;
+    }
+    function botSay(text) {
+      var t = add("…", "bot");
+      setTimeout(function () { t.textContent = text; scrollDown(); }, 420);
+    }
+    function respond(text) {
+      var hit = REPLIES.find(function (r) { return r.k.test(text); });
+      if (!hit) return botSay("Thanks! The quickest way to a detailed answer is a quick chat. Call +94 77 022 2000, tap WhatsApp below, or use the contact form and we'll reply within one business day.");
+      if (hit.a === "__WA__") { botSay("Opening WhatsApp…"); setTimeout(function () { window.open(waHref, "_blank"); }, 500); return; }
+      botSay(hit.a);
+    }
+    function renderQuick() {
+      quickEl.innerHTML = "";
+      QUICK.forEach(function (q) {
+        var b = document.createElement("button");
+        b.className = "chat__chip"; b.type = "button"; b.textContent = q;
+        b.onclick = function () {
+          if (q === "Talk on WhatsApp") { window.open(waHref, "_blank"); return; }
+          add(q, "me"); respond(q);
+        };
+        quickEl.appendChild(b);
+      });
+    }
+    function openChat() {
+      panel.classList.add("is-open");
+      toggle.querySelector(".fab__dot") && toggle.querySelector(".fab__dot").remove();
+      if (!greeted) { greeted = true; botSay("Hi, I'm the Excello assistant. Ask about our services, Aathavan, or booking a call."); renderQuick(); }
+      setTimeout(function () { inputEl && inputEl.focus(); }, 300);
+    }
+    function closeChat() { panel.classList.remove("is-open"); }
+
+    toggle.addEventListener("click", function () { panel.classList.contains("is-open") ? closeChat() : openChat(); });
+    var closeBtn = panel.querySelector("#chatClose");
+    if (closeBtn) closeBtn.addEventListener("click", closeChat);
+    formEl.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var v = inputEl.value.trim();
+      if (!v) return;
+      add(v, "me"); inputEl.value = ""; respond(v);
+    });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeChat(); });
+  })();
+
+  /* ---------------------------------------------------------------------
+     Working map (Leaflet) — only where a #map-live element exists
+     --------------------------------------------------------------------- */
+  (function () {
+    var el = document.getElementById("map-live");
+    if (!el || typeof window.L === "undefined") return;
+    var LATLNG = [6.8389, 79.8653]; // Mount Lavinia
+    var map = window.L.map(el, { scrollWheelZoom: false, zoomControl: true, attributionControl: true }).setView(LATLNG, 12);
+    window.L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+      maxZoom: 19, subdomains: "abcd",
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+    }).addTo(map);
+    var icon = window.L.divIcon({ className: "", html: '<span class="map-pin"></span>', iconSize: [18, 18], iconAnchor: [9, 9] });
+    window.L.marker(LATLNG, { icon: icon }).addTo(map).bindPopup("<strong>Excello Developers</strong><br>No 16, St Rita's Road, Mount Lavinia");
+    map.on("click", function () { map.scrollWheelZoom.enable(); });
+  })();
 
   /* ---------------------------------------------------------------------
      Boot
