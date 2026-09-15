@@ -54,7 +54,10 @@
     "</div>" +
     '<div class="cursor" id="cursor"><span class="cursor__label">View</span></div>' +
     '<header class="header" id="header">' +
-    '<a class="brand" href="/" aria-label="Excello home"><span class="brand__word">EXCELLO</span><span class="brand__sub">Design &amp; Build</span></a>' +
+    '<a class="brand" href="/" aria-label="Excello home">' +
+    '<svg class="brand__mark" viewBox="0 0 100 100" fill="none" stroke="var(--bronze)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M50 11 L88 80"/><path d="M50 11 L12 80"/><path d="M12 80 L40 80"/><path d="M60 80 L88 80"/><path d="M52 35 L72 80"/></svg>' +
+    '<span class="brand__text"><span class="brand__word">EXCELLO</span><span class="brand__sub">the way you imagine</span></span>' +
+    "</a>" +
     '<nav class="nav" aria-label="Primary">' + navHtml + "</nav>" +
     '<a class="btn" href="/contact.html" data-magnetic>Start a project ' + arrow + "</a>" +
     '<button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>' +

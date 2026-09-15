@@ -381,6 +381,25 @@
         var sc = Math.max(cw / iw, ch / ih), w = iw * sc, h = ih * sc, x = (cw - w) / 2, y = (ch - h) / 2;
         ctx.fillStyle = "#151613"; ctx.fillRect(0, 0, cw, ch);
         ctx.drawImage(img, x, y, w, h);
+        if (mode === "hero") drawStamp(sx(iw, sc, x), sy(ih, sc, y), 0.042 * iw * sc);
+      }
+      /* Watermark cover: a small brand stamp drawn over the source-video mark */
+      function sx(iw, sc, x) { return x + 0.891 * iw * sc; }
+      function sy(ih, sc, y) { return y + 0.820 * ih * sc; }
+      function drawStamp(cx, cy, R) {
+        ctx.save();
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fillStyle = "rgba(19, 18, 13, 0.92)"; ctx.fill();
+        ctx.lineWidth = Math.max(1, R * 0.05); ctx.strokeStyle = "rgba(200, 168, 119, 0.85)";
+        ctx.beginPath(); ctx.arc(cx, cy, R * 0.88, 0, Math.PI * 2); ctx.stroke();
+        var s = R * 1.15;
+        ctx.lineWidth = Math.max(1.2, R * 0.055); ctx.lineJoin = "round"; ctx.lineCap = "round";
+        ctx.strokeStyle = "rgba(210, 180, 130, 0.95)";
+        function P(px, py) { return [cx + (px - 50) / 100 * s, cy + (py - 46) / 100 * s]; }
+        var seg = [[50, 20, 82, 76], [50, 20, 18, 76], [18, 76, 40, 76], [60, 76, 82, 76], [52, 40, 70, 76]];
+        ctx.beginPath();
+        for (var k = 0; k < seg.length; k++) { var a = P(seg[k][0], seg[k][1]), b = P(seg[k][2], seg[k][3]); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); }
+        ctx.stroke();
+        ctx.restore();
       }
       function redraw() { paint(Math.round(progress * (count - 1))); }
       var need = (mode === "hero") ? Math.min(count, 72) : 0, priorityLoaded = 0;
