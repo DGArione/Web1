@@ -1211,7 +1211,8 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
 /* ==========================================================================
    ADDENDUM 12 — hero cloud transition (finished home -> clouds -> construction)
    ========================================================================== */
-.hero__clouds { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; will-change: opacity; }
+.hero__clouds { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0; will-change: opacity, transform;
+  background: radial-gradient(130% 110% at 50% 42%, rgba(250,248,244,0.99) 0%, rgba(248,245,238,0.92) 55%, rgba(245,241,232,0.86) 100%); }
 .hero__cloud {
   position: absolute; display: block; will-change: transform;
   background: radial-gradient(58% 58% at 50% 50%, rgba(250, 248, 244, 0.96) 0%, rgba(250, 248, 244, 0) 72%);

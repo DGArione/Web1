@@ -364,7 +364,7 @@
       var pad = parseInt(host.dataset.pad || "3", 10);
       var ext = host.dataset.ext || "jpg";
       var mode = host.dataset.seqMode || "band";
-      var rev = host.hasAttribute("data-seq-reverse");
+      var isHero = mode === "hero";
       var canvas = host.querySelector("canvas");
       if (!canvas || !count) return;
       var ctx = canvas.getContext("2d", { alpha: false });
@@ -410,9 +410,18 @@
         ctx.stroke();
         ctx.restore();
       }
-      function frameFor(p) { return Math.round((rev ? 1 - p : p) * (count - 1)); }
+      /* Hero: hold the FINISHED frame as a teaser, cut to construction behind a
+         cloud cover, then play forward (construction -> finished). Band: linear. */
+      function frameFor(p) {
+        var last = count - 1;
+        if (!isHero) return Math.round(p * last);
+        if (p < 0.14) return last;                 // finished-home teaser
+        if (p < 0.22) return 0;                    // construction, hidden by clouds
+        var t = (p - 0.22) / 0.78; if (t > 1) t = 1;
+        return Math.round(t * last);               // forward build to finished
+      }
       function redraw() { paint(frameFor(progress)); }
-      var firstIdx = rev ? count - 1 : 0; /* frame shown at rest */
+      var firstIdx = isHero ? count - 1 : 0; /* frame shown at rest */
       var need = (mode === "hero") ? Math.min(count, 72) : 0, priorityLoaded = 0;
       if (mode === "hero") window.__heroReady = 0;
       function onFrame(idx, k) {
@@ -423,10 +432,9 @@
         if (loaded >= count && loaderWrap) loaderWrap.classList.add("is-done");
         if (idx === cur || cur === -1) redraw();
       }
-      /* Load in play order (reverse loads the finished frames first) so the
-         resting frame appears quickly. */
+      /* Hero loads the finished frames first so the resting teaser appears fast. */
       for (var k = 0; k < count; k++) (function (k) {
-        var idx = rev ? count - 1 - k : k;
+        var idx = isHero ? count - 1 - k : k;
         var img = new Image(); frames[idx] = img;
         img.onload = function () { onFrame(idx, k); };
         img.onerror = function () { onFrame(idx, k); };
@@ -447,10 +455,18 @@
             var p = self.progress;
             var c = scene.querySelector(".hero__content");
             if (c) { var o = p < 0.6 ? 1 : 1 - (p - 0.6) / 0.4; gsap.set(c, { autoAlpha: Math.max(0, o), y: -50 * Math.max(0, p - 0.45) }); }
-            /* Clouds roll in over the middle of the scroll and part to reveal
-               the construction site: finished home -> clouds -> ground. */
+            /* Clouds fully cover the finished->construction cut, then part so
+               the build plays through: finished teaser -> clouds -> ground. */
             var cl = scene.querySelector("#heroClouds");
-            if (cl) { var bell = Math.sin(Math.max(0, Math.min(1, p)) * Math.PI); gsap.set(cl, { opacity: Math.pow(bell, 0.72), scale: 1 + 0.12 * bell }); }
+            if (cl) {
+              var o;
+              if (p < 0.02) o = 0;
+              else if (p < 0.14) o = (p - 0.02) / 0.12;   // roll in over the teaser
+              else if (p < 0.24) o = 1;                    // full cover during the cut
+              else if (p < 0.42) o = 1 - (p - 0.24) / 0.18; // part to reveal construction
+              else o = 0;
+              gsap.set(cl, { opacity: Math.max(0, Math.min(1, o)), scale: 1 + 0.14 * Math.max(0, Math.min(1, o)) });
+            }
           }
         }
       });
