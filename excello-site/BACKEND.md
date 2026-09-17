@@ -42,11 +42,23 @@ Open **http://localhost:3000/admin**
 ```
 data/projects.json     your projects        (safe to back up / edit by hand)
 data/insights.json     your insights
+data/enquiries.json    contact-form submissions (created at runtime, gitignored)
 data/settings.json     admin user + hashed password (gitignored, never commit)
 uploads/               uploaded images       (gitignored)
 server/                the Express app
 admin/                 the admin panel
 ```
+
+## Contact form
+
+The contact form posts to `POST /api/enquiry`, which validates and appends the
+submission to `data/enquiries.json` (newest first, capped at 500). Submissions
+are private: read them at `GET /api/admin/enquiries` while signed in to the
+admin panel. If the page is opened without the server (e.g. as a plain file),
+the form shows a fallback message with the phone and email instead of failing
+silently. To also receive enquiries by email, point the form at a mail service
+(Formspree, or an SMTP sender added to `/api/enquiry`) — ask and this can be
+wired up.
 
 ## Hosting notes
 

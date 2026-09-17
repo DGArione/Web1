@@ -157,12 +157,12 @@
       var isHero = el.closest(".hero") !== null;
       if (isHero) {
         var hs = new SplitText(el, { type: "lines", mask: "lines", linesClass: "split-line" });
-        gsap.set(hs.lines, { yPercent: 110 });
+        gsap.set(hs.lines, { yPercent: 140 });
         el._heroLines = hs.lines;
         return;
       }
       var split = new SplitText(el, { type: "lines,chars", mask: "lines", linesClass: "split-line" });
-      gsap.set(split.chars, { yPercent: 120 });
+      gsap.set(split.chars, { yPercent: 140 });
       gsap.to(split.chars, {
         yPercent: 0,
         duration: 0.9,
@@ -596,7 +596,8 @@
   }
 
   /* ---------------------------------------------------------------------
-     Contact form (demo only: no backend)
+     Contact form — POSTs to /api/enquiry (server stores it); falls back to a
+     helpful message if there is no backend (e.g. opened as a plain file).
      --------------------------------------------------------------------- */
   var form = document.querySelector("form.form");
   if (form) {
@@ -604,9 +605,32 @@
       e.preventDefault();
       var note = form.querySelector(".form__note");
       var btn = form.querySelector("button[type=submit]");
+      function done(msg) {
+        note.textContent = msg;
+        gsap.fromTo(note, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.6 });
+      }
+      var data = {
+        name: (form.querySelector("#name") || {}).value || "",
+        email: (form.querySelector("#email") || {}).value || "",
+        phone: (form.querySelector("#phone") || {}).value || "",
+        service: (form.querySelector("#service") || {}).value || "",
+        message: (form.querySelector("#message") || {}).value || ""
+      };
       btn.disabled = true;
-      note.textContent = "Thank you. Our team will be in touch within one business day.";
-      gsap.fromTo(note, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.6 });
+      note.textContent = "Sending…";
+      fetch("/api/enquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      }).then(function (r) {
+        if (!r.ok) return r.json().then(function (j) { throw new Error(j.error || "Something went wrong."); });
+        form.reset();
+        done("Thank you. We've received your enquiry and will be in touch within one business day.");
+      }).catch(function (err) {
+        /* No backend (e.g. opened as a plain file) or a validation error. */
+        btn.disabled = false;
+        done((err && err.message) ? err.message : "We couldn't send that just now — please email inquiry@excello.lk or call +94 77 022 2000.");
+      });
     });
   }
 

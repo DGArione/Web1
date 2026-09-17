@@ -588,6 +588,11 @@ em, .it { font-style: italic; font-weight: 300; }
 /* Team */
 .team { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px, 2vw, 32px); }
 .person__name { font-family: var(--font-serif); font-size: 1.6rem; margin-top: 18px; }
+/* Leadership signature card (About) */
+.lead-card { border: 1px solid var(--rule); border-radius: 14px; padding: clamp(22px, 2.4vw, 30px); background: rgba(0,0,0,0.015); }
+.lead-card__name { font-family: var(--font-serif); font-size: clamp(1.5rem, 2.4vw, 2rem); line-height: 1.1; }
+.lead-card__role { margin-top: 12px; color: var(--bronze); }
+.lead-card__unit { margin-top: 6px; font-size: 14px; color: var(--muted); }
 @media (max-width: 800px) { .team { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 520px) { .team { grid-template-columns: 1fr; } }
 
@@ -679,8 +684,11 @@ em, .it { font-style: italic; font-weight: 300; }
    -------------------------------------------------------------------------- */
 .js [data-reveal] { opacity: 0; transform: translateY(30px); }
 .js .media--clip { clip-path: inset(0 0 100% 0); }
-.split-line-mask { padding-bottom: 0.24em; margin-bottom: -0.24em; }
-.split-line { overflow: hidden; }
+/* The line masks must leave room for descenders (g, y, f, j) so they are never
+   clipped mid-reveal. The extra bottom padding is cancelled by a negative margin
+   so layout is unchanged; the line itself no longer clips (the mask wrapper does). */
+.split-line-mask { padding-bottom: 0.34em; margin-bottom: -0.34em; }
+.split-line { overflow: visible; }
 
 @media (prefers-reduced-motion: reduce) {
   .js [data-reveal] { opacity: 1; transform: none; }
@@ -1037,9 +1045,11 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
 .tslide__scrim { position: absolute; inset: 0; background:
   linear-gradient(90deg, rgba(20,20,15,0.9) 0%, rgba(20,20,15,0.55) 42%, rgba(20,20,15,0.15) 100%),
   linear-gradient(0deg, rgba(20,20,15,0.75) 0%, rgba(20,20,15,0) 48%); }
-.tslide__inner { position: absolute; left: 0; right: 0; bottom: clamp(120px, 17vh, 210px); z-index: 2; }
+.tslide__inner { position: absolute; left: 0; right: 0; bottom: clamp(120px, 17vh, 210px); z-index: 2; max-height: 62vh; overflow: hidden; }
 .tslide__meta { color: var(--bronze-2); margin-bottom: 18px; }
-.tslide__title { max-width: 15ch; }
+/* Insight titles run long, so cap the size and let them wrap instead of the
+   display clamp (which overflowed the stage for multi-line headlines). */
+.tslide__title { font-size: clamp(2rem, 4.6vw, 4.4rem); line-height: 1.04; max-width: 20ch; }
 .tslide__excerpt { max-width: 46ch; margin-top: 20px; font-size: 15px; line-height: 1.7; color: rgba(248,244,236,0.82); }
 .tslide__inner .btn { margin-top: 30px; }
 

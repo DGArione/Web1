@@ -94,6 +94,30 @@ app.get("/insight/:slug", function (req, res, next) {
 app.get("/api/projects", function (req, res) { res.json(store.list("projects", { publishedOnly: true })); });
 app.get("/api/insights", function (req, res) { res.json(store.list("insights", { publishedOnly: true })); });
 
+/* ---- Contact form: capture enquiries to data/enquiries.json -------------- */
+const ENQUIRIES = path.join(ROOT, "data", "enquiries.json");
+function readEnquiries() {
+  try { return JSON.parse(fs.readFileSync(ENQUIRIES, "utf8")); } catch (e) { return []; }
+}
+function clip(v, max) { return String(v == null ? "" : v).slice(0, max).trim(); }
+app.post("/api/enquiry", function (req, res) {
+  const b = req.body || {};
+  const name = clip(b.name, 120), email = clip(b.email, 160), message = clip(b.message, 4000);
+  if (!name || !email || !message) return res.status(400).json({ error: "Please add your name, email and a message." });
+  const list = readEnquiries();
+  list.unshift({
+    id: Date.now().toString(36) + crypto.randomBytes(3).toString("hex"),
+    at: new Date().toISOString(),
+    name: name, email: email, phone: clip(b.phone, 60),
+    service: clip(b.service, 120), message: message
+  });
+  const tmp = ENQUIRIES + ".tmp";
+  fs.writeFileSync(tmp, JSON.stringify(list.slice(0, 500), null, 2));
+  fs.renameSync(tmp, ENQUIRIES); /* atomic write */
+  res.json({ ok: true });
+});
+app.get("/api/admin/enquiries", auth.requireAuth, function (req, res) { res.json(readEnquiries()); });
+
 /* ---- Auth --------------------------------------------------------------- */
 app.post("/admin/login", function (req, res) {
   const { user, pass } = req.body || {};
