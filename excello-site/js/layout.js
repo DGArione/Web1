@@ -43,7 +43,7 @@
     "EXCELLO".split("").map(function (c) { return "<span>" + c + "</span>"; }).join("") +
     "</div>" +
     '<div class="preloader__roll"><span id="preRoll">' +
-    ["Architecture","Construction","Interiors","Real Estate","Branding"].map(function (w) { return "<b>" + w + "</b>"; }).join("") +
+    ["Architecture","Interiors","Design &amp; Build","Construction","Development"].map(function (w) { return "<b>" + w + "</b>"; }).join("") +
     "</span></div>" +
     "</div>" +
     '<div class="preloader__bottom">' +
@@ -64,20 +64,20 @@
     "</header>" +
     '<div class="menu" id="menu" aria-hidden="true">' +
     '<div class="menu__links">' + menuHtml + "</div>" +
-    '<div class="menu__foot"><span>No 16, St Rita’s Road, Mount Lavinia, Sri Lanka</span><span>+94 77 022 2000</span><span>&copy; Excello Developers</span></div>' +
+    '<div class="menu__foot"><span>No. 16, St Rita’s Road, Mount Lavinia, Sri Lanka</span><span>+94 77 022 2000</span><span>&copy; Excello Developers</span></div>' +
     "</div>";
 
   var footer =
     '<div class="footer-wrap"><footer class="footer" id="footer">' +
     '<div class="footer__top">' +
-    '<div class="footer__col"><p class="footer__tag">Elevating standards of living, one landmark at a time.</p></div>' +
+    '<div class="footer__col"><p class="footer__tag">Thoughtfully designed. Precisely built.</p></div>' +
     '<div class="footer__col"><h4>Navigate</h4><ul>' +
     links.map(function (l) { return '<li><a href="' + l.href + '">' + l.label + "</a></li>"; }).join("") +
     "</ul></div>" +
-    '<div class="footer__col"><h4>Visit</h4><ul><li>No 16, St Rita’s Road</li><li>Mount Lavinia</li><li>Sri Lanka</li></ul></div>' +
+    '<div class="footer__col"><h4>Visit</h4><ul><li>No. 16, St Rita’s Road</li><li>Mount Lavinia</li><li>Sri Lanka</li></ul></div>' +
     '<div class="footer__col"><h4>Connect</h4><ul>' +
     '<li><a href="tel:+94770222000">+94 77 022 2000</a></li>' +
-    '<li><a href="mailto:info@excello.lk">info@excello.lk</a></li>' +
+    '<li><a href="mailto:inquiry@excello.lk">inquiry@excello.lk</a></li>' +
     '<li><a href="https://www.facebook.com/ExcelloSriLanka/" target="_blank" rel="noopener">Facebook</a></li>' +
     '<li><a href="https://lk.linkedin.com/company/excello-developers-pvt-ltd" target="_blank" rel="noopener">LinkedIn</a></li>' +
     "</ul></div>" +
@@ -85,7 +85,7 @@
     '<div class="footer__wordmark" data-wordmark>' +
     "EXCELLO".split("").map(function (c) { return "<span>" + c + "</span>"; }).join("") +
     "</div>" +
-    '<div class="footer__bottom"><span>&copy; ' + new Date().getFullYear() + ' Excello Developers (Pvt) Ltd. All rights reserved.</span><span>Design &amp; Build · Architecture · Interiors · Real Estate</span></div>' +
+    '<div class="footer__bottom"><span>&copy; ' + new Date().getFullYear() + ' Excello Developers (Pvt) Ltd. All rights reserved.</span><span>Mount Lavinia · Colombo · Sri Lanka</span></div>' +
     "</footer></div>";
 
   /* ---- Floating WhatsApp + chat assistant (every page) ------------------ */

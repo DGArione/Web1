@@ -65,7 +65,8 @@ All motion is disabled automatically for `prefers-reduced-motion`.
 * **Contact form** is front-end only. Point it at your form handler (Formspree, Netlify Forms,
   a PHP mailer, etc.) by giving the `<form>` an `action` and removing the demo handler at the
   bottom of `js/main.js`.
-* The email `info@excello.lk` is a placeholder. Confirm the real address before launch.
+* The email `inquiry@excello.lk` and phone `+94 77 022 2000` are taken from the live Excello site.
+  Confirm they are current before launch.
 
 ---
 
