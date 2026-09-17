@@ -216,20 +216,20 @@ em, .it { font-style: italic; font-weight: 300; }
 .cursor {
   position: fixed;
   top: 0; left: 0;
-  width: 13px; height: 13px;
+  width: 96px; height: 96px;
   border-radius: 50%;
-  background: var(--fg);
+  background: #fff;
   pointer-events: none;
   z-index: 900;
-  transform: translate(-50%, -50%);
-  /* A light ring + soft dark glow keep the dot visible on any background
-     (a plain blend-mode dot disappeared over mid-grey / near-white areas). */
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.6), 0 0 7px 1px rgba(0, 0, 0, 0.3);
-  transition: width 0.4s var(--ease), height 0.4s var(--ease), background-color 0.4s;
+  transform: translate(-50%, -50%) scale(0.2);
+  box-shadow: 0 6px 30px rgba(0,0,0,0.28);
+  /* Hidden by default — the normal OS cursor is used. Only the "View" bubble
+     over projects/images shows this. */
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.35s var(--ease), transform 0.4s var(--ease);
   display: none;
 }
-.cursor.is-link { width: 56px; height: 56px; background: #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.15), 0 6px 24px rgba(0,0,0,0.22); }
-.cursor.is-view { width: 96px; height: 96px; background: #fff; box-shadow: 0 6px 30px rgba(0,0,0,0.28); }
+.cursor.is-view { opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1); }
 .cursor__label {
   position: absolute;
   inset: 0;
