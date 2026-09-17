@@ -957,8 +957,10 @@ body::after {
 .spotlight__specs { border-top-color: var(--fg); }
 
 /* ---- Quote: monumental ---------------------------------------------------*/
-.quote { max-width: 22ch; }
+.quote { max-width: 24ch; }
 .quote .lede { font-size: clamp(1.7rem, 3.4vw, 3.2rem); line-height: 1.16; }
+/* Longer quotes need a wider column so they don't collapse to one word a line. */
+@media (min-width: 700px) { .quote { max-width: 40ch; } .quote .lede { font-size: clamp(2rem, 3vw, 2.9rem); } }
 .quote__mark { color: var(--bronze); font-style: italic; }
 
 /* ---- CTA: giant, outline accent ----------------------------------------- */
