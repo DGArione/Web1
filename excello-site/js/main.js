@@ -59,20 +59,21 @@
      --------------------------------------------------------------------- */
   var cursor = document.getElementById("cursor");
   if (finePointer && cursor && !reduce) {
-    /* Keep the normal OS cursor visible everywhere (it was disappearing over
-       some backgrounds). The custom cursor is now only the "View" bubble that
-       appears when hovering a project or image. */
+    body.classList.add("no-cursor");
     var cx = gsap.quickTo(cursor, "x", { duration: 0.35, ease: "power3" });
     var cy = gsap.quickTo(cursor, "y", { duration: 0.35, ease: "power3" });
     window.addEventListener("mousemove", function (e) { cx(e.clientX); cy(e.clientY); });
 
     document.addEventListener("mouseover", function (e) {
-      var t = e.target.closest('[data-cursor="view"]');
-      if (t) cursor.classList.add("is-view");
+      var t = e.target.closest("[data-cursor], a, button, .service");
+      if (!t) return;
+      if (t.dataset.cursor === "view") cursor.classList.add("is-view");
+      else cursor.classList.add("is-link");
     });
     document.addEventListener("mouseout", function (e) {
-      var t = e.target.closest('[data-cursor="view"]');
-      if (t) cursor.classList.remove("is-view");
+      var t = e.target.closest("[data-cursor], a, button, .service");
+      if (!t) return;
+      cursor.classList.remove("is-view", "is-link");
     });
 
     document.querySelectorAll("[data-magnetic]").forEach(function (el) {
