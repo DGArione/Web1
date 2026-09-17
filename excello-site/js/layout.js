@@ -85,7 +85,7 @@
     '<div class="footer__wordmark" data-wordmark>' +
     "EXCELLO".split("").map(function (c) { return "<span>" + c + "</span>"; }).join("") +
     "</div>" +
-    '<div class="footer__bottom"><span>&copy; ' + new Date().getFullYear() + ' Excello Developers (Pvt) Ltd. All rights reserved.</span><span>Mount Lavinia · Colombo · Sri Lanka</span></div>' +
+    '<div class="footer__bottom"><span>&copy; ' + new Date().getFullYear() + ' Excello Developers (Pvt) Ltd. All rights reserved.</span><span>Mount Lavinia · Colombo · Sri Lanka</span><span class="footer__credit">Developed by <a href="https://rapidsolutions.live" target="_blank" rel="noopener">RapidSolutions</a></span></div>' +
     "</footer></div>";
 
   /* ---- Floating WhatsApp + chat assistant (every page) ------------------ */

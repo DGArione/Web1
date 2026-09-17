@@ -25,7 +25,27 @@
       { k: "body", label: "Body (blank line = new paragraph)", type: "textarea", big: true },
       { k: "cover", label: "Cover image", type: "image" },
       { k: "published", label: "Published (visible on the site)", type: "bool" }
+    ],
+    services: [
+      { k: "title", label: "Service name", type: "text", req: true },
+      { k: "headline", label: "Headline (big line)", type: "text", half: true },
+      { k: "headlineEm", label: "Headline italic part", type: "text", half: true },
+      { k: "tagline", label: "Intro line (under the headline)", type: "textarea" },
+      { k: "card", label: "Home-page card description", type: "textarea" },
+      { k: "forWho", label: "For", type: "text" },
+      { k: "scope", label: "Scope", type: "text" },
+      { k: "deliverables", label: "Deliverables", type: "text" },
+      { k: "lead", label: "Lead", type: "text" },
+      { k: "connected", label: "Connected to (optional)", type: "text" },
+      { k: "projects", label: "Related projects (optional)", type: "text" },
+      { k: "cover", label: "Image", type: "image" },
+      { k: "published", label: "Published (visible on the site)", type: "bool" }
     ]
+  };
+  var LABELS = {
+    projects: { plural: "Projects", one: "project" },
+    insights: { plural: "Insights", one: "insight" },
+    services: { plural: "Services", one: "service" }
   };
 
   /* ---- API ---- */
@@ -81,8 +101,9 @@
         '<div class="tabs">' +
           '<button class="tab ' + (state.coll === "projects" ? "is-active" : "") + '" data-coll="projects">Projects</button>' +
           '<button class="tab ' + (state.coll === "insights" ? "is-active" : "") + '" data-coll="insights">Insights</button>' +
+          '<button class="tab ' + (state.coll === "services" ? "is-active" : "") + '" data-coll="services">Services</button>' +
         "</div>" +
-        '<div class="head"><h2>' + (state.coll === "projects" ? "Projects" : "Insights") + " <span style=\"color:var(--muted);font-family:var(--sans);font-size:14px\">(" + state.items.length + ')</span></h2><button class="btn" id="newBtn">+ New ' + (state.coll === "projects" ? "project" : "insight") + "</button></div>" +
+        '<div class="head"><h2>' + LABELS[state.coll].plural + " <span style=\"color:var(--muted);font-family:var(--sans);font-size:14px\">(" + state.items.length + ')</span></h2><button class="btn" id="newBtn">+ New ' + LABELS[state.coll].one + "</button></div>" +
         renderList() +
       "</div>" +
       '<div class="drawer" id="drawer"><div class="drawer__scrim" data-close></div><div class="drawer__panel" id="panel"></div></div>';
@@ -104,6 +125,7 @@
     if (!state.items.length) return '<div class="list"><div class="empty">Nothing here yet. Click “New” to add the first one.</div></div>';
     return '<div class="list">' + state.items.map(function (it) {
       var meta = [it.category, it.location || it.date, it.year].filter(Boolean).map(esc).join(" · ");
+      if (!meta && (it.tagline || it.card)) meta = esc((it.tagline || it.card).slice(0, 64));
       var thumb = it.cover ? '<img src="' + esc(it.cover) + '" alt="">' : "";
       return '<div class="row">' +
         '<div class="row__thumb">' + thumb + "</div>" +
@@ -121,7 +143,7 @@
     var item = id ? JSON.parse(JSON.stringify(state.items.find(function (x) { return x.id === id; }))) : { published: true, gallery: [] };
     state.editing = item;
     var fields = FIELDS[state.coll];
-    var html = '<div class="drawer__head"><h3>' + (id ? "Edit" : "New " + (state.coll === "projects" ? "project" : "insight")) + '</h3><button class="btn btn--ghost btn--sm" data-close>Close</button></div>';
+    var html = '<div class="drawer__head"><h3>' + (id ? "Edit" : "New " + LABELS[state.coll].one) + '</h3><button class="btn btn--ghost btn--sm" data-close>Close</button></div>';
     var i = 0;
     while (i < fields.length) {
       var f = fields[i];

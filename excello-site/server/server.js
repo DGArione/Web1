@@ -16,7 +16,7 @@ if (!fs.existsSync(UPLOADS)) fs.mkdirSync(UPLOADS, { recursive: true });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const COLLS = { projects: 1, insights: 1 };
+const COLLS = { projects: 1, insights: 1, services: 1 };
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
@@ -63,6 +63,14 @@ function injectPage(file, marker, html) {
 }
 
 /* ---- Public dynamic pages (before static) ------------------------------- */
+app.get(["/", "/index.html"], function (req, res) {
+  const cards = render.serviceCards(store.list("services", { publishedOnly: true }));
+  res.type("html").send(injectPage("index.html", "<!--HOME_SERVICES-->", cards));
+});
+app.get(["/services", "/services.html"], function (req, res) {
+  const blocks = render.serviceBlocks(store.list("services", { publishedOnly: true }));
+  res.type("html").send(injectPage("services.html", "<!--SERVICES-->", blocks));
+});
 app.get(["/projects", "/projects.html"], function (req, res) {
   const cards = render.projectCards(store.list("projects", { publishedOnly: true }));
   res.type("html").send(injectPage("projects.html", "<!--PROJECTS-->", cards));
@@ -93,6 +101,7 @@ app.get("/insight/:slug", function (req, res, next) {
 /* ---- Public API ---------------------------------------------------------- */
 app.get("/api/projects", function (req, res) { res.json(store.list("projects", { publishedOnly: true })); });
 app.get("/api/insights", function (req, res) { res.json(store.list("insights", { publishedOnly: true })); });
+app.get("/api/services", function (req, res) { res.json(store.list("services", { publishedOnly: true })); });
 
 /* ---- Contact form: capture enquiries to data/enquiries.json -------------- */
 const ENQUIRIES = path.join(ROOT, "data", "enquiries.json");

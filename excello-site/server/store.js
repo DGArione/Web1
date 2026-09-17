@@ -6,7 +6,8 @@ const crypto = require("crypto");
 const DATA_DIR = path.join(__dirname, "..", "data");
 const FILES = {
   projects: path.join(DATA_DIR, "projects.json"),
-  insights: path.join(DATA_DIR, "insights.json")
+  insights: path.join(DATA_DIR, "insights.json"),
+  services: path.join(DATA_DIR, "services.json")
 };
 
 function ensure() {

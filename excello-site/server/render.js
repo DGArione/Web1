@@ -69,6 +69,55 @@ function insightSlides(list) {
     "</div>";
 }
 
+/* ---- Services ------------------------------------------------------------ */
+var ARROW = '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 13 13 1M4 1h9v9"/></svg>';
+/* Home page: the compact service cards. */
+function serviceCards(list) {
+  if (!list.length) return '<p class="body body--muted">No services yet. Add them in the admin panel.</p>';
+  return list.map(function (s, i) {
+    return '' +
+      '<a class="service" href="/services.html#' + esc(s.slug) + '">' +
+        '<span class="service__num">' + pad2(i + 1) + "</span>" +
+        '<span class="service__title">' + esc(s.title) + "</span>" +
+        '<span class="service__desc">' + esc(s.card || s.tagline || "") + "</span>" +
+        '<span class="service__arrow">' + ARROW + "</span>" +
+      "</a>";
+  }).join("\n");
+}
+/* Services page: the full alternating detail blocks. */
+function serviceBlocks(list) {
+  if (!list.length) return '<p class="body body--muted">No services yet. Add them in the admin panel.</p>';
+  return list.map(function (s, i) {
+    var rows = [
+      ["For", s.forWho], ["Scope", s.scope], ["Deliverables", s.deliverables],
+      ["Lead", s.lead], ["Connected to", s.connected], ["Projects", s.projects]
+    ].filter(function (r) { return r[1]; }).map(function (r) {
+      return "<li><span>" + esc(r[0]) + "</span><span>" + esc(r[1]) + "</span></li>";
+    }).join("");
+    var h2 = "";
+    if (s.headline) {
+      var h = esc(s.headline);
+      if (s.headlineEm) {
+        var e = esc(s.headlineEm), idx = h.indexOf(e);
+        if (idx >= 0) h = h.slice(0, idx) + "<em>" + e + "</em>" + h.slice(idx + e.length);
+      }
+      h2 = '<h2 class="h-1" data-split style="margin-top: 18px;">' + h + "</h2>";
+    }
+    return '' +
+      '<div class="svc" id="' + esc(s.slug) + '">' +
+        '<div class="svc__media media media--parallax media--clip media--ratio-portrait" data-parallax="8">' +
+          cover(s.cover, s.title) +
+        "</div>" +
+        "<div>" +
+          '<p class="label" data-reveal><span class="num">' + pad2(i + 1) + "</span>" + esc(s.title) + "</p>" +
+          h2 +
+          '<p class="body body--muted" data-reveal style="margin-top: 26px;">' + esc(s.tagline || "") + "</p>" +
+          '<ul class="svc__list" data-reveal>' + rows + "</ul>" +
+        "</div>" +
+      "</div>";
+  }).join("\n");
+}
+
 /* ---- Detail bodies ------------------------------------------------------- */
 function projectDetail(p) {
   const facts = [
@@ -87,4 +136,4 @@ function insightDetail(a) {
     body: bodyHtml(a.body), excerpt: a.excerpt || "" };
 }
 
-module.exports = { esc, projectCards, insightSlides, projectDetail, insightDetail, bodyHtml, cover };
+module.exports = { esc, projectCards, insightSlides, serviceCards, serviceBlocks, projectDetail, insightDetail, bodyHtml, cover };

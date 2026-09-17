@@ -369,6 +369,15 @@
       if (!canvas || !count) return;
       var ctx = canvas.getContext("2d", { alpha: false });
       var scene = host.closest("[data-seq-scene]") || host;
+      /* Hero headline narrates the build as you scroll through the sequence. */
+      var heroTitle = isHero ? scene.querySelector(".hero__title") : null;
+      var heroPhrases = [
+        'Thoughtfully designed. <em>Precisely built.</em>',
+        'Every home begins with <em>a clear idea.</em>',
+        'We build it, <em>stage by stage.</em>',
+        'From first question to <em>final handover.</em>'
+      ];
+      if (heroTitle) heroTitle._phase = 0;
       var loaderWrap = (mode === "hero" ? scene : host).querySelector("[data-seq-loader]");
       var loaderNum = loaderWrap && loaderWrap.querySelector("b");
       var frames = new Array(count);
@@ -455,6 +464,20 @@
             var p = self.progress;
             var c = scene.querySelector(".hero__content");
             if (c) { var o = p < 0.6 ? 1 : 1 - (p - 0.6) / 0.4; gsap.set(c, { autoAlpha: Math.max(0, o), y: -50 * Math.max(0, p - 0.45) }); }
+            /* Swap the headline through the build phases; fade the sub/CTA out
+               quickly so only the narrating line remains during the scroll. */
+            if (heroTitle) {
+              var phase = p < 0.14 ? 0 : p < 0.30 ? 1 : p < 0.46 ? 2 : 3;
+              if (heroTitle._phase !== phase) {
+                heroTitle._phase = phase;
+                gsap.to(heroTitle, { autoAlpha: 0, duration: 0.2, overwrite: true, onComplete: function () {
+                  heroTitle.innerHTML = heroPhrases[phase];
+                  gsap.to(heroTitle, { autoAlpha: 1, duration: 0.35, overwrite: true });
+                } });
+              }
+            }
+            var hb = scene.querySelector(".hero__bottom");
+            if (hb) { var bo = p < 0.05 ? 1 : 1 - (p - 0.05) / 0.09; gsap.set(hb, { autoAlpha: Math.max(0, Math.min(1, bo)) }); }
             /* Clouds fully cover the finished->construction cut, then part so
                the build plays through: finished teaser -> clouds -> ground. */
             var cl = scene.querySelector("#heroClouds");
