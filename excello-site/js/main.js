@@ -641,7 +641,8 @@
       };
       btn.disabled = true;
       note.textContent = "Sending…";
-      fetch("/api/enquiry", {
+      var endpoint = (window.__SITE && window.__SITE.formEndpoint) || "/api/enquiry";
+      fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
@@ -668,7 +669,12 @@
     var quickEl = panel.querySelector("#chatQuick");
     var formEl = panel.querySelector("#chatForm");
     var inputEl = panel.querySelector("#chatInput");
-    var waHref = "https://wa.me/94770222000?text=" + encodeURIComponent("Hello Excello, I'd like to talk about a project.");
+    /* WhatsApp target comes from the shared site settings (see js/layout.js). */
+    function waHref() {
+      var s = window.__SITE || {};
+      return "https://wa.me/" + (s.whatsapp || "94770222000").replace(/[^\d]/g, "") +
+        "?text=" + encodeURIComponent(s.whatsappText || "Hello Excello, I'd like to talk about a project.");
+    }
     var greeted = false;
 
     /* The Q&A is editable in the admin panel (Chatbot tab). These built-ins are
@@ -715,7 +721,7 @@
       var t = add("…", "bot");
       setTimeout(function () { t.textContent = text; scrollDown(); }, 420);
     }
-    function openWa() { botSay("Opening WhatsApp…"); setTimeout(function () { window.open(waHref, "_blank"); }, 500); }
+    function openWa() { botSay("Opening WhatsApp…"); setTimeout(function () { window.open(waHref(), "_blank"); }, 500); }
     function respond(text) {
       var low = text.toLowerCase();
       if (/\b(whatsapp|whats app)\b/.test(low)) return openWa();
@@ -735,7 +741,7 @@
       });
       var wa = document.createElement("button");
       wa.className = "chat__chip"; wa.type = "button"; wa.textContent = "Talk on WhatsApp";
-      wa.onclick = function () { window.open(waHref, "_blank"); };
+      wa.onclick = function () { window.open(waHref(), "_blank"); };
       quickEl.appendChild(wa);
     }
     function openChat() {

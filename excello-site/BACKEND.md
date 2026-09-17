@@ -44,6 +44,7 @@ data/projects.json     your projects        (safe to back up / edit by hand)
 data/insights.json     your insights
 data/services.json     your services        (edit in the Services admin tab)
 data/chatbot.json      chatbot questions & answers (edit in the Chatbot admin tab)
+data/site.json         company details, socials, form endpoint, SEO (Site details tab)
 data/enquiries.json    contact-form submissions (created at runtime, gitignored)
 data/settings.json     admin user + hashed password (gitignored, never commit)
 uploads/               uploaded images       (gitignored)
@@ -51,16 +52,38 @@ server/                the Express app
 admin/                 the admin panel
 ```
 
+## Company details (Site details tab)
+
+Phone, WhatsApp, email, address and social links live in one place —
+`data/site.json`, edited in the admin **Site details** tab. On every page,
+`js/layout.js` fetches `GET /api/site` and fills the header tagline, footer
+address/phone/email/socials, the menu, the floating WhatsApp button and the
+contact page. The chatbot's WhatsApp link and the contact form's target also
+read from it. Change a number once and it updates everywhere.
+
 ## Contact form
 
-The contact form posts to `POST /api/enquiry`, which validates and appends the
-submission to `data/enquiries.json` (newest first, capped at 500). Submissions
-are private: read them at `GET /api/admin/enquiries` while signed in to the
-admin panel. If the page is opened without the server (e.g. as a plain file),
-the form shows a fallback message with the phone and email instead of failing
-silently. To also receive enquiries by email, point the form at a mail service
-(Formspree, or an SMTP sender added to `/api/enquiry`) — ask and this can be
-wired up.
+The contact form posts to the endpoint named in the **Site details** tab
+(`formEndpoint`, default `POST /api/enquiry`). `/api/enquiry` validates and
+appends the submission to `data/enquiries.json` (newest first, capped at 500);
+read them at `GET /api/admin/enquiries` while signed in. If the page is opened
+without the server, the form shows a fallback message with the phone and email.
+
+**To send submissions elsewhere** (e.g. straight to your inbox): create a form
+on a service like Formspree, then in the Site details tab set the contact-form
+endpoint to that service's URL — no code change needed. To keep `/api/enquiry`
+but also email you, add an SMTP/Nodemailer call inside the `/api/enquiry`
+handler in `server/server.js`.
+
+## SEO
+
+Each page carries its own `<title>`, `<meta name="description">`, favicon,
+mobile viewport and semantic headings in its `<head>` — that is where per-page
+SEO is edited, and it stays crawlable without JavaScript. On top of that,
+`js/layout.js` adds Open Graph, Twitter-card and canonical tags from the Site
+details (site name + default description) so shared links preview well. Not yet
+included (happy to add on request): a static `sitemap.xml` and `robots.txt`,
+and per-page Open Graph images.
 
 ## Hosting notes
 

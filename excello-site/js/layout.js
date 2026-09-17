@@ -56,7 +56,7 @@
     '<header class="header" id="header">' +
     '<a class="brand" href="/" aria-label="Excello home">' +
     '<svg class="brand__mark" viewBox="0 0 100 100" fill="none" stroke="var(--bronze)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M50 11 L88 80"/><path d="M50 11 L12 80"/><path d="M12 80 L40 80"/><path d="M60 80 L88 80"/><path d="M52 35 L72 80"/></svg>' +
-    '<span class="brand__text"><span class="brand__word">EXCELLO</span><span class="brand__sub">the way you imagine</span></span>' +
+    '<span class="brand__text"><span class="brand__word">EXCELLO</span><span class="brand__sub" data-site="tagline">the way you imagine</span></span>' +
     "</a>" +
     '<nav class="nav" aria-label="Primary">' + navHtml + "</nav>" +
     '<a class="btn" href="/contact.html" data-magnetic>Start a project ' + arrow + "</a>" +
@@ -64,7 +64,7 @@
     "</header>" +
     '<div class="menu" id="menu" aria-hidden="true">' +
     '<div class="menu__links">' + menuHtml + "</div>" +
-    '<div class="menu__foot"><span>No. 16, St Rita’s Road, Mount Lavinia, Sri Lanka</span><span>+94 77 022 2000</span><span>&copy; Excello Developers</span></div>' +
+    '<div class="menu__foot"><span data-site="addrFull">No. 16, St Rita’s Road, Mount Lavinia, Sri Lanka</span><span data-site="phone">+94 77 022 2000</span><span>&copy; Excello Developers</span></div>' +
     "</div>";
 
   var footer =
@@ -74,12 +74,13 @@
     '<div class="footer__col"><h4>Navigate</h4><ul>' +
     links.map(function (l) { return '<li><a href="' + l.href + '">' + l.label + "</a></li>"; }).join("") +
     "</ul></div>" +
-    '<div class="footer__col"><h4>Visit</h4><ul><li>No. 16, St Rita’s Road</li><li>Mount Lavinia</li><li>Sri Lanka</li></ul></div>' +
+    '<div class="footer__col"><h4>Visit</h4><ul><li data-site="addr1">No. 16, St Rita’s Road</li><li data-site="addr2">Mount Lavinia</li><li data-site="addr3">Sri Lanka</li></ul></div>' +
     '<div class="footer__col"><h4>Connect</h4><ul>' +
-    '<li><a href="tel:+94770222000">+94 77 022 2000</a></li>' +
-    '<li><a href="mailto:inquiry@excello.lk">inquiry@excello.lk</a></li>' +
-    '<li><a href="https://www.facebook.com/ExcelloSriLanka/" target="_blank" rel="noopener">Facebook</a></li>' +
-    '<li><a href="https://lk.linkedin.com/company/excello-developers-pvt-ltd" target="_blank" rel="noopener">LinkedIn</a></li>' +
+    '<li><a href="tel:+94770222000" data-site="phone">+94 77 022 2000</a></li>' +
+    '<li><a href="mailto:inquiry@excello.lk" data-site="email">inquiry@excello.lk</a></li>' +
+    '<li><a href="https://www.facebook.com/ExcelloSriLanka/" target="_blank" rel="noopener" data-site="facebook">Facebook</a></li>' +
+    '<li><a href="https://lk.linkedin.com/company/excello-developers-pvt-ltd" target="_blank" rel="noopener" data-site="linkedin">LinkedIn</a></li>' +
+    '<li data-site-item="instagram" hidden><a href="#" target="_blank" rel="noopener" data-site="instagram">Instagram</a></li>' +
     "</ul></div>" +
     "</div>" +
     '<div class="footer__wordmark" data-wordmark>' +
@@ -112,5 +113,96 @@
   /* The footer must land after <main>, so wait for the document to be parsed. */
   document.addEventListener("DOMContentLoaded", function () {
     document.body.insertAdjacentHTML("beforeend", footer);
+    applySite(window.__SITE); /* patch the footer too, once it exists */
   });
+
+  /* ---- Company details come from the backend (data/site.json) ------------- *
+     One editable source drives phone, WhatsApp, email, address and socials
+     across the header, footer, menu, WhatsApp button and contact page. */
+  var DEFAULT_SITE = {
+    companyName: "Excello Developers", tagline: "the way you imagine",
+    phone: "+94 77 022 2000", whatsapp: "94770222000",
+    whatsappText: "Hello Excello, I'd like to talk about a project.", email: "inquiry@excello.lk",
+    addressLine1: "No. 16, St Rita’s Road", addressLine2: "Mount Lavinia", addressLine3: "Sri Lanka",
+    facebook: "https://www.facebook.com/ExcelloSriLanka/",
+    linkedin: "https://lk.linkedin.com/company/excello-developers-pvt-ltd", instagram: "",
+    formEndpoint: "/api/enquiry", seoTitleSuffix: "Excello Developers", seoDescription: ""
+  };
+  window.__SITE = DEFAULT_SITE;
+
+  function telHref(p) { return "tel:" + String(p || "").replace(/[^\d+]/g, ""); }
+  function waHref(s) {
+    return "https://wa.me/" + (s.whatsapp || "").replace(/[^\d]/g, "") +
+      "?text=" + encodeURIComponent(s.whatsappText || "");
+  }
+  function setText(sel, val) {
+    if (val == null) return;
+    document.querySelectorAll(sel).forEach(function (el) { el.textContent = val; });
+  }
+  function applySite(s) {
+    if (!s) return;
+    setText('[data-site="tagline"]', s.tagline);
+    setText('[data-site="addr1"]', s.addressLine1);
+    setText('[data-site="addr2"]', s.addressLine2);
+    setText('[data-site="addr3"]', s.addressLine3);
+    setText('[data-site="addrFull"]', [s.addressLine1, s.addressLine2, s.addressLine3].filter(Boolean).join(", "));
+    document.querySelectorAll('[data-site="addrHtml"]').forEach(function (el) {
+      var e = function (t) { return String(t || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); };
+      el.innerHTML = e(s.addressLine1) + ",<br>" + [s.addressLine2, s.addressLine3].filter(Boolean).map(e).join(", ");
+    });
+    document.querySelectorAll('[data-site="phone"]').forEach(function (el) {
+      el.textContent = s.phone || ""; if (el.tagName === "A") el.setAttribute("href", telHref(s.phone));
+    });
+    document.querySelectorAll('[data-site="email"]').forEach(function (el) {
+      el.textContent = s.email || ""; if (el.tagName === "A") el.setAttribute("href", "mailto:" + (s.email || ""));
+    });
+    ["facebook", "linkedin", "instagram"].forEach(function (k) {
+      document.querySelectorAll('[data-site="' + k + '"]').forEach(function (el) {
+        if (s[k]) { el.setAttribute("href", s[k]); var li = el.closest("[data-site-item]"); if (li) li.hidden = false; }
+        else { var li2 = el.closest("[data-site-item]"); if (li2) li2.hidden = true; }
+      });
+    });
+    document.querySelectorAll(".fab--wa").forEach(function (el) { el.setAttribute("href", waHref(s)); });
+  }
+
+  /* Social/SEO tags. The per-page <title> and <meta name="description"> stay
+     authoritative; this adds Open Graph + Twitter + canonical on top, using the
+     site settings, so shared links look right. */
+  function meta(attr, key, val) {
+    if (!val) return;
+    var el = document.head.querySelector("meta[" + attr + '="' + key + '"]');
+    if (!el) { el = document.createElement("meta"); el.setAttribute(attr, key); document.head.appendChild(el); }
+    el.setAttribute("content", val);
+  }
+  function injectSeo(s) {
+    var descEl = document.head.querySelector('meta[name="description"]');
+    var desc = (descEl && descEl.getAttribute("content")) || s.seoDescription || "";
+    if (!descEl && desc) meta("name", "description", desc);
+    var canonical = location.origin + location.pathname;
+    var link = document.head.querySelector('link[rel="canonical"]');
+    if (!link) { link = document.createElement("link"); link.rel = "canonical"; document.head.appendChild(link); }
+    link.href = canonical;
+    meta("property", "og:site_name", s.seoTitleSuffix || s.companyName || "Excello Developers");
+    meta("property", "og:title", document.title);
+    meta("property", "og:description", desc);
+    meta("property", "og:type", "website");
+    meta("property", "og:url", canonical);
+    meta("name", "twitter:card", "summary_large_image");
+    meta("name", "twitter:title", document.title);
+    meta("name", "twitter:description", desc);
+  }
+
+  /* Expose a promise so main.js (chat / contact form) can use the same data. */
+  window.__sitePromise = fetch("/api/site")
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (s) {
+      var merged = Object.assign({}, DEFAULT_SITE, s || {});
+      window.__SITE = merged;
+      applySite(merged);
+      injectSeo(merged);
+      return merged;
+    })
+    .catch(function () { applySite(DEFAULT_SITE); injectSeo(DEFAULT_SITE); return DEFAULT_SITE; });
+
+  applySite(DEFAULT_SITE); /* header/widgets are already in the DOM */
 })();

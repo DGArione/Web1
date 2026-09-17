@@ -2,7 +2,25 @@
 (function () {
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
-  var state = { me: null, coll: "projects", items: [], editing: null, saving: false };
+  var state = { me: null, coll: "projects", items: [], editing: null, saving: false, site: null };
+
+  var SITE_FIELDS = [
+    { k: "companyName", label: "Company name" },
+    { k: "tagline", label: "Header tagline (small text under the logo)" },
+    { k: "phone", label: "Phone (as shown, e.g. +94 77 022 2000)" },
+    { k: "whatsapp", label: "WhatsApp number (digits only, with country code, e.g. 94770222000)" },
+    { k: "whatsappText", label: "WhatsApp pre-filled message", type: "textarea" },
+    { k: "email", label: "Email address" },
+    { k: "addressLine1", label: "Address line 1" },
+    { k: "addressLine2", label: "Address line 2" },
+    { k: "addressLine3", label: "Address line 3" },
+    { k: "facebook", label: "Facebook URL" },
+    { k: "linkedin", label: "LinkedIn URL" },
+    { k: "instagram", label: "Instagram URL (optional — leave blank to hide)" },
+    { k: "formEndpoint", label: "Contact-form endpoint (where submissions are sent)" },
+    { k: "seoTitleSuffix", label: "SEO: site name (used in <title>)" },
+    { k: "seoDescription", label: "SEO: default meta description", type: "textarea" }
+  ];
 
   var FIELDS = {
     projects: [
@@ -74,7 +92,10 @@
   /* ---- Boot ---- */
   api("GET", "/api/admin/me").then(function (me) { state.me = me; loadItems(); }).catch(function () { render(); });
 
-  function loadItems() { api("GET", "/api/admin/" + state.coll).then(function (items) { state.items = items; render(); }); }
+  function loadItems() {
+    if (state.coll === "site") { api("GET", "/api/admin/site").then(function (s) { state.site = s; render(); }).catch(function () { render(); }); return; }
+    api("GET", "/api/admin/" + state.coll).then(function (items) { state.items = items; render(); });
+  }
 
   /* ---- Render ---- */
   function render() {
@@ -113,9 +134,11 @@
           '<button class="tab ' + (state.coll === "insights" ? "is-active" : "") + '" data-coll="insights">Insights</button>' +
           '<button class="tab ' + (state.coll === "services" ? "is-active" : "") + '" data-coll="services">Services</button>' +
           '<button class="tab ' + (state.coll === "chatbot" ? "is-active" : "") + '" data-coll="chatbot">Chatbot</button>' +
+          '<button class="tab ' + (state.coll === "site" ? "is-active" : "") + '" data-coll="site">Site details</button>' +
         "</div>" +
-        '<div class="head"><h2>' + LABELS[state.coll].plural + " <span style=\"color:var(--muted);font-family:var(--sans);font-size:14px\">(" + state.items.length + ')</span></h2><button class="btn" id="newBtn">+ New ' + LABELS[state.coll].one + "</button></div>" +
-        renderList() +
+        (state.coll === "site"
+          ? '<div class="head"><h2>Site details</h2></div>' + renderSite()
+          : '<div class="head"><h2>' + LABELS[state.coll].plural + " <span style=\"color:var(--muted);font-family:var(--sans);font-size:14px\">(" + state.items.length + ')</span></h2><button class="btn" id="newBtn">+ New ' + LABELS[state.coll].one + "</button></div>" + renderList()) +
       "</div>" +
       '<div class="drawer" id="drawer"><div class="drawer__scrim" data-close></div><div class="drawer__panel" id="panel"></div></div>';
 
@@ -123,10 +146,12 @@
     document.getElementById("viewBtn").onclick = function () { window.open("/", "_blank"); };
     document.getElementById("pwBtn").onclick = changePassword;
     if (document.getElementById("chgpw")) document.getElementById("chgpw").onclick = function (e) { e.preventDefault(); changePassword(); };
-    document.getElementById("newBtn").onclick = function () { openEditor(null); };
+    var newBtn = document.getElementById("newBtn");
+    if (newBtn) newBtn.onclick = function () { openEditor(null); };
     Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (t) {
       t.onclick = function () { state.coll = t.dataset.coll; state.items = []; loadItems(); };
     });
+    if (state.coll === "site") bindSite();
     Array.prototype.forEach.call(document.querySelectorAll("[data-edit]"), function (b) { b.onclick = function () { openEditor(b.dataset.edit); }; });
     Array.prototype.forEach.call(document.querySelectorAll("[data-del]"), function (b) { b.onclick = function () { del(b.dataset.del); }; });
     Array.prototype.forEach.call(document.querySelectorAll("[data-toggle]"), function (b) { b.onclick = function () { togglePublish(b.dataset.toggle); }; });
@@ -147,6 +172,30 @@
           '<button class="btn btn--danger btn--sm" data-del="' + it.id + '">Delete</button>' +
         "</div></div>";
     }).join("") + "</div>";
+  }
+
+  /* ---- Site details (single settings record) ---- */
+  function renderSite() {
+    var s = state.site || {};
+    var body = SITE_FIELDS.map(function (f) {
+      var v = esc(s[f.k] || "");
+      if (f.type === "textarea") return '<div class="field"><label>' + f.label + '</label><textarea data-sk="' + f.k + '">' + v + "</textarea></div>";
+      return '<div class="field"><label>' + f.label + '</label><input type="text" data-sk="' + f.k + '" value="' + v + '"></div>';
+    }).join("");
+    return '<div class="siteform" style="max-width:680px">' + body +
+      '<div style="margin-top:8px"><button class="btn" id="siteSave">Save site details</button></div>' +
+      '<p style="color:var(--muted);font-size:12px;margin-top:14px">These drive the header, footer, menu, WhatsApp button and contact page across the whole site.</p>' +
+      "</div>";
+  }
+  function bindSite() {
+    state.site = state.site || {};
+    Array.prototype.forEach.call(document.querySelectorAll("[data-sk]"), function (el) {
+      el.oninput = function () { state.site[el.dataset.sk] = el.value; };
+    });
+    var btn = document.getElementById("siteSave");
+    if (btn) btn.onclick = function () {
+      api("PUT", "/api/admin/site", state.site).then(function (s) { state.site = s; toast("Site details saved."); }).catch(function (e) { toast(e.message); });
+    };
   }
 
   /* ---- Editor ---- */

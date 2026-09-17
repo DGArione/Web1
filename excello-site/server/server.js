@@ -104,6 +104,26 @@ app.get("/api/insights", function (req, res) { res.json(store.list("insights", {
 app.get("/api/services", function (req, res) { res.json(store.list("services", { publishedOnly: true })); });
 app.get("/api/chatbot", function (req, res) { res.json(store.list("chatbot", { publishedOnly: true })); });
 
+/* ---- Site settings (company details, socials, form endpoint, SEO) -------- */
+const SITE = path.join(ROOT, "data", "site.json");
+const SITE_KEYS = ["companyName", "tagline", "phone", "whatsapp", "whatsappText", "email",
+  "addressLine1", "addressLine2", "addressLine3", "facebook", "linkedin", "instagram",
+  "formEndpoint", "seoTitleSuffix", "seoDescription"];
+function readSite() { try { return JSON.parse(fs.readFileSync(SITE, "utf8")) || {}; } catch (e) { return {}; } }
+function writeSite(obj) {
+  const tmp = SITE + ".tmp";
+  fs.writeFileSync(tmp, JSON.stringify(obj, null, 2));
+  fs.renameSync(tmp, SITE);
+}
+app.get("/api/site", function (req, res) { res.json(readSite()); });
+app.get("/api/admin/site", auth.requireAuth, function (req, res) { res.json(readSite()); });
+app.put("/api/admin/site", auth.requireAuth, function (req, res) {
+  const cur = readSite(), body = req.body || {};
+  SITE_KEYS.forEach(function (k) { if (typeof body[k] === "string") cur[k] = body[k].slice(0, 2000); });
+  writeSite(cur);
+  res.json(cur);
+});
+
 /* ---- Contact form: capture enquiries to data/enquiries.json -------------- */
 const ENQUIRIES = path.join(ROOT, "data", "enquiries.json");
 function readEnquiries() {
