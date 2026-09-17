@@ -40,13 +40,23 @@
       { k: "projects", label: "Related projects (optional)", type: "text" },
       { k: "cover", label: "Image", type: "image" },
       { k: "published", label: "Published (visible on the site)", type: "bool" }
+    ],
+    chatbot: [
+      { k: "title", label: "Question / button label", type: "text", req: true },
+      { k: "keywords", label: "Trigger words (comma-separated — what the visitor might type)", type: "textarea" },
+      { k: "answer", label: "Answer", type: "textarea", big: true },
+      { k: "quick", label: "Show as a quick-reply button in the chat", type: "bool" },
+      { k: "published", label: "Active (chatbot uses this)", type: "bool" }
     ]
   };
   var LABELS = {
     projects: { plural: "Projects", one: "project" },
     insights: { plural: "Insights", one: "insight" },
-    services: { plural: "Services", one: "service" }
+    services: { plural: "Services", one: "service" },
+    chatbot: { plural: "Chatbot", one: "Q&A" }
   };
+  /* Defaults for a brand-new item, per collection (e.g. chatbot quick = off). */
+  var NEW_DEFAULTS = { chatbot: { published: true, quick: false } };
 
   /* ---- API ---- */
   function api(method, url, body, isForm) {
@@ -102,6 +112,7 @@
           '<button class="tab ' + (state.coll === "projects" ? "is-active" : "") + '" data-coll="projects">Projects</button>' +
           '<button class="tab ' + (state.coll === "insights" ? "is-active" : "") + '" data-coll="insights">Insights</button>' +
           '<button class="tab ' + (state.coll === "services" ? "is-active" : "") + '" data-coll="services">Services</button>' +
+          '<button class="tab ' + (state.coll === "chatbot" ? "is-active" : "") + '" data-coll="chatbot">Chatbot</button>' +
         "</div>" +
         '<div class="head"><h2>' + LABELS[state.coll].plural + " <span style=\"color:var(--muted);font-family:var(--sans);font-size:14px\">(" + state.items.length + ')</span></h2><button class="btn" id="newBtn">+ New ' + LABELS[state.coll].one + "</button></div>" +
         renderList() +
@@ -125,7 +136,7 @@
     if (!state.items.length) return '<div class="list"><div class="empty">Nothing here yet. Click “New” to add the first one.</div></div>';
     return '<div class="list">' + state.items.map(function (it) {
       var meta = [it.category, it.location || it.date, it.year].filter(Boolean).map(esc).join(" · ");
-      if (!meta && (it.tagline || it.card)) meta = esc((it.tagline || it.card).slice(0, 64));
+      if (!meta && (it.tagline || it.card || it.answer)) meta = esc((it.tagline || it.card || it.answer).slice(0, 64));
       var thumb = it.cover ? '<img src="' + esc(it.cover) + '" alt="">' : "";
       return '<div class="row">' +
         '<div class="row__thumb">' + thumb + "</div>" +
@@ -140,7 +151,7 @@
 
   /* ---- Editor ---- */
   function openEditor(id) {
-    var item = id ? JSON.parse(JSON.stringify(state.items.find(function (x) { return x.id === id; }))) : { published: true, gallery: [] };
+    var item = id ? JSON.parse(JSON.stringify(state.items.find(function (x) { return x.id === id; }))) : Object.assign({ published: true, gallery: [] }, NEW_DEFAULTS[state.coll] || {});
     state.editing = item;
     var fields = FIELDS[state.coll];
     var html = '<div class="drawer__head"><h3>' + (id ? "Edit" : "New " + LABELS[state.coll].one) + '</h3><button class="btn btn--ghost btn--sm" data-close>Close</button></div>';

@@ -43,6 +43,7 @@ Open **http://localhost:3000/admin**
 data/projects.json     your projects        (safe to back up / edit by hand)
 data/insights.json     your insights
 data/services.json     your services        (edit in the Services admin tab)
+data/chatbot.json      chatbot questions & answers (edit in the Chatbot admin tab)
 data/enquiries.json    contact-form submissions (created at runtime, gitignored)
 data/settings.json     admin user + hashed password (gitignored, never commit)
 uploads/               uploaded images       (gitignored)

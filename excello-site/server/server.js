@@ -16,7 +16,7 @@ if (!fs.existsSync(UPLOADS)) fs.mkdirSync(UPLOADS, { recursive: true });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const COLLS = { projects: 1, insights: 1, services: 1 };
+const COLLS = { projects: 1, insights: 1, services: 1, chatbot: 1 };
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
@@ -102,6 +102,7 @@ app.get("/insight/:slug", function (req, res, next) {
 app.get("/api/projects", function (req, res) { res.json(store.list("projects", { publishedOnly: true })); });
 app.get("/api/insights", function (req, res) { res.json(store.list("insights", { publishedOnly: true })); });
 app.get("/api/services", function (req, res) { res.json(store.list("services", { publishedOnly: true })); });
+app.get("/api/chatbot", function (req, res) { res.json(store.list("chatbot", { publishedOnly: true })); });
 
 /* ---- Contact form: capture enquiries to data/enquiries.json -------------- */
 const ENQUIRIES = path.join(ROOT, "data", "enquiries.json");

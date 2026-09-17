@@ -1,0 +1,74 @@
+[
+  {
+    "id": "seed-chat-services",
+    "order": 0,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "quick": true,
+    "slug": "our-services",
+    "title": "Our services",
+    "keywords": "service, services, offer, do you, architecture, construction, interior, property, development, design",
+    "answer": "We work four ways in: Architecture & Interior Design, Design and Build, Construction & Project Delivery, and Property Development & Consultation. Which one are you exploring?"
+  },
+  {
+    "id": "seed-chat-aathavan",
+    "order": 1,
+    "createdAt": 1789328684770,
+    "updatedAt": 1789328684770,
+    "published": true,
+    "quick": true,
+    "slug": "about-aathavan",
+    "title": "About Aathavan",
+    "keywords": "aathavan, price, pricing, cost, how much, rate, budget",
+    "answer": "Aathavan Apartments is a family-oriented development of 44 residences at No. 6 Carron Place, Dehiwala, with two- and three-bedroom homes, rooftop amenities, solar infrastructure and parking. Shall I have our team share more detail?"
+  },
+  {
+    "id": "seed-chat-projects",
+    "order": 2,
+    "createdAt": 1789328683770,
+    "updatedAt": 1789328683770,
+    "published": true,
+    "quick": false,
+    "slug": "our-projects",
+    "title": "Our projects",
+    "keywords": "sea esta, villa, panimozhi, kaapi, bambalapitiya, rudra, project, projects, portfolio",
+    "answer": "Our recent work includes Aathavan Apartments, Panimozhi Club House, Sea Esta Villas, Café Kaapi, Bambalapitiya Residence and Rudra Wellness Retreat. Would you like the project archive?"
+  },
+  {
+    "id": "seed-chat-book",
+    "order": 3,
+    "createdAt": 1789328682770,
+    "updatedAt": 1789328682770,
+    "published": true,
+    "quick": true,
+    "slug": "book-a-call",
+    "title": "Book a call",
+    "keywords": "call, meet, book, appointment, visit, consult, clarity",
+    "answer": "Happy to arrange it. Call us on +94 77 022 2000, or leave your details on the contact page and we'll help you identify the right first step."
+  },
+  {
+    "id": "seed-chat-location",
+    "order": 4,
+    "createdAt": 1789328681770,
+    "updatedAt": 1789328681770,
+    "published": true,
+    "quick": false,
+    "slug": "where-are-you-located",
+    "title": "Where are you located?",
+    "keywords": "where, location, address, office, map, colombo, lavinia",
+    "answer": "We're at No. 16, St Rita's Road, Mount Lavinia, Sri Lanka. There's a live map on our contact page."
+  },
+  {
+    "id": "seed-chat-contact",
+    "order": 5,
+    "createdAt": 1789328680770,
+    "updatedAt": 1789328680770,
+    "published": true,
+    "quick": false,
+    "slug": "contact-details",
+    "title": "Contact details",
+    "keywords": "email, contact, reach, phone, number",
+    "answer": "You can reach us at inquiry@excello.lk or +94 77 022 2000. Want me to open WhatsApp?"
+  }
+]

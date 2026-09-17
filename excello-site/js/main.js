@@ -671,18 +671,36 @@
     var waHref = "https://wa.me/94770222000?text=" + encodeURIComponent("Hello Excello, I'd like to talk about a project.");
     var greeted = false;
 
-    var QUICK = ["Our services", "About Aathavan", "Book a call", "Talk on WhatsApp"];
-    var REPLIES = [
-      { k: /service|do you|offer|architect|construct|interior|property|develop|design/i, a: "We work four ways in: Architecture & Interior Design, Design and Build, Construction & Project Delivery, and Property Development & Consultation. Which one are you exploring?" },
-      { k: /aathavan|price|pricing|cost|how much|rate|budget/i, a: "Aathavan Apartments is a family-oriented development of 44 residences at No. 6 Carron Place, Dehiwala, with two- and three-bedroom homes, rooftop amenities, solar infrastructure and parking. Shall I have our team share more detail?" },
-      { k: /sea esta|villa|panimozhi|kaapi|bambalapitiya|rudra|project/i, a: "Our recent work includes Aathavan Apartments, Panimozhi Club House, Sea Esta Villas, Café Kaapi, Bambalapitiya Residence and Rudra Wellness Retreat. Would you like the project archive?" },
-      { k: /call|meet|book|appointment|visit|consult|clarity/i, a: "Happy to arrange it. Call us on +94 77 022 2000, or leave your details on the contact page and we'll help you identify the right first step." },
-      { k: /whatsapp|whats app|wa\b/i, a: "__WA__" },
-      { k: /where|location|address|office|map|colombo|lavinia/i, a: "We're at No. 16, St Rita's Road, Mount Lavinia, Sri Lanka. There's a live map on our contact page." },
-      { k: /email|contact|reach/i, a: "You can reach us at inquiry@excello.lk or +94 77 022 2000. Want me to open WhatsApp?" },
-      { k: /hi|hello|hey|good (morning|evening|afternoon)/i, a: "Hello! How can we help with your project today?" },
-      { k: /thank|thanks|great|awesome/i, a: "You're most welcome. Anything else I can help with?" }
+    /* The Q&A is editable in the admin panel (Chatbot tab). These built-ins are
+       only used as a fallback if the backend can't be reached (e.g. opened as a
+       plain file). Each entry: title (chip label / question), keywords (comma
+       list used to match what the visitor types), answer, and quick (chip). */
+    var FALLBACK = [
+      { title: "Our services", quick: true, keywords: "service, services, offer, do you, architecture, construction, interior, property, development, design", answer: "We work four ways in: Architecture & Interior Design, Design and Build, Construction & Project Delivery, and Property Development & Consultation. Which one are you exploring?" },
+      { title: "About Aathavan", quick: true, keywords: "aathavan, price, pricing, cost, how much, rate, budget", answer: "Aathavan Apartments is a family-oriented development of 44 residences at No. 6 Carron Place, Dehiwala, with two- and three-bedroom homes, rooftop amenities, solar infrastructure and parking. Shall I have our team share more detail?" },
+      { title: "Our projects", quick: false, keywords: "sea esta, villa, panimozhi, kaapi, bambalapitiya, rudra, project, projects, portfolio", answer: "Our recent work includes Aathavan Apartments, Panimozhi Club House, Sea Esta Villas, Café Kaapi, Bambalapitiya Residence and Rudra Wellness Retreat. Would you like the project archive?" },
+      { title: "Book a call", quick: true, keywords: "call, meet, book, appointment, visit, consult, clarity", answer: "Happy to arrange it. Call us on +94 77 022 2000, or leave your details on the contact page and we'll help you identify the right first step." },
+      { title: "Where are you located?", quick: false, keywords: "where, location, address, office, map, colombo, lavinia", answer: "We're at No. 16, St Rita's Road, Mount Lavinia, Sri Lanka. There's a live map on our contact page." },
+      { title: "Contact details", quick: false, keywords: "email, contact, reach, phone, number", answer: "You can reach us at inquiry@excello.lk or +94 77 022 2000. Want me to open WhatsApp?" }
     ];
+    var entries = FALLBACK;
+
+    function tokensFor(e) {
+      return (e.keywords || e.title || "").split(/[,|]/).map(function (t) { return t.trim().toLowerCase(); }).filter(Boolean);
+    }
+    function matchEntry(text) {
+      var low = " " + text.toLowerCase() + " ";
+      for (var i = 0; i < entries.length; i++) {
+        var toks = tokensFor(entries[i]);
+        for (var j = 0; j < toks.length; j++) { if (toks[j] && low.indexOf(toks[j]) !== -1) return entries[i]; }
+      }
+      return null;
+    }
+
+    /* Load the editable Q&A from the backend; keep the fallback on failure. */
+    fetch("/api/chatbot").then(function (r) { return r.ok ? r.json() : null; }).then(function (list) {
+      if (list && list.length) { entries = list; if (panel.classList.contains("is-open")) renderQuick(); }
+    }).catch(function () {});
 
     function scrollDown() { bodyEl.scrollTop = bodyEl.scrollHeight; }
     function add(text, who) {
@@ -697,23 +715,28 @@
       var t = add("…", "bot");
       setTimeout(function () { t.textContent = text; scrollDown(); }, 420);
     }
+    function openWa() { botSay("Opening WhatsApp…"); setTimeout(function () { window.open(waHref, "_blank"); }, 500); }
     function respond(text) {
-      var hit = REPLIES.find(function (r) { return r.k.test(text); });
-      if (!hit) return botSay("Thanks! The quickest way to a detailed answer is a quick chat. Call +94 77 022 2000, tap WhatsApp below, or use the contact form and we'll reply within one business day.");
-      if (hit.a === "__WA__") { botSay("Opening WhatsApp…"); setTimeout(function () { window.open(waHref, "_blank"); }, 500); return; }
-      botSay(hit.a);
+      var low = text.toLowerCase();
+      if (/\b(whatsapp|whats app)\b/.test(low)) return openWa();
+      if (/^\s*(hi|hello|hey|good (morning|evening|afternoon))\b/.test(low)) return botSay("Hello! How can we help with your project today?");
+      if (/\b(thanks|thank you|thankyou|cheers)\b/.test(low)) return botSay("You're most welcome. Anything else I can help with?");
+      var hit = matchEntry(text);
+      if (hit && hit.answer) { if (hit.answer === "__WA__") return openWa(); return botSay(hit.answer); }
+      botSay("Thanks! The quickest way to a detailed answer is a quick chat. Call +94 77 022 2000, tap WhatsApp below, or use the contact form and we'll reply within one business day.");
     }
     function renderQuick() {
       quickEl.innerHTML = "";
-      QUICK.forEach(function (q) {
+      entries.filter(function (e) { return e.quick; }).forEach(function (e) {
         var b = document.createElement("button");
-        b.className = "chat__chip"; b.type = "button"; b.textContent = q;
-        b.onclick = function () {
-          if (q === "Talk on WhatsApp") { window.open(waHref, "_blank"); return; }
-          add(q, "me"); respond(q);
-        };
+        b.className = "chat__chip"; b.type = "button"; b.textContent = e.title;
+        b.onclick = function () { add(e.title, "me"); if (e.answer && e.answer !== "__WA__") botSay(e.answer); else respond(e.title); };
         quickEl.appendChild(b);
       });
+      var wa = document.createElement("button");
+      wa.className = "chat__chip"; wa.type = "button"; wa.textContent = "Talk on WhatsApp";
+      wa.onclick = function () { window.open(waHref, "_blank"); };
+      quickEl.appendChild(wa);
     }
     function openChat() {
       panel.classList.add("is-open");

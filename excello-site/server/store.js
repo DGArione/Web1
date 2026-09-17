@@ -7,7 +7,8 @@ const DATA_DIR = path.join(__dirname, "..", "data");
 const FILES = {
   projects: path.join(DATA_DIR, "projects.json"),
   insights: path.join(DATA_DIR, "insights.json"),
-  services: path.join(DATA_DIR, "services.json")
+  services: path.join(DATA_DIR, "services.json"),
+  chatbot: path.join(DATA_DIR, "chatbot.json")
 };
 
 function ensure() {
