@@ -1,0 +1,364 @@
+// Private Buy & Sell Platform — data model
+// See docs/IMPLEMENTATION.md for how this maps to the proposal sections.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Users, roles & hierarchy (proposal §3, §4, §31, §32)
+// ---------------------------------------------------------------------------
+
+enum Role {
+  ADMIN
+  SELLER
+  CUSTOMER
+}
+
+enum AccountStatus {
+  PENDING // application submitted, awaiting approval
+  ACTIVE
+  INACTIVE // auto-deactivated for inactivity / non-payment
+  RESTRICTED // limited functions (e.g. overdue payments)
+  DISABLED // manually disabled by admin/master
+}
+
+model User {
+  id           String        @id @default(cuid())
+  role         Role
+  name         String
+  email        String?       @unique
+  phone        String?       @unique
+  passwordHash String
+  // Separate recovery/reactivation credential (§26). Never stored plaintext.
+  recoveryHash String?
+  status       AccountStatus @default(ACTIVE)
+  points       Int           @default(0)
+  totalSales   Float         @default(0)
+
+  // Seller level (null for admin/customer)
+  levelId String?
+  level   SellerLevel? @relation("UserLevel", fields: [levelId], references: [id])
+
+  // Hierarchy: a seller's or customer's master (the seller/admin above them)
+  masterId String?
+  master   User?   @relation("Hierarchy", fields: [masterId], references: [id])
+  reports  User[]  @relation("Hierarchy")
+
+  lastActiveAt DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  products             Product[]              @relation("SellerProducts")
+  customerOrders       Order[]                @relation("CustomerOrders")
+  sellerOrders         Order[]                @relation("SellerOrders")
+  invitationsCreated   Invitation[]           @relation("InvitationCreator")
+  commissionEntries    CommissionEntry[]      @relation("SellerCommission")
+  notifications        Notification[]
+  policyAcks           PolicyAcknowledgement[]
+  verifiedPayments     Payment[]              @relation("PaymentVerifier")
+
+  @@index([role])
+  @@index([masterId])
+  @@index([levelId])
+}
+
+// ---------------------------------------------------------------------------
+// Configurable seller levels (proposal §4, §5, §6, §7)
+// ---------------------------------------------------------------------------
+
+model SellerLevel {
+  id            String  @id @default(cuid())
+  name          String
+  rank          Int     @unique // ordering: 1 = lowest. No hard-coded maximum.
+  minSales      Float   @default(0)
+  minPoints     Int     @default(0)
+  commissionPct Float   @default(0) // fallback commission if no bracket matches
+  registrationFee Float @default(0)
+
+  // Permissions
+  canRecruit       Boolean @default(false) // may create subordinate sellers
+  canCreateProducts Boolean @default(true)
+  creditAllowed    Boolean @default(false)
+  creditDays       Int     @default(0)
+
+  // Inactivity rules (§25)
+  inactivityDays Int @default(0) // 0 = disabled
+
+  policy    Policy?
+  users     User[]  @relation("UserLevel")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Invitations — one-time registration links (proposal §9, §10)
+// ---------------------------------------------------------------------------
+
+enum InvitationType {
+  SELLER
+  CUSTOMER
+}
+
+enum InvitationStatus {
+  ACTIVE
+  USED
+  EXPIRED
+  REVOKED
+}
+
+model Invitation {
+  id        String           @id @default(cuid())
+  token     String           @unique
+  type      InvitationType
+  status    InvitationStatus @default(ACTIVE)
+
+  createdById String
+  createdBy   User   @relation("InvitationCreator", fields: [createdById], references: [id])
+
+  // For seller invites: which level the new seller joins
+  levelId String?
+
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([status])
+  @@index([createdById])
+}
+
+// ---------------------------------------------------------------------------
+// Seller applications (direct-to-admin request, §10; customer→seller, §11)
+// ---------------------------------------------------------------------------
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model SellerApplication {
+  id        String            @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  message   String?
+  status    ApplicationStatus @default(PENDING)
+  createdAt DateTime          @default(now())
+  reviewedAt DateTime?
+}
+
+// ---------------------------------------------------------------------------
+// Products (proposal §13)
+// ---------------------------------------------------------------------------
+
+model Product {
+  id          String   @id @default(cuid())
+  sellerId    String
+  seller      User     @relation("SellerProducts", fields: [sellerId], references: [id])
+  name        String
+  code        String
+  description String   @default("")
+  price       Float
+  stock       Int      @default(0)
+  active      Boolean  @default(true)
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orderItems OrderItem[]
+
+  @@index([sellerId])
+}
+
+// ---------------------------------------------------------------------------
+// Commission brackets by product price range (proposal §14)
+// ---------------------------------------------------------------------------
+
+model CommissionBracket {
+  id       String @id @default(cuid())
+  minPrice Float
+  maxPrice Float? // null = no upper bound
+  pct      Float
+  createdAt DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Orders & the order lifecycle (proposal §15)
+// ---------------------------------------------------------------------------
+
+enum OrderStatus {
+  CREATED // customer created, awaiting seller review
+  AWAITING_PAYMENT // seller provided payment info
+  PROOF_SUBMITTED // customer uploaded payment proof
+  PAYMENT_VERIFIED // seller/admin verified payment
+  READY_FOR_COLLECTION
+  COMPLETED
+  CANCELLED
+}
+
+model Order {
+  id         String      @id @default(cuid())
+  customerId String
+  customer   User        @relation("CustomerOrders", fields: [customerId], references: [id])
+  sellerId   String
+  seller     User        @relation("SellerOrders", fields: [sellerId], references: [id])
+  status     OrderStatus @default(CREATED)
+  total      Float       @default(0)
+
+  // Temporary, seller-provided info (§15, §22). Visible to the customer only
+  // until `expiresAt`.
+  paymentInfo    String?
+  collectionInfo String?
+
+  // Temporary-data expiration (§22, §23). After this, customer-facing views hide it.
+  expiresAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items      OrderItem[]
+  payment    Payment?
+  commission CommissionEntry?
+
+  @@index([customerId])
+  @@index([sellerId])
+  @@index([status])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  name      String // snapshot
+  price     Float // snapshot
+  quantity  Int     @default(1)
+}
+
+// ---------------------------------------------------------------------------
+// Payments — bank transfer & crypto proof (proposal §16, §17)
+// ---------------------------------------------------------------------------
+
+enum PaymentMethod {
+  BANK
+  CRYPTO
+}
+
+enum PaymentStatus {
+  SUBMITTED
+  VERIFIED
+  REJECTED
+}
+
+model Payment {
+  id       String        @id @default(cuid())
+  orderId  String        @unique
+  order    Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  method   PaymentMethod
+  status   PaymentStatus @default(SUBMITTED)
+
+  // Bank transfer receipt upload (§16)
+  receiptUrl String?
+  // Crypto proof (§17)
+  txHash     String?
+  note       String?
+
+  verifiedById String?
+  verifiedBy   User?     @relation("PaymentVerifier", fields: [verifiedById], references: [id])
+  verifiedAt   DateTime?
+
+  createdAt DateTime @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Commission settlement ledger (proposal §19, §20, §24)
+// Retained even after customer-facing order info expires.
+// ---------------------------------------------------------------------------
+
+enum SettlementStatus {
+  PENDING
+  DUE
+  PAID
+  OVERDUE
+}
+
+model CommissionEntry {
+  id       String           @id @default(cuid())
+  sellerId String
+  seller   User             @relation("SellerCommission", fields: [sellerId], references: [id])
+  orderId  String           @unique
+  order    Order            @relation(fields: [orderId], references: [id])
+  saleAmount    Float
+  commissionPct Float
+  commissionDue Float
+  status   SettlementStatus @default(PENDING)
+  dueDate  DateTime?
+  paidAt   DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([sellerId])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Policies & acknowledgements (proposal §6, §28)
+// ---------------------------------------------------------------------------
+
+model Policy {
+  id      String @id @default(cuid())
+  levelId String @unique
+  level   SellerLevel @relation(fields: [levelId], references: [id], onDelete: Cascade)
+  version Int    @default(1)
+  content String @default("")
+  updatedAt DateTime @updatedAt
+
+  acknowledgements PolicyAcknowledgement[]
+}
+
+model PolicyAcknowledgement {
+  id        String   @id @default(cuid())
+  policyId  String
+  policy    Policy   @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  version   Int
+  createdAt DateTime @default(now())
+
+  @@unique([policyId, userId, version])
+}
+
+// ---------------------------------------------------------------------------
+// Notifications (proposal §27)
+// ---------------------------------------------------------------------------
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  body      String   @default("")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ---------------------------------------------------------------------------
+// System settings — key/value (proposal §18, §29 Settings)
+// bank details, crypto details, expiration periods, payment method, etc.
+// ---------------------------------------------------------------------------
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

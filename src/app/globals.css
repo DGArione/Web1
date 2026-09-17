@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+/* Authenticated areas render in dark mode (proposal: dark-mode authenticated
+   interface). The <html> tag gets the `dark` class in the dashboard layout. */
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  @apply antialiased;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-tea-600 text-white hover:bg-tea-700 focus:ring-tea-500;
+  }
+  .btn-gold {
+    @apply btn bg-gold-500 text-tea-950 hover:bg-gold-400 focus:ring-gold-400;
+  }
+  .btn-ghost {
+    @apply btn border border-tea-700/40 bg-transparent text-tea-100 hover:bg-tea-800/40;
+  }
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  }
+  .card {
+    @apply rounded-xl border border-tea-800/60 bg-tea-900/40 p-5 shadow-sm;
+  }
+  .input {
+    @apply w-full rounded-md border border-tea-700/50 bg-tea-950/60 px-3 py-2 text-sm text-tea-50 placeholder-tea-400/60 focus:border-tea-500 focus:outline-none focus:ring-1 focus:ring-tea-500;
+  }
+  .label {
+    @apply mb-1 block text-sm font-medium text-tea-200;
+  }
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+}
