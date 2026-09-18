@@ -13,8 +13,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    // suppressHydrationWarning tolerates attributes injected by browser
+    // extensions (e.g. grammar/writing tools add data-* on <html>/<body>)
+    // and theme attributes, which would otherwise trip React's hydration check.
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }
