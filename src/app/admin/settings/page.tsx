@@ -40,6 +40,16 @@ export default async function AdminSettings() {
               <label className="label" htmlFor={K.SETTLEMENT_DAYS}>Commission settlement period (days)</label>
               <input id={K.SETTLEMENT_DAYS} name={K.SETTLEMENT_DAYS} type="number" min={0} defaultValue={s[K.SETTLEMENT_DAYS]} className="input" />
             </div>
+            <div>
+              <label className="label" htmlFor={K.OVERDUE_GRACE_DAYS}>Overdue grace (days after due)</label>
+              <input id={K.OVERDUE_GRACE_DAYS} name={K.OVERDUE_GRACE_DAYS} type="number" min={0} defaultValue={s[K.OVERDUE_GRACE_DAYS]} className="input" />
+              <p className="mt-1 text-xs text-tea-400">Due commission becomes overdue (seller restricted) after this.</p>
+            </div>
+            <div>
+              <label className="label" htmlFor={K.OVERDUE_DEACTIVATE_DAYS}>Deactivate after overdue (days)</label>
+              <input id={K.OVERDUE_DEACTIVATE_DAYS} name={K.OVERDUE_DEACTIVATE_DAYS} type="number" min={0} defaultValue={s[K.OVERDUE_DEACTIVATE_DAYS]} className="input" />
+              <p className="mt-1 text-xs text-tea-400">Long-overdue sellers are deactivated after this. 0 disables.</p>
+            </div>
           </div>
         </section>
 

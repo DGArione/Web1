@@ -16,6 +16,8 @@ async function main() {
     payment_terms: "IMMEDIATE",
     credit_days: "14",
     settlement_days: "14",
+    overdue_grace_days: "7",
+    overdue_deactivate_days: "30",
     bank_name: "Bank of Ceylon",
     bank_account_name: "Ceylon Tea Traders (Pvt) Ltd",
     bank_account_number: "0001234567",

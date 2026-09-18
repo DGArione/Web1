@@ -63,6 +63,8 @@ model User {
   notifications        Notification[]
   policyAcks           PolicyAcknowledgement[]
   verifiedPayments     Payment[]              @relation("PaymentVerifier")
+  settlements          Settlement[]           @relation("SellerSettlement")
+  confirmedSettlements Settlement[]           @relation("SettlementConfirmer")
 
   @@index([role])
   @@index([masterId])
@@ -303,6 +305,44 @@ model CommissionEntry {
   status   SettlementStatus @default(PENDING)
   dueDate  DateTime?
   paidAt   DateTime?
+  createdAt DateTime @default(now())
+
+  // The confirmed settlement that paid this entry (§20).
+  settlementId String?
+  settlement   Settlement? @relation(fields: [settlementId], references: [id])
+
+  @@index([sellerId])
+  @@index([status])
+}
+
+// ---------------------------------------------------------------------------
+// Settlement submissions — a seller pays their outstanding commission to the
+// platform and the admin confirms it (proposal §20).
+// ---------------------------------------------------------------------------
+
+enum SettlementSubmissionStatus {
+  SUBMITTED
+  CONFIRMED
+  REJECTED
+}
+
+model Settlement {
+  id       String                     @id @default(cuid())
+  sellerId String
+  seller   User                       @relation("SellerSettlement", fields: [sellerId], references: [id])
+  amount   Float
+  method   PaymentMethod
+  status   SettlementSubmissionStatus @default(SUBMITTED)
+
+  receiptUrl String?
+  txHash     String?
+  note       String?
+
+  confirmedById String?
+  confirmedBy   User?     @relation("SettlementConfirmer", fields: [confirmedById], references: [id])
+  confirmedAt   DateTime?
+
+  entries   CommissionEntry[]
   createdAt DateTime @default(now())
 
   @@index([sellerId])

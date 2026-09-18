@@ -58,8 +58,8 @@ Legend: ✅ implemented · 🟡 partial / foundation present · ⬜ planned
 | § | Area | Status | Where |
 | --- | --- | --- | --- |
 | §19 | Per-sale commission → ledger | ✅ | `CommissionEntry` created on payment verify |
-| §20 | Scheduled/periodic settlement | 🟡 | due dates + statuses present; settlement submission/confirm UI planned |
-| §21 | Non-payment escalation | 🟡 | statuses (DUE/OVERDUE/RESTRICTED) present; auto-escalation job planned |
+| §20 | Settlement submission + admin confirmation | ✅ | `Settlement` model; `submitSettlement` (seller) / `confirmSettlement` (admin) |
+| §21 | Non-payment escalation (due→overdue→restricted→inactive) | ✅ | `src/lib/settlement.ts` `runEscalation`; admin "Run escalation" + grace settings |
 | §24 | Retention split (account / temporary / financial) | ✅ | schema separates these; ledger retained past expiry |
 
 ## Temporary data, notifications, policies
@@ -95,9 +95,21 @@ Legend: ✅ implemented · 🟡 partial / foundation present · ⬜ planned
 
 ## Suggested next phase
 
-1. Settlement submission + admin confirmation UI (§20) and non-payment escalation
-   job (§21).
-2. Scheduled jobs: temporary-data purge (§22/§23), inactivity deactivation (§25).
-3. Account reactivation via recovery credential (§26).
-4. Level visibility screens and master/subordinate sourcing enforcement (§7/§12).
-5. Two-factor auth (§31) and move uploads to object storage.
+1. Scheduled jobs to run `runEscalation` (§21) and temporary-data purge (§22/§23)
+   automatically, plus inactivity deactivation (§25). Currently escalation is run
+   on demand by an admin from Finance → "Run escalation".
+2. Account reactivation via recovery credential (§26).
+3. Level visibility screens and master/subordinate sourcing enforcement (§7/§12).
+4. Two-factor auth (§31) and move uploads to object storage.
+
+### Phase 2 additions (§20, §21)
+
+- `Settlement` model: a seller submits a bank/crypto payment proof covering all
+  their outstanding commission (`src/app/seller/finance` → `SettlementForm`); the
+  admin confirms or rejects it (`src/app/admin/finance`). Confirming marks the
+  covered `CommissionEntry` rows `PAID` and lifts an escalation restriction if the
+  seller has no remaining overdue commission.
+- `runEscalation()` (`src/lib/settlement.ts`) is idempotent and transitions
+  `PENDING → DUE → OVERDUE` by due date + configurable grace, restricts sellers
+  with overdue commission, deactivates the long-overdue, and lifts restrictions
+  once cleared. Grace/deactivation windows are in admin Settings.

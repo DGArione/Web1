@@ -11,6 +11,10 @@ export const SETTING_KEYS = {
   PAYMENT_TERMS: "payment_terms",
   CREDIT_DAYS: "credit_days",
   SETTLEMENT_DAYS: "settlement_days",
+  // Grace days after a commission is DUE before it becomes OVERDUE (§21).
+  OVERDUE_GRACE_DAYS: "overdue_grace_days",
+  // Days a seller may remain OVERDUE (restricted) before auto-deactivation (§21).
+  OVERDUE_DEACTIVATE_DAYS: "overdue_deactivate_days",
 
   // Bank transfer details (§16)
   BANK_NAME: "bank_name",
@@ -40,6 +44,8 @@ const DEFAULTS: Record<string, string> = {
   [SETTING_KEYS.PAYMENT_TERMS]: "IMMEDIATE",
   [SETTING_KEYS.CREDIT_DAYS]: "14",
   [SETTING_KEYS.SETTLEMENT_DAYS]: "14",
+  [SETTING_KEYS.OVERDUE_GRACE_DAYS]: "7",
+  [SETTING_KEYS.OVERDUE_DEACTIVATE_DAYS]: "30",
   [SETTING_KEYS.BANK_NAME]: "",
   [SETTING_KEYS.BANK_ACCOUNT_NAME]: "",
   [SETTING_KEYS.BANK_ACCOUNT_NUMBER]: "",

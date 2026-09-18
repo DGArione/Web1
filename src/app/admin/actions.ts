@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { requireRole } from "@/lib/auth";
 import { generateToken } from "@/lib/tokens";
 import { getSettingNumber, setSetting, SETTING_KEYS } from "@/lib/settings";
+import { runEscalation } from "@/lib/settlement";
 import { notify } from "@/lib/notify";
 
 // --- Seller invitations (§10) ------------------------------------------------
@@ -134,6 +135,77 @@ export async function savePolicy(formData: FormData): Promise<void> {
     await prisma.policy.create({ data: { levelId, content } });
   }
   revalidatePath("/admin/levels");
+}
+
+// --- Settlement confirmation (§20) ------------------------------------------
+export async function confirmSettlement(formData: FormData): Promise<void> {
+  const admin = await requireRole("ADMIN");
+  const id = String(formData.get("id") ?? "");
+  const settlement = await prisma.settlement.findUnique({
+    where: { id },
+    include: { entries: { select: { id: true } } },
+  });
+  if (!settlement || settlement.status !== "SUBMITTED") return;
+
+  await prisma.$transaction([
+    prisma.settlement.update({
+      where: { id },
+      data: { status: "CONFIRMED", confirmedById: admin.id, confirmedAt: new Date() },
+    }),
+    prisma.commissionEntry.updateMany({
+      where: { id: { in: settlement.entries.map((e) => e.id) } },
+      data: { status: "PAID", paidAt: new Date() },
+    }),
+  ]);
+
+  // If the seller is only RESTRICTED and now has no overdue commission, restore.
+  const seller = await prisma.user.findUnique({ where: { id: settlement.sellerId } });
+  if (seller?.status === "RESTRICTED") {
+    const stillOverdue = await prisma.commissionEntry.count({
+      where: { sellerId: seller.id, status: "OVERDUE" },
+    });
+    if (stillOverdue === 0) {
+      await prisma.user.update({ where: { id: seller.id }, data: { status: "ACTIVE" } });
+    }
+  }
+
+  await notify(
+    settlement.sellerId,
+    "Settlement confirmed",
+    `Your commission settlement of $${settlement.amount.toFixed(2)} has been confirmed.`
+  );
+  revalidatePath("/admin/finance");
+}
+
+export async function rejectSettlement(formData: FormData): Promise<void> {
+  await requireRole("ADMIN");
+  const id = String(formData.get("id") ?? "");
+  const settlement = await prisma.settlement.findUnique({ where: { id } });
+  if (!settlement || settlement.status !== "SUBMITTED") return;
+
+  await prisma.$transaction([
+    // Release the entries so they can be settled again.
+    prisma.commissionEntry.updateMany({
+      where: { settlementId: id },
+      data: { settlementId: null },
+    }),
+    prisma.settlement.update({ where: { id }, data: { status: "REJECTED" } }),
+  ]);
+
+  await notify(
+    settlement.sellerId,
+    "Settlement not accepted",
+    "Your commission settlement was not accepted. Please review and re-submit."
+  );
+  revalidatePath("/admin/finance");
+}
+
+// --- Escalation of overdue commission (§21) ---------------------------------
+export async function processEscalation(): Promise<void> {
+  await requireRole("ADMIN");
+  await runEscalation();
+  revalidatePath("/admin/finance");
+  revalidatePath("/admin/sellers");
 }
 
 // --- Emergency data purge (§30) ---------------------------------------------

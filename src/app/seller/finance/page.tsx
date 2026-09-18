@@ -3,10 +3,12 @@ import { requireRole } from "@/lib/auth";
 import { PageHeader } from "@/components/dashboard/Shell";
 import { StatCard, StatusBadge, Table, EmptyState } from "@/components/ui";
 import { money, dateTime } from "@/lib/format";
+import { getAllSettings, SETTING_KEYS as K } from "@/lib/settings";
+import { SettlementForm } from "../SettlementForm";
 
 export default async function SellerFinance() {
   const me = await requireRole("SELLER");
-  const [entries, totals] = await Promise.all([
+  const [entries, totals, settlements, settings] = await Promise.all([
     prisma.commissionEntry.findMany({
       where: { sellerId: me.id },
       orderBy: { createdAt: "desc" },
@@ -17,9 +19,19 @@ export default async function SellerFinance() {
       where: { sellerId: me.id },
       _sum: { commissionDue: true },
     }),
+    prisma.settlement.findMany({
+      where: { sellerId: me.id },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+    }),
+    getAllSettings(),
   ]);
   const sumFor = (s: string) => totals.find((t) => t.status === s)?._sum.commissionDue ?? 0;
-  const outstanding = sumFor("PENDING") + sumFor("DUE") + sumFor("OVERDUE");
+  const outstanding = Math.round((sumFor("PENDING") + sumFor("DUE") + sumFor("OVERDUE")) * 100) / 100;
+  const method = settings[K.PAYMENT_METHOD];
+  const allowBank = method === "BANK" || method === "BOTH";
+  const allowCrypto = method === "CRYPTO" || method === "BOTH";
+  const hasPending = settlements.some((s) => s.status === "SUBMITTED");
 
   return (
     <div>
@@ -33,10 +45,34 @@ export default async function SellerFinance() {
         <StatCard label="Overdue" value={money(sumFor("OVERDUE"))} />
       </div>
 
-      <div className="card mt-6 text-sm text-tea-300">
-        Settlement is handled with your administrator. When a payment is due, submit your proof
-        to the administrator and they will confirm it. Your sale earnings (sale amount minus
-        commission) are yours to keep.
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        {outstanding > 0 && !hasPending ? (
+          <SettlementForm outstanding={outstanding} allowBank={allowBank} allowCrypto={allowCrypto} />
+        ) : (
+          <div className="card text-sm text-tea-300">
+            {hasPending
+              ? "You have a settlement awaiting administrator confirmation."
+              : "You have no outstanding commission. Nothing to settle right now."}
+          </div>
+        )}
+
+        <div className="card">
+          <h2 className="mb-3 font-serif text-base font-semibold">Settlement history</h2>
+          {settlements.length === 0 ? (
+            <p className="text-sm text-tea-400">No settlements submitted yet.</p>
+          ) : (
+            <div className="space-y-2">
+              {settlements.map((s) => (
+                <div key={s.id} className="flex items-center justify-between text-sm">
+                  <span className="text-tea-200">{money(s.amount)} · {s.method}</span>
+                  <span className="flex items-center gap-2 text-tea-400">
+                    {dateTime(s.createdAt)} <StatusBadge status={s.status} />
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <h2 className="mb-3 mt-8 font-serif text-lg font-semibold">Ledger</h2>

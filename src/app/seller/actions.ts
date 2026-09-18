@@ -6,6 +6,7 @@ import { requireRole } from "@/lib/auth";
 import { generateToken } from "@/lib/tokens";
 import { getSettingNumber, SETTING_KEYS } from "@/lib/settings";
 import { resolveCommissionPct, commissionDue } from "@/lib/commission";
+import { saveUpload } from "@/lib/uploads";
 import { notify } from "@/lib/notify";
 
 async function seller() {
@@ -180,6 +181,72 @@ export async function acknowledgePolicy(formData: FormData): Promise<void> {
     update: {},
   });
   revalidatePath("/seller/level");
+}
+
+// --- Commission settlement submission (§20) ---------------------------------
+export interface SettlementState {
+  error?: string;
+  success?: string;
+}
+
+export async function submitSettlement(
+  _prev: SettlementState,
+  formData: FormData
+): Promise<SettlementState> {
+  const me = await seller();
+  const method = String(formData.get("method") ?? "");
+  const txHash = String(formData.get("txHash") ?? "").trim();
+  const note = String(formData.get("note") ?? "").trim();
+  const file = formData.get("receipt") as File | null;
+
+  if (method !== "BANK" && method !== "CRYPTO") return { error: "Choose a payment method." };
+
+  // One pending settlement at a time.
+  const existing = await prisma.settlement.findFirst({
+    where: { sellerId: me.id, status: "SUBMITTED" },
+  });
+  if (existing) {
+    return { error: "You already have a settlement awaiting confirmation." };
+  }
+
+  // Cover all currently-unpaid, unlinked commission entries.
+  const entries = await prisma.commissionEntry.findMany({
+    where: { sellerId: me.id, status: { in: ["PENDING", "DUE", "OVERDUE"] }, settlementId: null },
+    select: { id: true, commissionDue: true },
+  });
+  if (entries.length === 0) return { error: "You have no outstanding commission to settle." };
+
+  const amount = Math.round(entries.reduce((s, e) => s + e.commissionDue, 0) * 100) / 100;
+
+  let receiptUrl: string | undefined;
+  try {
+    if (file && file.size > 0) receiptUrl = await saveUpload(file);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Upload failed." };
+  }
+  if (method === "BANK" && !receiptUrl) return { error: "Upload your bank transfer receipt." };
+  if (method === "CRYPTO" && !txHash) return { error: "Enter the transaction hash." };
+
+  await prisma.settlement.create({
+    data: {
+      sellerId: me.id,
+      amount,
+      method: method as "BANK" | "CRYPTO",
+      receiptUrl,
+      txHash: method === "CRYPTO" ? txHash : null,
+      note: note || null,
+      entries: { connect: entries.map((e) => ({ id: e.id })) },
+    },
+  });
+
+  // Notify all administrators.
+  const admins = await prisma.user.findMany({ where: { role: "ADMIN" }, select: { id: true } });
+  for (const a of admins) {
+    await notify(a.id, "Settlement submitted", `${me.name} submitted a commission settlement of $${amount.toFixed(2)}.`);
+  }
+
+  revalidatePath("/seller/finance");
+  return { success: `Settlement of $${amount.toFixed(2)} submitted for confirmation.` };
 }
 
 // --- Notifications ----------------------------------------------------------
