@@ -861,7 +861,7 @@ body.is-dark .sky { color: var(--ink); }
 
 /* ---- Type system --------------------------------------------------------- */
 :root {
-  --font-serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
   --font-sans: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --ink: #17150f;
   --paper: #f2ece0;
@@ -1233,7 +1233,7 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
    ADDENDUM 11 — brand lockup (mark + wordmark)
    ========================================================================== */
 .brand { flex-direction: row; align-items: center; gap: 11px; }
-.brand__mark { width: clamp(24px, 2.6vw, 32px); height: auto; flex: 0 0 auto; }
+.brand__mark { width: clamp(26px, 2.8vw, 34px); height: auto; flex: 0 0 auto; display: block; }
 .brand__text { display: flex; flex-direction: column; line-height: 1; }
 .header.is-compact .brand__mark { width: clamp(22px, 2.2vw, 28px); }
 

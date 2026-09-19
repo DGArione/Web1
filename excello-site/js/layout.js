@@ -55,7 +55,7 @@
     '<div class="cursor" id="cursor"><span class="cursor__label">View</span></div>' +
     '<header class="header" id="header">' +
     '<a class="brand" href="/" aria-label="Excello home">' +
-    '<svg class="brand__mark" viewBox="0 0 100 100" fill="none" stroke="var(--bronze)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M50 11 L88 80"/><path d="M50 11 L12 80"/><path d="M12 80 L40 80"/><path d="M60 80 L88 80"/><path d="M52 35 L72 80"/></svg>' +
+    '<img class="brand__mark" src="/img/logo-triangle.png" alt="" aria-hidden="true">' +
     '<span class="brand__text"><span class="brand__word">EXCELLO</span><span class="brand__sub" data-site="tagline">the way you imagine</span></span>' +
     "</a>" +
     '<nav class="nav" aria-label="Primary">' + navHtml + "</nav>" +
@@ -82,9 +82,6 @@
     '<li><a href="https://lk.linkedin.com/company/excello-developers-pvt-ltd" target="_blank" rel="noopener" data-site="linkedin">LinkedIn</a></li>' +
     '<li data-site-item="instagram" hidden><a href="#" target="_blank" rel="noopener" data-site="instagram">Instagram</a></li>' +
     "</ul></div>" +
-    "</div>" +
-    '<div class="footer__wordmark" data-wordmark>' +
-    "EXCELLO".split("").map(function (c) { return "<span>" + c + "</span>"; }).join("") +
     "</div>" +
     '<div class="footer__bottom"><span>&copy; ' + new Date().getFullYear() + ' Excello Developers (Pvt) Ltd. All rights reserved.</span><span>Mount Lavinia · Colombo · Sri Lanka</span><span class="footer__credit">Developed by <a href="https://rapidsolutions.live" target="_blank" rel="noopener">RapidSolutions</a></span></div>' +
     "</footer></div>";

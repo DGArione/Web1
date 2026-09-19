@@ -324,14 +324,17 @@
         ease: "none",
         scrollTrigger: { trigger: footerWrap, start: "top bottom", end: "top 20%", scrub: true }
       });
-      gsap.from(footerWrap.querySelectorAll("[data-wordmark] span"), {
-        yPercent: 70,
-        opacity: 0,
-        stagger: 0.05,
-        duration: 1.2,
-        ease: "power4.out",
-        scrollTrigger: { trigger: footerWrap.querySelector("[data-wordmark]"), start: "top 95%", once: true }
-      });
+      var wordmark = footerWrap.querySelector("[data-wordmark]");
+      if (wordmark) {
+        gsap.from(wordmark.querySelectorAll("span"), {
+          yPercent: 70,
+          opacity: 0,
+          stagger: 0.05,
+          duration: 1.2,
+          ease: "power4.out",
+          scrollTrigger: { trigger: wordmark, start: "top 95%", once: true }
+        });
+      }
     }
 
     /* Hero intro (runs after preloader) */
