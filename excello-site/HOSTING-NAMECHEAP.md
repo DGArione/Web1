@@ -98,6 +98,26 @@ Your content and uploads are saved on the server in `data/*.json` and
 
 ---
 
+## Troubleshooting
+
+### “Cannot move a directory … into itself” (shutil.Error on Setup Node.js App)
+This happens when you **edit the Application Root of an existing Node app to a
+nested path** — CloudLinux tries to move the app’s virtualenv inside itself.
+Your code is fine. Fix it by recreating the app, not editing it:
+
+1. **Setup Node.js App → Destroy** the broken `excello-site` app.
+2. In **File Manager**, delete the leftover virtualenv folders in your home dir:
+   `nodevenv/excello-site/excello-site` and `nodevenv/excello-site`.
+3. Find the folder that **directly** contains `package.json` and note its path
+   relative to home. If it is double-nested (`excello-site/excello-site/…`),
+   flatten it or use the inner folder as the root.
+4. **Create a new** Node.js app pointing Application Root at that exact folder,
+   startup file `server/server.js`. Get it right the first time.
+5. Run NPM Install → set `SESSION_SECRET` → Restart.
+
+**Golden rule:** never edit an existing app’s Application Root. If it’s wrong,
+Destroy the app and create a new one.
+
 ## If Node isn’t available on your plan
 
 Two fallbacks:
