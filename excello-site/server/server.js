@@ -189,7 +189,9 @@ app.post("/api/admin/:coll/reorder", auth.requireAuth, coll, function (req, res)
 /* ---- Admin app + static site -------------------------------------------- */
 app.get("/admin", function (req, res) { res.sendFile(path.join(ROOT, "admin", "index.html")); });
 app.use("/uploads", express.static(UPLOADS, { maxAge: "7d" }));
-app.use(express.static(ROOT, { extensions: ["html"], maxAge: "1h" }));
+/* maxAge 0 + etag: browsers revalidate every load, so edits and redeploys show
+   immediately (a 304 is returned when a file is unchanged, so it stays fast). */
+app.use(express.static(ROOT, { extensions: ["html"], etag: true, maxAge: 0 }));
 
 app.listen(PORT, function () {
   console.log("Excello site + admin running on http://localhost:" + PORT);
