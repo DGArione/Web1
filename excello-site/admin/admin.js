@@ -2,6 +2,8 @@
 (function () {
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
+  /* Base path (from the injected <base>) so admin calls work under a sub-folder. */
+  var B = (function () { var b = document.querySelector("base"); return b ? (b.getAttribute("href") || "/").replace(/\/+$/, "") : ""; })();
   var state = { me: null, coll: "projects", items: [], editing: null, saving: false, site: null };
 
   var SITE_FIELDS = [
@@ -78,6 +80,7 @@
 
   /* ---- API ---- */
   function api(method, url, body, isForm) {
+    if (url && url.charAt(0) === "/") url = B + url;
     var opts = { method: method, headers: {}, credentials: "same-origin" };
     if (body && !isForm) { opts.headers["Content-Type"] = "application/json"; opts.body = JSON.stringify(body); }
     if (body && isForm) opts.body = body;
@@ -143,7 +146,7 @@
       '<div class="drawer" id="drawer"><div class="drawer__scrim" data-close></div><div class="drawer__panel" id="panel"></div></div>';
 
     document.getElementById("logoutBtn").onclick = function () { api("POST", "/admin/logout").then(function () { state.me = null; render(); }); };
-    document.getElementById("viewBtn").onclick = function () { window.open("/", "_blank"); };
+    document.getElementById("viewBtn").onclick = function () { window.open((B || "") + "/", "_blank"); };
     document.getElementById("pwBtn").onclick = changePassword;
     if (document.getElementById("chgpw")) document.getElementById("chgpw").onclick = function (e) { e.preventDefault(); changePassword(); };
     var newBtn = document.getElementById("newBtn");

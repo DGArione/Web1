@@ -12,6 +12,9 @@
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   var body = document.body;
+  /* Base path (from the injected <base>) so internal fetches work under a sub-folder. */
+  var B = (function () { var b = document.querySelector("base"); return b ? (b.getAttribute("href") || "/").replace(/\/+$/, "") : ""; })();
+  function apiUrl(p) { return p && p.charAt(0) === "/" ? B + p : p; }
 
   /* After a masked line reveal finishes, stop clipping so glyph descenders
      and italic overhangs are never cut off. */
@@ -644,7 +647,7 @@
       };
       btn.disabled = true;
       note.textContent = "Sending…";
-      var endpoint = (window.__SITE && window.__SITE.formEndpoint) || "/api/enquiry";
+      var endpoint = apiUrl((window.__SITE && window.__SITE.formEndpoint) || "/api/enquiry");
       fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -707,7 +710,7 @@
     }
 
     /* Load the editable Q&A from the backend; keep the fallback on failure. */
-    fetch("/api/chatbot").then(function (r) { return r.ok ? r.json() : null; }).then(function (list) {
+    fetch(B + "/api/chatbot").then(function (r) { return r.ok ? r.json() : null; }).then(function (list) {
       if (list && list.length) { entries = list; if (panel.classList.contains("is-open")) renderQuick(); }
     }).catch(function () {});
 

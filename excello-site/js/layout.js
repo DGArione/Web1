@@ -3,7 +3,9 @@
 (function () {
   document.documentElement.classList.add("js");
 
-  var path = location.pathname.replace(/index\.html$/, "").toLowerCase();
+  /* Base path when the app runs under a sub-folder (from the injected <base>). */
+  var B = (function () { var b = document.querySelector("base"); return b ? (b.getAttribute("href") || "/").replace(/\/+$/, "") : ""; })();
+  var path = (location.pathname.replace(B, "") || "/").replace(/index\.html$/, "").toLowerCase() || "/";
   var links = [
     { href: "/", label: "Home", num: "01", match: ["/", "/index.html"] },
     { href: "/about.html", label: "About", num: "02", match: ["/about.html"] },
@@ -22,14 +24,14 @@
   var navHtml = links
     .map(function (l) {
       var active = isActive(l) ? " is-active" : "";
-      return '<a class="nav__link' + active + '" href="' + l.href + '" data-magnetic>' + l.label + "</a>";
+      return '<a class="nav__link' + active + '" href="' + B + l.href + '" data-magnetic>' + l.label + "</a>";
     })
     .join("");
 
   var menuHtml = links
     .map(function (l) {
       return (
-        '<a class="menu__link" href="' + l.href + '"><span><small>' + l.num + "</small> " + l.label + "</span></a>"
+        '<a class="menu__link" href="' + B + l.href + '"><span><small>' + l.num + "</small> " + l.label + "</span></a>"
       );
     })
     .join("");
@@ -54,12 +56,12 @@
     "</div>" +
     '<div class="cursor" id="cursor"><span class="cursor__label">View</span></div>' +
     '<header class="header" id="header">' +
-    '<a class="brand" href="/" aria-label="Excello home">' +
-    '<img class="brand__mark" src="/img/logo-triangle.png" alt="" aria-hidden="true">' +
+    '<a class="brand" href="' + B + '/" aria-label="Excello home">' +
+    '<img class="brand__mark" src="' + B + '/img/logo-triangle.png" alt="" aria-hidden="true">' +
     '<span class="brand__text"><span class="brand__word">EXCELLO</span><span class="brand__sub" data-site="tagline">the way you imagine</span></span>' +
     "</a>" +
     '<nav class="nav" aria-label="Primary">' + navHtml + "</nav>" +
-    '<a class="btn" href="/contact.html" data-magnetic>Start a project ' + arrow + "</a>" +
+    '<a class="btn" href="' + B + '/contact.html" data-magnetic>Start a project ' + arrow + "</a>" +
     '<button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>' +
     "</header>" +
     '<div class="menu" id="menu" aria-hidden="true">' +
@@ -72,7 +74,7 @@
     '<div class="footer__top">' +
     '<div class="footer__col"><p class="footer__tag">Thoughtfully designed. Precisely built.</p></div>' +
     '<div class="footer__col"><h4>Navigate</h4><ul>' +
-    links.map(function (l) { return '<li><a href="' + l.href + '">' + l.label + "</a></li>"; }).join("") +
+    links.map(function (l) { return '<li><a href="' + B + l.href + '">' + l.label + "</a></li>"; }).join("") +
     "</ul></div>" +
     '<div class="footer__col"><h4>Visit</h4><ul><li data-site="addr1">No. 16, St Rita’s Road</li><li data-site="addr2">Mount Lavinia</li><li data-site="addr3">Sri Lanka</li></ul></div>' +
     '<div class="footer__col"><h4>Connect</h4><ul>' +
@@ -123,7 +125,7 @@
     addressLine1: "No. 16, St Rita’s Road", addressLine2: "Mount Lavinia", addressLine3: "Sri Lanka",
     facebook: "https://www.facebook.com/ExcelloSriLanka/",
     linkedin: "https://lk.linkedin.com/company/excello-developers-pvt-ltd", instagram: "",
-    formEndpoint: "/api/enquiry", seoTitleSuffix: "Excello Developers", seoDescription: ""
+    formEndpoint: B + "/api/enquiry", seoTitleSuffix: "Excello Developers", seoDescription: ""
   };
   window.__SITE = DEFAULT_SITE;
 
@@ -190,7 +192,7 @@
   }
 
   /* Expose a promise so main.js (chat / contact form) can use the same data. */
-  window.__sitePromise = fetch("/api/site")
+  window.__sitePromise = fetch(B + "/api/site")
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (s) {
       var merged = Object.assign({}, DEFAULT_SITE, s || {});

@@ -1,6 +1,7 @@
 /* Insights "theater" — a cinematic, autoplaying showcase slider.
    Loads before main.js; uses the global gsap. */
 (function () {
+  var B = (function () { var b = document.querySelector("base"); return b ? (b.getAttribute("href") || "/").replace(/\/+$/, "") : ""; })();
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function initTheater() {
@@ -78,12 +79,12 @@
   function initList() {
     var host = document.getElementById("ilist");
     if (!host) return;
-    fetch("/api/insights").then(function (r) { return r.json(); }).then(function (items) {
+    fetch(B + "/api/insights").then(function (r) { return r.json(); }).then(function (items) {
       if (!items || !items.length) { host.innerHTML = '<p class="body body--muted" style="padding:24px 0;">No insights yet.</p>'; return; }
       host.innerHTML = items.map(function (a, i) {
         var meta = [a.category, a.date].filter(Boolean).join(" · ");
         var n = (i < 9 ? "0" : "") + (i + 1);
-        return '<a class="icard" href="/insight/' + a.slug + '" data-cursor="view">' +
+        return '<a class="icard" href="' + B + '/insight/' + a.slug + '" data-cursor="view">' +
           '<span class="icard__i">' + n + "</span>" +
           '<span class="icard__title">' + esc(a.title) + "</span>" +
           '<span class="icard__meta">' + esc(meta) + "</span>" +
