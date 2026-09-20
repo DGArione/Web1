@@ -170,6 +170,13 @@
       });
     });
     document.querySelectorAll(".fab--wa").forEach(function (el) { el.setAttribute("href", waHref(s)); });
+    /* Per-page hero image override (set in the admin). Falls back to the
+       default already in the markup. Works even if the page is served as a
+       static file, since it applies from the /api/site fetch. */
+    document.querySelectorAll("img[data-hero]").forEach(function (el) {
+      var key = "hero" + el.getAttribute("data-hero").replace(/^./, function (c) { return c.toUpperCase(); });
+      if (s[key]) el.setAttribute("src", s[key]);
+    });
   }
 
   /* Social/SEO tags. The per-page <title> and <meta name="description"> stay

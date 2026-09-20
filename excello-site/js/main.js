@@ -22,6 +22,71 @@
   })();
   function apiUrl(p) { return p && p.charAt(0) === "/" ? B + p : p; }
 
+  /* ------------------------------------------------------------------
+     Home hydration — if the page is served as a static file (so the server
+     never filled the Services / Featured / Selected markers), build those
+     sections in the browser from the API. No-op when the server already
+     rendered them (dynamic serving).
+     ------------------------------------------------------------------ */
+  (function hydrateHome() {
+    var cS = document.getElementById("homeServices");
+    var cF = document.getElementById("homeFeatured");
+    var cL = document.getElementById("homeSelected");
+    if (!cS && !cF && !cL) return;                       // not the home page
+    var needS = cS && cS.children.length === 0;
+    var needF = cF && cF.children.length === 0;
+    var needL = cL && cL.children.length === 0;
+    if (!needS && !needF && !needL) return;              // server already filled
+
+    function esc(t) { return String(t == null ? "" : t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+    function pad2(n) { return (n < 10 ? "0" : "") + n; }
+    function bySlug(list, slug) { for (var i = 0; i < list.length; i++) if (list[i].slug === slug) return list[i]; return null; }
+    function get(u) { return fetch(apiUrl(u)).then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; }); }
+    var ARROW = '<svg class="arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 13 13 1M4 1h9v9"/></svg>';
+
+    Promise.all([
+      needS ? get("/api/services") : Promise.resolve([]),
+      (needF || needL) ? get("/api/projects") : Promise.resolve([]),
+      (window.__sitePromise || Promise.resolve(null))
+    ]).then(function (r) {
+      var services = r[0] || [], projects = r[1] || [], site = r[2] || {};
+      if (needS && services.length) {
+        cS.innerHTML = services.map(function (s, i) {
+          return '<a class="service" href="services#' + esc(s.slug) + '">' +
+            '<span class="service__num">' + pad2(i + 1) + '</span>' +
+            '<span class="service__title">' + esc(s.title) + '</span>' +
+            '<span class="service__desc">' + esc(s.card || s.tagline || "") + '</span>' +
+            '<span class="service__arrow">' + ARROW + '</span></a>';
+        }).join("");
+      }
+      if (needF && projects.length) {
+        var fp = bySlug(projects, site.homeFeatured) || projects[0];
+        var kick = [fp.category, fp.location].filter(Boolean).map(esc).join(" · ");
+        cF.innerHTML =
+          '<section class="section container" data-theme="dark"><div class="spotlight">' +
+            '<div class="media media--ratio-portrait"><img src="' + esc(site.homeFeaturedImage || fp.cover) + '" alt="' + esc(fp.title) + '">' +
+              (kick ? '<span class="media__caption">' + kick + '</span>' : '') + '</div>' +
+            '<div><p class="label"><span class="num">(02)</span>Featured project</p>' +
+              '<h2 class="h-1" style="margin-top:18px">' + esc(fp.title) + '</h2>' +
+              (fp.excerpt ? '<p class="body" style="margin-top:28px">' + esc(fp.excerpt) + '</p>' : '') +
+              '<div style="margin-top:40px"><a class="btn" href="project/' + esc(fp.slug) + '">View the project ' + ARROW + '</a></div>' +
+            '</div></div></section>';
+      }
+      if (needL && projects.length) {
+        var a = bySlug(projects, site.homeSelectedA) || projects[1] || projects[0];
+        var b2 = bySlug(projects, site.homeSelectedB) || projects[2] || projects[1] || projects[0];
+        function media(p, img) { var cap = [p.title, p.location].filter(Boolean).map(esc).join(" · "); return '<div class="media"><img src="' + esc(img || p.cover) + '" alt="' + esc(p.title) + '"><span class="media__caption">' + cap + '</span></div>'; }
+        cL.innerHTML =
+          '<section class="container"><div class="duo">' +
+            '<div class="duo__lead"><p class="lede">From coastal villas and urban residences to café interiors and wellness retreats, our projects are places shaped by a clear idea, and a considered response to place, climate and daily life.</p>' +
+            '<a class="link" href="projects">Selected work</a></div>' +
+            media(a, site.homeSelectedImageA) + media(b2, site.homeSelectedImageB) +
+          '</div></section>';
+      }
+      if (window.ScrollTrigger && ScrollTrigger.refresh) ScrollTrigger.refresh();
+    });
+  })();
+
   /* After a masked line reveal finishes, stop clipping so glyph descenders
      and italic overhangs are never cut off. */
   function unclip(el) {
