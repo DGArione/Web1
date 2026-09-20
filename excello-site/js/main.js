@@ -506,10 +506,25 @@
         var w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
         if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
       }
+      function ready1(i) { var im = frames[i]; return im && im.complete && im.naturalWidth; }
+      var wantIdx = -1;
       function paint(i) {
         i = i < 0 ? 0 : (i > count - 1 ? count - 1 : i);
+        wantIdx = i; /* the exact frame we want; may fall back to a neighbour below */
+        /* If the exact target frame hasn't decoded yet, draw the nearest frame
+           that has, instead of freezing on the last one. Motion keeps flowing
+           (just briefly coarser) and sharpens to the exact frame the instant it
+           lands — no stutter while frames are still streaming in. */
+        if (!ready1(i)) {
+          var found = -1;
+          for (var d = 1; d < count; d++) {
+            if (i - d >= 0 && ready1(i - d)) { found = i - d; break; }
+            if (i + d < count && ready1(i + d)) { found = i + d; break; }
+          }
+          if (found < 0) return;
+          i = found;
+        }
         var img = frames[i];
-        if (!img || !img.complete || !img.naturalWidth) return;
         cur = i;
         var cw = canvas.width, ch = canvas.height, iw = img.naturalWidth, ih = img.naturalHeight;
         var sc = Math.max(cw / iw, ch / ih), w = iw * sc, h = ih * sc, x = (cw - w) / 2, y = (ch - h) / 2;
@@ -566,11 +581,19 @@
         if (loaderNum) loaderNum.textContent = Math.round(loaded / count * 100);
         if (idx === firstIdx && !ready) { ready = true; sizeCanvas(); redraw(); }
         if (loaded >= count && loaderWrap) loaderWrap.classList.add("is-done");
-        if (idx === cur || cur === -1) redraw();
+        /* Repaint when the frame we currently want (or are showing) just landed,
+           so a coarse neighbour sharpens to the exact frame the instant it decodes. */
+        if (idx === wantIdx || idx === cur || cur === -1) redraw();
       }
-      /* Hero loads the finished frames first so the resting teaser appears fast. */
-      for (var k = 0; k < count; k++) (function (k) {
-        var idx = isHero ? count - 1 - k : k;
+      /* Load in the order the scrub visits: the resting teaser (last frame)
+         first so the hero appears, then the forward build 0..last — which is
+         exactly the order you scroll through. That way the frames you reach
+         first are decoded first, so the scrub never steps waiting on a download. */
+      var order = [];
+      if (isHero) { order.push(count - 1); for (var j = 0; j < count - 1; j++) order.push(j); }
+      else { for (var j = 0; j < count; j++) order.push(j); }
+      for (var k = 0; k < order.length; k++) (function (k) {
+        var idx = order[k];
         var img = new Image(); img.decoding = "async"; frames[idx] = img;
         function done() { onFrame(idx, k); }
         /* Decode the frame to a ready bitmap up front (while loading, off the
