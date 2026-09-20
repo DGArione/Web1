@@ -20,8 +20,20 @@
     { k: "linkedin", label: "LinkedIn URL" },
     { k: "instagram", label: "Instagram URL (optional — leave blank to hide)" },
     { k: "formEndpoint", label: "Contact-form endpoint (where submissions are sent)" },
-    { k: "seoTitleSuffix", label: "SEO: site name (used in <title>)" },
-    { k: "seoDescription", label: "SEO: default meta description", type: "textarea" }
+    { k: "seoTitleSuffix", label: "SEO: site name (shown in the browser tab)" },
+    { k: "seoDescription", label: "SEO: default meta description", type: "textarea" },
+    { k: "__home", label: "Home page — highlighted & selected work", type: "heading" },
+    { k: "homeFeatured", label: "Highlighted project", type: "project" },
+    { k: "homeFeaturedImage", label: "Highlighted image (optional — overrides the project's cover)", type: "image" },
+    { k: "homeSelectedA", label: "Selected work — project 1", type: "project" },
+    { k: "homeSelectedImageA", label: "Selected work — image 1 (optional)", type: "image" },
+    { k: "homeSelectedB", label: "Selected work — project 2", type: "project" },
+    { k: "homeSelectedImageB", label: "Selected work — image 2 (optional)", type: "image" },
+    { k: "__heroes", label: "Page hero images", type: "heading" },
+    { k: "heroAbout", label: "About page hero image", type: "image" },
+    { k: "heroServices", label: "Services page hero image", type: "image" },
+    { k: "heroProjects", label: "Projects page hero image", type: "image" },
+    { k: "heroContact", label: "Contact page hero image", type: "image" }
   ];
 
   var FIELDS = {
@@ -96,7 +108,12 @@
   api("GET", "/api/admin/me").then(function (me) { state.me = me; loadItems(); }).catch(function () { render(); });
 
   function loadItems() {
-    if (state.coll === "site") { api("GET", "/api/admin/site").then(function (s) { state.site = s; render(); }).catch(function () { render(); }); return; }
+    if (state.coll === "site") {
+      Promise.all([api("GET", "/api/admin/site"), api("GET", "/api/admin/projects")])
+        .then(function (r) { state.site = r[0]; state.projectList = r[1] || []; render(); })
+        .catch(function () { render(); });
+      return;
+    }
     api("GET", "/api/admin/" + state.coll).then(function (items) { state.items = items; render(); });
   }
 
@@ -181,9 +198,17 @@
   function renderSite() {
     var s = state.site || {};
     var body = SITE_FIELDS.map(function (f) {
-      var v = esc(s[f.k] || "");
-      if (f.type === "textarea") return '<div class="field"><label>' + f.label + '</label><textarea data-sk="' + f.k + '">' + v + "</textarea></div>";
-      return '<div class="field"><label>' + f.label + '</label><input type="text" data-sk="' + f.k + '" value="' + v + '"></div>';
+      var raw = s[f.k] || "", v = esc(raw), lab = esc(f.label);
+      if (f.type === "heading") return '<h3 style="margin:30px 0 6px;font-size:15px;letter-spacing:.02em;border-top:1px solid #e7e2d7;padding-top:22px">' + lab + "</h3>";
+      if (f.type === "textarea") return '<div class="field"><label>' + lab + '</label><textarea data-sk="' + f.k + '">' + v + "</textarea></div>";
+      if (f.type === "image") return '<div class="field"><label>' + lab + '</label><div class="cover" data-cover="' + f.k + '">' + (raw ? '<img src="' + v + '">' : "") + '</div><div class="uploader" data-siteup="' + f.k + '">Click or drop an image here</div>' + (raw ? '<button type="button" class="btn btn--ghost btn--sm" data-siteclear="' + f.k + '" style="margin-top:8px">Remove image</button>' : "") + "</div>";
+      if (f.type === "project") {
+        var opts = '<option value="">— Select a project —</option>' + (state.projectList || []).map(function (p) {
+          return '<option value="' + esc(p.slug) + '"' + (p.slug === raw ? " selected" : "") + ">" + esc(p.title) + "</option>";
+        }).join("");
+        return '<div class="field"><label>' + lab + '</label><select data-sk="' + f.k + '">' + opts + "</select></div>";
+      }
+      return '<div class="field"><label>' + lab + '</label><input type="text" data-sk="' + f.k + '" value="' + v + '"></div>';
     }).join("");
     return '<div class="siteform" style="max-width:680px">' + body +
       '<div style="margin-top:8px"><button class="btn" id="siteSave">Save site details</button></div>' +
@@ -193,7 +218,25 @@
   function bindSite() {
     state.site = state.site || {};
     Array.prototype.forEach.call(document.querySelectorAll("[data-sk]"), function (el) {
-      el.oninput = function () { state.site[el.dataset.sk] = el.value; };
+      el.oninput = el.onchange = function () { state.site[el.dataset.sk] = el.value; };
+    });
+    /* Image uploaders on the Site tab (highlighted / selected / hero images). */
+    Array.prototype.forEach.call(document.querySelectorAll("[data-siteup]"), function (u) {
+      var key = u.dataset.siteup;
+      wireUpload(u, false, function (url) {
+        state.site[key] = url;
+        var box = document.querySelector('[data-cover="' + key + '"]');
+        if (box) box.innerHTML = '<img src="' + esc(url) + '">';
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-siteclear]"), function (b) {
+      b.onclick = function () {
+        var key = b.dataset.siteclear;
+        state.site[key] = "";
+        var box = document.querySelector('[data-cover="' + key + '"]');
+        if (box) box.innerHTML = "";
+        b.style.display = "none";
+      };
     });
     var btn = document.getElementById("siteSave");
     if (btn) btn.onclick = function () {

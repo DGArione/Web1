@@ -122,6 +122,53 @@ function serviceBlocks(list) {
   }).join("\n");
 }
 
+/* ---- Home page: highlighted project + selected work (admin-driven) ------- */
+function homeFeatured(p, img) {
+  if (!p) return "";
+  var src = img || p.cover;
+  var kicker = [p.category, p.location].filter(Boolean).map(esc).join(" · ");
+  return '' +
+    '<section class="section container" data-theme="dark">' +
+      '<div class="spotlight">' +
+        '<div class="media media--parallax media--clip media--ratio-portrait" data-parallax="10">' +
+          cover(src, p.title) +
+          (kicker ? '<span class="media__caption">' + kicker + "</span>" : "") +
+        "</div>" +
+        "<div>" +
+          '<p class="label" data-reveal><span class="num">(02)</span>Featured project</p>' +
+          '<h2 class="h-1" data-split style="margin-top: 18px;">' + esc(p.title) + "</h2>" +
+          (p.excerpt ? '<p class="body" data-reveal style="margin-top: 28px;">' + esc(p.excerpt) + "</p>" : "") +
+          '<div style="margin-top: 40px;" data-reveal>' +
+            '<a class="btn" href="project/' + esc(p.slug) + '" data-magnetic>View the project ' + ARROW + "</a>" +
+          "</div>" +
+        "</div>" +
+      "</div>" +
+    "</section>";
+}
+function homeSelected(items) {
+  items = (items || []).filter(function (it) { return it && it.p; });
+  if (!items.length) return "";
+  var media = items.map(function (it, i) {
+    var src = it.img || it.p.cover;
+    var cap = [it.p.title, it.p.location].filter(Boolean).map(esc).join(" · ");
+    return '' +
+      '<div class="media media--parallax media--clip" data-parallax="' + (i === 0 ? 8 : 12) + '">' +
+        cover(src, it.p.title) +
+        '<span class="media__caption">' + cap + "</span>" +
+      "</div>";
+  }).join("\n");
+  return '' +
+    '<section class="container">' +
+      '<div class="duo">' +
+        '<div class="duo__lead">' +
+          '<p class="lede" data-reveal>From coastal villas and urban residences to café interiors and wellness retreats, our projects are places shaped by a clear idea, and a considered response to place, climate and daily life.</p>' +
+          '<a class="link" href="projects.html" data-reveal>Selected work</a>' +
+        "</div>" +
+        media +
+      "</div>" +
+    "</section>";
+}
+
 /* ---- Detail bodies ------------------------------------------------------- */
 function projectDetail(p) {
   const facts = [
@@ -140,4 +187,4 @@ function insightDetail(a) {
     body: bodyHtml(a.body), excerpt: a.excerpt || "" };
 }
 
-module.exports = { BASE, esc, projectCards, insightSlides, serviceCards, serviceBlocks, projectDetail, insightDetail, bodyHtml, cover };
+module.exports = { BASE, esc, projectCards, insightSlides, serviceCards, serviceBlocks, homeFeatured, homeSelected, projectDetail, insightDetail, bodyHtml, cover };

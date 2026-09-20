@@ -72,7 +72,23 @@ function withBase(html, logical) {
     '}catch(e){document.write(\'<base href="./">\');}})();</script>';
   return String(html).replace(/<head([^>]*)>/i, '<head$1>' + s);
 }
-function sendPage(res, html, req) { res.type("html").send(withBase(html, req && req.path)); }
+/* Per-page hero images are editable in the admin. Pages carry a {{HERO_X}}
+   token; we swap in the configured image, or fall back to the default. */
+const HERO_DEFAULTS = {
+  ABOUT: "https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=2200&q=80",
+  SERVICES: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=2200&q=80",
+  PROJECTS: "https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=2200&q=80",
+  CONTACT: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=2200&q=80"
+};
+function applyHeroImages(html) {
+  if (html.indexOf("{{HERO_") === -1) return html;
+  const site = readSite();
+  return html.replace(/\{\{HERO_([A-Z]+)\}\}/g, function (_, name) {
+    const key = "hero" + name.charAt(0) + name.slice(1).toLowerCase();
+    return render.esc(site[key] || HERO_DEFAULTS[name] || "");
+  });
+}
+function sendPage(res, html, req) { res.type("html").send(withBase(applyHeroImages(html), req && req.path)); }
 
 /* ---- Block sensitive paths --------------------------------------------- */
 r.use(function (req, res, next) {
@@ -94,8 +110,21 @@ function injectPage(file, marker, html) {
 
 /* ---- Public dynamic pages (before static) ------------------------------- */
 r.get(["/", "/index.html"], function (req, res) {
+  const site = readSite();
+  const projects = store.list("projects", { publishedOnly: true });
+  const bySlug = function (slug) { return projects.filter(function (p) { return p.slug === slug; })[0]; };
   const cards = render.serviceCards(store.list("services", { publishedOnly: true }));
-  sendPage(res, injectPage("index.html", "<!--HOME_SERVICES-->", cards), req);
+  let html = injectPage("index.html", "<!--HOME_SERVICES-->", cards);
+  /* Highlighted project (falls back to the first project). */
+  const feat = bySlug(site.homeFeatured) || projects[0];
+  html = html.replace("<!--HOME_FEATURED-->", render.homeFeatured(feat, site.homeFeaturedImage));
+  /* Two selected-work projects (fall back to the next projects). */
+  const selA = bySlug(site.homeSelectedA) || projects[1] || projects[0];
+  const selB = bySlug(site.homeSelectedB) || projects[2] || projects[1] || projects[0];
+  html = html.replace("<!--HOME_SELECTED-->", render.homeSelected([
+    { p: selA, img: site.homeSelectedImageA }, { p: selB, img: site.homeSelectedImageB }
+  ]));
+  sendPage(res, html, req);
 });
 r.get(["/services", "/services.html"], function (req, res) {
   const blocks = render.serviceBlocks(store.list("services", { publishedOnly: true }));
@@ -138,7 +167,12 @@ r.get("/api/chatbot", function (req, res) { res.json(store.list("chatbot", { pub
 const SITE = path.join(ROOT, "data", "site.json");
 const SITE_KEYS = ["companyName", "tagline", "phone", "whatsapp", "whatsappText", "email",
   "addressLine1", "addressLine2", "addressLine3", "facebook", "linkedin", "instagram",
-  "formEndpoint", "seoTitleSuffix", "seoDescription"];
+  "formEndpoint", "seoTitleSuffix", "seoDescription",
+  /* Home page: highlighted project + two selected-work projects (slugs) with
+     optional image overrides; and each page's hero image. */
+  "homeFeatured", "homeFeaturedImage", "homeSelectedA", "homeSelectedImageA",
+  "homeSelectedB", "homeSelectedImageB",
+  "heroAbout", "heroServices", "heroProjects", "heroContact"];
 function readSite() { try { return JSON.parse(fs.readFileSync(SITE, "utf8")) || {}; } catch (e) { return {}; } }
 function writeSite(obj) {
   const tmp = SITE + ".tmp";
