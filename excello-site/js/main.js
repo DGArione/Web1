@@ -392,7 +392,10 @@
       function url(i) { var n = String(i + 1); while (n.length < pad) n = "0" + n; return dir + "/f_" + n + "." + ext; }
       function sizeCanvas() {
         var r = host.getBoundingClientRect();
-        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        /* Photographic background frames don't need retina; 1x (capped) keeps
+           the per-frame draw cheap so the scroll scrub stays smooth on hi-dpi
+           screens, where 2x would mean pushing 4x the pixels every frame. */
+        var dpr = Math.min(window.devicePixelRatio || 1, 1.25);
         var w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
         if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
       }
@@ -435,7 +438,15 @@
         var t = (p - 0.22) / 0.78; if (t > 1) t = 1;
         return Math.round(t * last);               // forward build to finished
       }
-      function redraw() { paint(frameFor(progress)); }
+      /* Batch paints to one per animation frame: ScrollTrigger's onUpdate can
+         fire several times between repaints, so we keep only the latest target
+         frame and draw it once, which removes redundant work during fast scroll. */
+      var _raf = 0, _tgt = 0;
+      function redraw() {
+        _tgt = frameFor(progress);
+        if (_raf) return;
+        _raf = requestAnimationFrame(function () { _raf = 0; paint(_tgt); });
+      }
       var firstIdx = isHero ? count - 1 : 0; /* frame shown at rest */
       var need = (mode === "hero") ? Math.min(count, 72) : 0, priorityLoaded = 0;
       if (mode === "hero") window.__heroReady = 0;
@@ -450,9 +461,12 @@
       /* Hero loads the finished frames first so the resting teaser appears fast. */
       for (var k = 0; k < count; k++) (function (k) {
         var idx = isHero ? count - 1 - k : k;
-        var img = new Image(); frames[idx] = img;
-        img.onload = function () { onFrame(idx, k); };
-        img.onerror = function () { onFrame(idx, k); };
+        var img = new Image(); img.decoding = "async"; frames[idx] = img;
+        function done() { onFrame(idx, k); }
+        /* Decode the frame to a ready bitmap up front (while loading, off the
+           scroll path) so painting it during the scrub never blocks on decode. */
+        img.onload = function () { if (img.decode) img.decode().then(done, done); else done(); };
+        img.onerror = done;
         img.src = url(idx);
       })(k);
       window.addEventListener("resize", function () { sizeCanvas(); redraw(); });
@@ -462,7 +476,7 @@
       var sticky = scene.hasAttribute("data-seq-sticky");
       ScrollTrigger.create({
         trigger: scene, start: "top top", end: host.dataset.seqEnd || "+=120%",
-        pin: !sticky, scrub: true, invalidateOnRefresh: true, anticipatePin: sticky ? 0 : 1,
+        pin: !sticky, scrub: 0.6, invalidateOnRefresh: true, anticipatePin: sticky ? 0 : 1,
         onRefresh: function () { sizeCanvas(); redraw(); },
         onUpdate: function (self) {
           progress = self.progress; if (ready) redraw();
