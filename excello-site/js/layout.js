@@ -57,7 +57,7 @@
     '<div class="cursor" id="cursor"><span class="cursor__label">View</span></div>' +
     '<header class="header" id="header">' +
     '<a class="brand" href="' + B + '/" aria-label="Excello home">' +
-    '<img class="brand__mark" src="' + B + '/img/logo-triangle.png" alt="" aria-hidden="true">' +
+    '<img class="brand__mark" src="img/logo-triangle.png" alt="" aria-hidden="true">' +
     '<span class="brand__text"><span class="brand__word">EXCELLO</span><span class="brand__sub" data-site="tagline">the way you imagine</span></span>' +
     "</a>" +
     '<nav class="nav" aria-label="Primary">' + navHtml + "</nav>" +
