@@ -13,7 +13,13 @@
   var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   var body = document.body;
   /* Base path (from the injected <base>) so internal fetches work under a sub-folder. */
-  var B = (function () { var b = document.querySelector("base"); return b ? (b.getAttribute("href") || "/").replace(/\/+$/, "") : ""; })();
+  var B = (function () {
+    try {
+      var s = (document.currentScript && document.currentScript.src) || "";
+      if (s) return new URL(s).pathname.replace(/\/js\/main\.js.*$/, "");
+    } catch (e) {}
+    var b = document.querySelector("base"); return b ? (b.getAttribute("href") || "/").replace(/\/+$/, "") : "";
+  })();
   function apiUrl(p) { return p && p.charAt(0) === "/" ? B + p : p; }
 
   /* After a masked line reveal finishes, stop clipping so glyph descenders
@@ -450,6 +456,17 @@
       var firstIdx = isHero ? count - 1 : 0; /* frame shown at rest */
       var need = (mode === "hero") ? Math.min(count, 72) : 0, priorityLoaded = 0;
       if (mode === "hero") window.__heroReady = 0;
+
+      /* Mobile: skip the pinned frame-scrub entirely. Phone browsers resize the
+         viewport as the address bar hides, which mis-sizes a pinned canvas (the
+         hero would show only half). Show the static CSS poster instead — clean,
+         bug-free, and no multi-MB frame download on mobile data. */
+      if (window.matchMedia("(max-width: 820px)").matches) {
+        if (loaderWrap) loaderWrap.classList.add("is-done");
+        if (mode === "hero") window.__heroReady = 1;
+        var canv = host.querySelector("canvas"); if (canv) canv.style.display = "none";
+        return;
+      }
       function onFrame(idx, k) {
         loaded++;
         if (mode === "hero" && k < need) { priorityLoaded++; window.__heroReady = priorityLoaded / need; }

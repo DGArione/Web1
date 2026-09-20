@@ -1278,6 +1278,10 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
   margin-top: 24px;
 }
 .hero--seq .hero__title { max-width: 16ch; }
+/* Inner page heroes carry longer headlines — keep them compact and tidy so
+   they don't overflow the screen. */
+.hero--page .hero__title { font-size: clamp(1.7rem, 3.2vw, 3.4rem); max-width: 24ch; line-height: 1.14; }
+.hero--page .hero__sub { max-width: 46ch; }
 
 /* Eyebrow: gold, quieter, wider tracking. */
 .hero__label {

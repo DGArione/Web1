@@ -3,8 +3,16 @@
 (function () {
   document.documentElement.classList.add("js");
 
-  /* Base path when the app runs under a sub-folder (from the injected <base>). */
-  var B = (function () { var b = document.querySelector("base"); return b ? (b.getAttribute("href") || "/").replace(/\/+$/, "") : ""; })();
+  /* Base path when the app runs under a sub-folder. Derived from where THIS
+     script actually loaded (…/<prefix>/js/layout.js) so nav/links resolve under
+     the sub-path with or without an injected <base>. Falls back to <base>. */
+  var B = (function () {
+    try {
+      var s = (document.currentScript && document.currentScript.src) || "";
+      if (s) return new URL(s).pathname.replace(/\/js\/layout\.js.*$/, "");
+    } catch (e) {}
+    var b = document.querySelector("base"); return b ? (b.getAttribute("href") || "/").replace(/\/+$/, "") : "";
+  })();
   var path = (location.pathname.replace(B, "") || "/").replace(/index\.html$/, "").toLowerCase() || "/";
   var links = [
     { href: "/", label: "Home", num: "01", match: ["/", "/index.html"] },

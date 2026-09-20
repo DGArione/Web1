@@ -1,7 +1,13 @@
 /* Insights "theater" — a cinematic, autoplaying showcase slider.
    Loads before main.js; uses the global gsap. */
 (function () {
-  var B = (function () { var b = document.querySelector("base"); return b ? (b.getAttribute("href") || "/").replace(/\/+$/, "") : ""; })();
+  var B = (function () {
+    try {
+      var s = (document.currentScript && document.currentScript.src) || "";
+      if (s) return new URL(s).pathname.replace(/\/js\/theater\.js.*$/, "");
+    } catch (e) {}
+    var b = document.querySelector("base"); return b ? (b.getAttribute("href") || "/").replace(/\/+$/, "") : "";
+  })();
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function initTheater() {
