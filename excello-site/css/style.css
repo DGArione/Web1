@@ -391,7 +391,9 @@ em, .it { font-style: italic; font-weight: 300; }
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(21, 22, 19, 0.82) 0%, rgba(21, 22, 19, 0.25) 45%, rgba(21, 22, 19, 0.12) 100%);
+  /* Darkens only the lower half for text legibility; fully transparent up top
+     so no band or edge can appear behind the header. */
+  background: linear-gradient(to top, rgba(21, 22, 19, 0.86) 0%, rgba(21, 22, 19, 0.30) 52%, rgba(21, 22, 19, 0) 100%);
 }
 .hero__content { position: relative; z-index: 1; }
 .hero__label { color: rgba(248, 244, 236, 0.85); }
