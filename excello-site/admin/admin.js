@@ -2,8 +2,16 @@
 (function () {
   var app = document.getElementById("app");
   var toastEl = document.getElementById("toast");
-  /* Base path (from the injected <base>) so admin calls work under a sub-folder. */
-  var B = (function () { var b = document.querySelector("base"); return b ? (b.getAttribute("href") || "/").replace(/\/+$/, "") : ""; })();
+  /* Base path derived from where this script loaded (…/<prefix>/admin/admin.js),
+     so admin calls and the "View site" link work under any sub-folder with or
+     without an injected <base>. */
+  var B = (function () {
+    try {
+      var s = (document.currentScript && document.currentScript.src) || "";
+      if (s) return new URL(s).pathname.replace(/\/admin\/admin\.js.*$/, "");
+    } catch (e) {}
+    var b = document.querySelector("base"); return b ? (b.getAttribute("href") || "/").replace(/\/+$/, "") : "";
+  })();
   var state = { me: null, coll: "projects", items: [], editing: null, saving: false, site: null };
 
   var SITE_FIELDS = [

@@ -16,11 +16,11 @@
   var path = (location.pathname.replace(B, "") || "/").replace(/index\.html$/, "").toLowerCase() || "/";
   var links = [
     { href: "/", label: "Home", num: "01", match: ["/", "/index.html"] },
-    { href: "/about.html", label: "About", num: "02", match: ["/about.html"] },
-    { href: "/services.html", label: "Services", num: "03", match: ["/services.html"] },
+    { href: "/about", label: "About", num: "02", match: ["/about", "/about.html"] },
+    { href: "/services", label: "Services", num: "03", match: ["/services", "/services.html"] },
     { href: "/projects", label: "Projects", num: "04", match: ["/projects", "/projects.html", "/project/"] },
     { href: "/insights", label: "Insights", num: "05", match: ["/insights", "/insights.html", "/insight/"] },
-    { href: "/contact.html", label: "Contact", num: "06", match: ["/contact.html"] }
+    { href: "/contact", label: "Contact", num: "06", match: ["/contact", "/contact.html"] }
   ];
   function isActive(l) {
     return l.match.some(function (m) { return m.slice(-1) === "/" && m !== "/" ? path.indexOf(m) === 0 : path === m; });
@@ -69,7 +69,7 @@
     '<span class="brand__text"><span class="brand__word">EXCELLO</span><span class="brand__sub" data-site="tagline">the way you imagine</span></span>' +
     "</a>" +
     '<nav class="nav" aria-label="Primary">' + navHtml + "</nav>" +
-    '<a class="btn" href="' + B + '/contact.html" data-magnetic>Start a project ' + arrow + "</a>" +
+    '<a class="btn" href="' + B + '/contact" data-magnetic>Start a project ' + arrow + "</a>" +
     '<button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>' +
     "</header>" +
     '<div class="menu" id="menu" aria-hidden="true">' +

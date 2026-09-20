@@ -80,7 +80,7 @@ function serviceCards(list) {
   if (!list.length) return '<p class="body body--muted">No services yet. Add them in the admin panel.</p>';
   return list.map(function (s, i) {
     return '' +
-      '<a class="service" href="services.html#' + esc(s.slug) + '">' +
+      '<a class="service" href="services#' + esc(s.slug) + '">' +
         '<span class="service__num">' + pad2(i + 1) + "</span>" +
         '<span class="service__title">' + esc(s.title) + "</span>" +
         '<span class="service__desc">' + esc(s.card || s.tagline || "") + "</span>" +
@@ -162,7 +162,7 @@ function homeSelected(items) {
       '<div class="duo">' +
         '<div class="duo__lead">' +
           '<p class="lede" data-reveal>From coastal villas and urban residences to café interiors and wellness retreats, our projects are places shaped by a clear idea, and a considered response to place, climate and daily life.</p>' +
-          '<a class="link" href="projects.html" data-reveal>Selected work</a>' +
+          '<a class="link" href="projects" data-reveal>Selected work</a>' +
         "</div>" +
         media +
       "</div>" +

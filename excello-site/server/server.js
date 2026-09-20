@@ -107,6 +107,15 @@ function injectPage(file, marker, html) {
   const src = fs.readFileSync(path.join(ROOT, file), "utf8");
   return src.replace(marker, html);
 }
+/* Serve a static page file through sendPage (so <base> + hero images inject). */
+function servePage(file) {
+  return function (req, res, next) {
+    fs.readFile(path.join(ROOT, file), "utf8", function (err, html) {
+      if (err) return next();
+      sendPage(res, html, req);
+    });
+  };
+}
 
 /* ---- Public dynamic pages (before static) ------------------------------- */
 r.get(["/", "/index.html"], function (req, res) {
@@ -138,6 +147,9 @@ r.get(["/insights", "/insights.html"], function (req, res) {
   const slides = render.insightSlides(store.list("insights", { publishedOnly: true }));
   sendPage(res, injectPage("insights.html", "<!--INSIGHTS-->", slides), req);
 });
+/* Clean URLs for the static pages (also served with the .html alias). */
+r.get(["/about", "/about.html"], servePage("about.html"));
+r.get(["/contact", "/contact.html"], servePage("contact.html"));
 r.get("/project/:slug", function (req, res, next) {
   const p = store.getBySlug("projects", req.params.slug);
   if (!p || p.published === false) return next();
@@ -286,6 +298,36 @@ if (BASE) {
     next();
   });
 }
+
+/* Auto-detect and peel any sub-folder mount prefix the host didn't strip (e.g.
+   "/excello-site" or a doubled "/excello-site/excello-site"). Any leading path
+   segment that is NOT one of the app's real routes is removed when what follows
+   IS a real route — so the app works at the domain root OR under any sub-folder
+   with no BASE_PATH configuration. */
+const KNOWN_FIRST = {
+  "": 1, "index.html": 1, "about": 1, "about.html": 1, "services": 1, "services.html": 1,
+  "projects": 1, "projects.html": 1, "insights": 1, "insights.html": 1, "contact": 1,
+  "contact.html": 1, "project": 1, "insight": 1, "admin": 1, "api": 1, "js": 1, "css": 1,
+  "img": 1, "uploads": 1, "favicon.ico": 1, "favicon.svg": 1, "robots.txt": 1, "sitemap.xml": 1,
+  "apple-touch-icon.png": 1
+};
+function firstSeg(p) { const m = /^\/([^\/?#]*)/.exec(p); return m ? m[1] : ""; }
+function isKnown(seg) { return Object.prototype.hasOwnProperty.call(KNOWN_FIRST, seg) || /\.[a-z0-9]+$/i.test(seg); }
+app.use(function (req, res, next) {
+  let guard = 0;
+  while (guard++ < 6) {
+    const qi = req.url.indexOf("?");
+    const pth = qi >= 0 ? req.url.slice(0, qi) : req.url;
+    const qs = qi >= 0 ? req.url.slice(qi) : "";
+    const m = /^\/([^\/]+)(\/.*)?$/.exec(pth);
+    if (!m) break;                            // "/" (root) — nothing to peel
+    const first = m[1], rest = m[2];
+    if (isKnown(first)) break;                // already at a real route
+    if (rest === undefined) break;            // bare "/prefix" with no remainder — 404
+    req.url = rest + qs;                       // peel this unknown mount segment and retry
+  }
+  next();
+});
 app.use("/", r);
 
 app.listen(PORT, function () {
