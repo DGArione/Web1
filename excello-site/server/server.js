@@ -23,6 +23,26 @@ const COLLS = { projects: 1, insights: 1, services: 1, chatbot: 1 };
    leave it unset to serve at the domain root. render.js reads it too. */
 const BASE = render.BASE; // "" or "/excello-site"
 
+/* Force every URL under a sub-path prefix even when the host mounts the app at
+   the domain root. Set FORCE_PREFIX=excello-site (an environment variable in
+   the cPanel Node app) to turn it on. Any top-level GET/HEAD request whose path
+   isn't already under the prefix is 302-redirected to the prefixed URL, so the
+   browser always shows rapidsolutions.live/excello-site/... — home, every page,
+   and /admin included. The auto-strip middleware below peels the prefix back
+   off for routing, so nothing else needs to change. Unset it (or clear it) to
+   serve at the domain root again — e.g. once the app moves to its own domain. */
+const FORCE_PREFIX = (process.env.FORCE_PREFIX || "").replace(/^\/+|\/+$/g, "");
+if (FORCE_PREFIX) {
+  const FP = "/" + FORCE_PREFIX;
+  app.use(function (req, res, next) {
+    if (req.method !== "GET" && req.method !== "HEAD") return next();
+    const qi = req.url.indexOf("?");
+    const pth = qi >= 0 ? req.url.slice(0, qi) : req.url;
+    if (pth === FP || pth.indexOf(FP + "/") === 0) return next(); // already prefixed — avoid a loop
+    return res.redirect(302, FP + (req.url === "/" ? "/" : req.url));
+  });
+}
+
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
