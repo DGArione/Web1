@@ -729,6 +729,8 @@ em, .it { font-style: italic; font-weight: 300; }
 .seq-band { position: relative; height: 100vh; height: 100svh; overflow: hidden; background: var(--ink); }
 .seq-band .seq { position: absolute; inset: 0; }
 .seq-band .seq__canvas { position: absolute; inset: 0; object-fit: cover; }
+.seq-band__bg { position: absolute; inset: 0; overflow: hidden; }
+.seq-band__bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .seq-band__overlay {
   position: absolute; inset: 0; z-index: 3;
   display: flex; flex-direction: column; justify-content: flex-end;
@@ -1221,13 +1223,27 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
   mix-blend-mode: normal !important;
   color: #fff;
   text-shadow: 0 1px 14px rgba(0, 0, 0, 0.4);
-  background: linear-gradient(to bottom, rgba(16, 16, 12, 0.58) 0%, rgba(16, 16, 12, 0) 130%);
+  background: none;
+}
+/* A tall scrim for legibility that fades fully to transparent, so there is no
+   visible hard edge under the header. Detached from the (short) header box via
+   fixed positioning, and removed once the header turns solid on scroll. */
+.header::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 190px;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(16, 16, 12, 0.55) 0%, rgba(16, 16, 12, 0.26) 40%, rgba(16, 16, 12, 0) 100%);
+  transition: opacity 0.4s var(--ease);
 }
 .header.is-solid {
   color: var(--ink);
   text-shadow: none;
   background: color-mix(in srgb, var(--paper) 90%, transparent);
 }
+.header.is-solid::after { opacity: 0; }
 
 /* ==========================================================================
    ADDENDUM 11 — brand lockup (mark + wordmark)

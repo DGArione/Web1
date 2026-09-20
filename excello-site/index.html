@@ -19,18 +19,12 @@
 
   <main>
     <!-- HERO -->
-    <section class="hero hero--seq container" data-seq-scene>
-      <div class="hero__bg seq" data-seq="img/hero-seq" data-frames="720" data-ext="webp" data-seq-mode="hero" data-seq-end="+=300%">
-        <canvas class="seq__canvas"></canvas>
-      </div>
-      <div class="hero__clouds" id="heroClouds" aria-hidden="true">
-        <span class="hero__cloud hc1"></span><span class="hero__cloud hc2"></span>
-        <span class="hero__cloud hc3"></span><span class="hero__cloud hc4"></span>
-        <span class="hero__cloud hc5"></span>
+    <section class="hero container">
+      <div class="hero__bg">
+        <img src="img/hero.webp" alt="Softly lit bedroom interior by Excello" fetchpriority="high">
       </div>
       <div class="hero__content">
         <p class="label hero__label" data-hero-fade>Boutique Design &amp; Build · Mount Lavinia, Colombo</p>
-        <div class="seq__loader" data-seq-loader aria-hidden="true">Loading <b>0</b>%</div>
         <h1 class="h-display hero__title" data-split>Thoughtfully designed. <em>Precisely built.</em></h1>
         <div class="hero__bottom">
           <div>
@@ -201,9 +195,8 @@
     <!-- CINEMATIC BAND + overlap: the stats panel slides up over the band -->
     <div class="stack">
       <section class="seq-band is-sticky" data-seq-scene data-seq-sticky>
-        <div class="seq" data-seq="img/clip-seq" data-frames="363" data-ext="webp" data-seq-mode="band" data-seq-end="+=100%">
-          <canvas class="seq__canvas"></canvas>
-          <div class="seq__loader" data-seq-loader aria-hidden="true">Loading <b>0</b>%</div>
+        <div class="seq-band__bg">
+          <img src="img/band.webp" alt="Excello project under construction, structure to finish" loading="lazy">
         </div>
         <div class="seq-band__overlay">
           <p class="label" style="color: rgba(248,244,236,0.82);" data-reveal><span class="num">(—)</span>In motion</p>
