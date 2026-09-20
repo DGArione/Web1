@@ -8,6 +8,11 @@
   "use strict";
 
   gsap.registerPlugin(ScrollTrigger, SplitText);
+  /* Phone browsers grow the viewport as the address bar hides; without this the
+     pinned hero canvas gets a stale height and shows only half. Telling
+     ScrollTrigger to ignore that resize keeps the pin correct so the frame-scrub
+     works on touch swipe too. */
+  ScrollTrigger.config({ ignoreMobileResize: true });
 
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -50,6 +55,35 @@
       (window.__sitePromise || Promise.resolve(null))
     ]).then(function (r) {
       var services = r[0] || [], projects = r[1] || [], site = r[2] || {};
+      /* Re-run the reveal / parallax / image-wipe / theme setup on injected
+         content so the client-built sections animate like the rest. */
+      function enhance(scope) {
+        scope.querySelectorAll("[data-reveal]").forEach(function (el) {
+          gsap.to(el, { opacity: 1, y: 0, duration: 1.05, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 92%", once: true } });
+        });
+        scope.querySelectorAll(".media--parallax").forEach(function (wrap) {
+          var im = wrap.querySelector("img"); if (!im) return;
+          var amt = parseFloat(wrap.dataset.parallax || 10);
+          gsap.fromTo(im, { yPercent: -amt }, { yPercent: amt, ease: "none", scrollTrigger: { trigger: wrap, start: "top bottom", end: "bottom top", scrub: true } });
+        });
+        scope.querySelectorAll(".media").forEach(function (wrap) {
+          var im = wrap.querySelector("img"); if (!im) return;
+          wrap.style.clipPath = "none";
+          var cov = document.createElement("span"); cov.className = "media__cover"; wrap.appendChild(cov);
+          gsap.set(im, { scale: 1.22 });
+          gsap.timeline({ scrollTrigger: { trigger: wrap, start: "top 84%", once: true } })
+            .to(cov, { scaleY: 0, duration: 1.15, ease: "power4.inOut" }, 0)
+            .to(im, { scale: 1, duration: 1.7, ease: "power3.out" }, 0.08);
+        });
+        scope.querySelectorAll("[data-theme]").forEach(function (sec) {
+          var dark = sec.dataset.theme === "dark";
+          ScrollTrigger.create({ trigger: sec, start: "top 55%", end: "bottom 55%",
+            onEnter: function () { body.classList.toggle("is-dark", dark); },
+            onEnterBack: function () { body.classList.toggle("is-dark", dark); },
+            onLeave: function () { body.classList.remove("is-dark"); },
+            onLeaveBack: function () { body.classList.remove("is-dark"); } });
+        });
+      }
       if (needS && services.length) {
         cS.innerHTML = services.map(function (s, i) {
           return '<a class="service" href="services#' + esc(s.slug) + '">' +
@@ -64,24 +98,26 @@
         var kick = [fp.category, fp.location].filter(Boolean).map(esc).join(" · ");
         cF.innerHTML =
           '<section class="section container" data-theme="dark"><div class="spotlight">' +
-            '<div class="media media--ratio-portrait"><img src="' + esc(site.homeFeaturedImage || fp.cover) + '" alt="' + esc(fp.title) + '">' +
+            '<div class="media media--parallax media--clip media--ratio-portrait" data-parallax="10"><img src="' + esc(site.homeFeaturedImage || fp.cover) + '" alt="' + esc(fp.title) + '">' +
               (kick ? '<span class="media__caption">' + kick + '</span>' : '') + '</div>' +
-            '<div><p class="label"><span class="num">(02)</span>Featured project</p>' +
-              '<h2 class="h-1" style="margin-top:18px">' + esc(fp.title) + '</h2>' +
-              (fp.excerpt ? '<p class="body" style="margin-top:28px">' + esc(fp.excerpt) + '</p>' : '') +
-              '<div style="margin-top:40px"><a class="btn" href="project/' + esc(fp.slug) + '">View the project ' + ARROW + '</a></div>' +
+            '<div><p class="label" data-reveal><span class="num">(02)</span>Featured project</p>' +
+              '<h2 class="h-1" data-reveal style="margin-top:18px">' + esc(fp.title) + '</h2>' +
+              (fp.excerpt ? '<p class="body" data-reveal style="margin-top:28px">' + esc(fp.excerpt) + '</p>' : '') +
+              '<div data-reveal style="margin-top:40px"><a class="btn" href="project/' + esc(fp.slug) + '">View the project ' + ARROW + '</a></div>' +
             '</div></div></section>';
+        enhance(cF);
       }
       if (needL && projects.length) {
         var a = bySlug(projects, site.homeSelectedA) || projects[1] || projects[0];
         var b2 = bySlug(projects, site.homeSelectedB) || projects[2] || projects[1] || projects[0];
-        function media(p, img) { var cap = [p.title, p.location].filter(Boolean).map(esc).join(" · "); return '<div class="media"><img src="' + esc(img || p.cover) + '" alt="' + esc(p.title) + '"><span class="media__caption">' + cap + '</span></div>'; }
+        function media(p, img, amt) { var cap = [p.title, p.location].filter(Boolean).map(esc).join(" · "); return '<div class="media media--parallax media--clip" data-parallax="' + amt + '"><img src="' + esc(img || p.cover) + '" alt="' + esc(p.title) + '"><span class="media__caption">' + cap + '</span></div>'; }
         cL.innerHTML =
           '<section class="container"><div class="duo">' +
-            '<div class="duo__lead"><p class="lede">From coastal villas and urban residences to café interiors and wellness retreats, our projects are places shaped by a clear idea, and a considered response to place, climate and daily life.</p>' +
-            '<a class="link" href="projects">Selected work</a></div>' +
-            media(a, site.homeSelectedImageA) + media(b2, site.homeSelectedImageB) +
+            '<div class="duo__lead"><p class="lede" data-reveal>From coastal villas and urban residences to café interiors and wellness retreats, our projects are places shaped by a clear idea, and a considered response to place, climate and daily life.</p>' +
+            '<a class="link" data-reveal href="projects">Selected work</a></div>' +
+            media(a, site.homeSelectedImageA, 8) + media(b2, site.homeSelectedImageB, 12) +
           '</div></section>';
+        enhance(cL);
       }
       if (window.ScrollTrigger && ScrollTrigger.refresh) ScrollTrigger.refresh();
     });
@@ -519,19 +555,11 @@
         _raf = requestAnimationFrame(function () { _raf = 0; paint(_tgt); });
       }
       var firstIdx = isHero ? count - 1 : 0; /* frame shown at rest */
-      var need = (mode === "hero") ? Math.min(count, 72) : 0, priorityLoaded = 0;
+      /* Priority frames gate the preloader. Keep it small so the site becomes
+         interactive fast; the rest of the (now light, ~50 KB) frames stream in
+         behind it and fill smoothness without blocking first paint. */
+      var need = (mode === "hero") ? Math.min(count, 30) : 0, priorityLoaded = 0;
       if (mode === "hero") window.__heroReady = 0;
-
-      /* Mobile: skip the pinned frame-scrub entirely. Phone browsers resize the
-         viewport as the address bar hides, which mis-sizes a pinned canvas (the
-         hero would show only half). Show the static CSS poster instead — clean,
-         bug-free, and no multi-MB frame download on mobile data. */
-      if (window.matchMedia("(max-width: 820px)").matches) {
-        if (loaderWrap) loaderWrap.classList.add("is-done");
-        if (mode === "hero") window.__heroReady = 1;
-        var canv = host.querySelector("canvas"); if (canv) canv.style.display = "none";
-        return;
-      }
       function onFrame(idx, k) {
         loaded++;
         if (mode === "hero" && k < need) { priorityLoaded++; window.__heroReady = priorityLoaded / need; }
