@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aathavan Unit Availability | Excello Developers</title>
+  <meta name="description" content="Compare currently available two- and three-bedroom residences at Aathavan, No. 6 Carron Place, Dehiwala — by floor, size and standard price. Enquire on WhatsApp.">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <meta name="theme-color" content="#17150f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <script src="js/layout.js"></script>
+
+  <main>
+    <section class="hero hero--page container">
+      <div class="hero__bg">
+        <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=2200&q=80" data-hero="availability" alt="Contemporary Aathavan apartment residences in Dehiwala">
+      </div>
+      <div class="hero__content">
+        <p class="label hero__label" data-hero-fade>Availability / <span data-avail="location">No. 6, Carron Place, Dehiwala</span></p>
+        <h1 class="h-display hero__title" data-split data-avail="heading">Find your home at <em>Aathavan.</em></h1>
+        <div class="hero__bottom">
+          <p class="hero__sub" data-hero-fade data-avail="intro">Compare currently available two- and three-bedroom residences by floor, size and standard price.</p>
+          <div class="hero__scroll" data-hero-fade><i></i> Scroll</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section container">
+      <!-- Meta strip: standard price, daily check, live available count -->
+      <div class="avail-meta" data-reveal>
+        <div class="avail-meta__item"><span class="avail-meta__k">Standard price</span><span class="avail-meta__v" data-avail="ppsf">LKR 40,000 / sq.ft</span></div>
+        <div class="avail-meta__item"><span class="avail-meta__k">Status</span><span class="avail-meta__v" data-avail="note">Availability checked daily</span></div>
+        <div class="avail-meta__item"><span class="avail-meta__k">Available now</span><span class="avail-meta__v"><span id="availCount">—</span> residences</span></div>
+      </div>
+
+      <!-- Filter toolbar -->
+      <div class="avail-bar" data-reveal>
+        <div class="avail-chips" role="group" aria-label="Filter by configuration">
+          <button class="chip is-active" type="button" data-conf="" aria-pressed="true">All homes</button>
+          <button class="chip" type="button" data-conf="2 Bedroom" aria-pressed="false">2 Bedroom</button>
+          <button class="chip" type="button" data-conf="3 Bedroom" aria-pressed="false">3 Bedroom</button>
+          <button class="chip" type="button" data-conf="3 Bedroom + Maid's" aria-pressed="false">3 Bedroom + Maid's</button>
+        </div>
+        <div class="avail-selects">
+          <label class="avail-field">
+            <span>Floor</span>
+            <select id="fFloor"><option value="">All floors</option></select>
+          </label>
+          <label class="avail-field">
+            <span>Status</span>
+            <select id="fStatus">
+              <option value="available" selected>Available</option>
+              <option value="reserved">Reserved</option>
+              <option value="sold">Sold</option>
+              <option value="">All statuses</option>
+            </select>
+          </label>
+          <label class="avail-field">
+            <span>Sort by</span>
+            <select id="fSort">
+              <option value="floor">Floor (low–high)</option>
+              <option value="area">Area (small–large)</option>
+              <option value="area-desc">Area (large–small)</option>
+              <option value="price">Price (low–high)</option>
+              <option value="price-desc">Price (high–low)</option>
+              <option value="configuration">Configuration</option>
+            </select>
+          </label>
+          <button class="btn btn--ghost btn--sm avail-reset" id="fReset" type="button">Reset filters</button>
+        </div>
+      </div>
+
+      <!-- Results (rendered by js/availability.js) -->
+      <div class="avail-results" id="availResults" aria-live="polite">
+        <p class="body body--muted" id="availLoading">Loading availability…</p>
+      </div>
+
+      <!-- Disclaimer -->
+      <p class="avail-disclaimer" data-avail="disclaimer" data-reveal>Availability and prices are indicative and subject to confirmation at reservation. Standard prices are calculated at LKR 40,000 per sq.ft. Promotional or negotiated rates may differ.</p>
+    </section>
+
+    <!-- Payment structure -->
+    <section class="section container" data-theme="dark">
+      <p class="label" data-reveal>Payment structure</p>
+      <div class="avail-pay" data-reveal>
+        <div class="avail-pay__step"><span class="avail-pay__n">01</span><span class="avail-pay__t" data-avail="pay1">LKR 1M Reservation</span></div>
+        <div class="avail-pay__step"><span class="avail-pay__n">02</span><span class="avail-pay__t" data-avail="pay2">30% Down payment</span></div>
+        <div class="avail-pay__step"><span class="avail-pay__n">03</span><span class="avail-pay__t" data-avail="pay3">22 Monthly instalments for balance 70%</span></div>
+      </div>
+    </section>
+
+    <!-- Help CTA -->
+    <section class="section container cta">
+      <p class="label" data-reveal data-avail="ctaTitle">Need help choosing?</p>
+      <h2 class="h-display" data-split data-avail="ctaLead">Speak with the <em>Aathavan</em> team.</h2>
+      <p class="body body--muted cta__text" data-reveal data-avail="ctaText">Ask about unit orientation, payment options, floor plans or arrange a project consultation.</p>
+      <div class="cta__row" data-reveal>
+        <a class="btn btn--solid" id="teamWa" href="#" target="_blank" rel="noopener" data-magnetic>Enquire on WhatsApp <svg class="arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 13 13 1M4 1h9v9"/></svg></a>
+      </div>
+      <div class="avail-contact" data-reveal>
+        <span data-avail="project">Aathavan by Excello</span>
+        <a href="tel:+94770222000" data-site="phone">+94 77 022 2000</a>
+        <a href="mailto:inquiry@excello.lk" data-site="email">inquiry@excello.lk</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/vendor/gsap.min.js"></script>
+  <script src="js/vendor/ScrollTrigger.min.js"></script>
+  <script src="js/vendor/SplitText.min.js"></script>
+  <script src="js/vendor/lenis.min.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/availability.js"></script>
+</body>
+</html>

@@ -19,8 +19,10 @@
     { href: "/about", label: "About", num: "02", match: ["/about", "/about.html"] },
     { href: "/services", label: "Services", num: "03", match: ["/services", "/services.html"] },
     { href: "/projects", label: "Projects", num: "04", match: ["/projects", "/projects.html", "/project/"] },
-    { href: "/insights", label: "Insights", num: "05", match: ["/insights", "/insights.html", "/insight/"] },
-    { href: "/contact", label: "Contact", num: "06", match: ["/contact", "/contact.html"] }
+    { href: "/availability", label: "Availability", num: "05", match: ["/availability", "/availability.html"] },
+    { href: "/calculator", label: "Calculator", num: "06", match: ["/calculator", "/calculator.html"] },
+    { href: "/insights", label: "Insights", num: "07", match: ["/insights", "/insights.html", "/insight/"] },
+    { href: "/contact", label: "Contact", num: "08", match: ["/contact", "/contact.html"] }
   ];
   function isActive(l) {
     return l.match.some(function (m) { return m.slice(-1) === "/" && m !== "/" ? path.indexOf(m) === 0 : path === m; });

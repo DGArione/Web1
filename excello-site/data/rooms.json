@@ -1,0 +1,112 @@
+[
+  {
+    "id": "seed-0",
+    "order": 0,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-0",
+    "title": "Bedroom",
+    "area": "150",
+    "note": "Default area per room (sq ft) \u2014 configurable."
+  },
+  {
+    "id": "seed-1",
+    "order": 1,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-1",
+    "title": "Bathroom",
+    "area": "55",
+    "note": "Default area per room (sq ft) \u2014 configurable."
+  },
+  {
+    "id": "seed-2",
+    "order": 2,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-2",
+    "title": "Living room",
+    "area": "220",
+    "note": "Default area per room (sq ft) \u2014 configurable."
+  },
+  {
+    "id": "seed-3",
+    "order": 3,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-3",
+    "title": "Kitchen",
+    "area": "120",
+    "note": "Default area per room (sq ft) \u2014 configurable."
+  },
+  {
+    "id": "seed-4",
+    "order": 4,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-4",
+    "title": "Dining",
+    "area": "140",
+    "note": "Default area per room (sq ft) \u2014 configurable."
+  },
+  {
+    "id": "seed-5",
+    "order": 5,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-5",
+    "title": "Pantry",
+    "area": "60",
+    "note": "Default area per room (sq ft) \u2014 configurable."
+  },
+  {
+    "id": "seed-6",
+    "order": 6,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-6",
+    "title": "Maid's room",
+    "area": "80",
+    "note": "Default area per room (sq ft) \u2014 configurable."
+  },
+  {
+    "id": "seed-7",
+    "order": 7,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-7",
+    "title": "Garage / parking",
+    "area": "180",
+    "note": "Default area per room (sq ft) \u2014 configurable."
+  },
+  {
+    "id": "seed-8",
+    "order": 8,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-8",
+    "title": "Balcony / verandah",
+    "area": "90",
+    "note": "Default area per room (sq ft) \u2014 configurable."
+  },
+  {
+    "id": "seed-9",
+    "order": 9,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-9",
+    "title": "Staircase / circulation",
+    "area": "100",
+    "note": "Default area per room (sq ft) \u2014 configurable."
+  }
+]

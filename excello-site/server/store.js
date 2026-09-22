@@ -8,7 +8,11 @@ const FILES = {
   projects: path.join(DATA_DIR, "projects.json"),
   insights: path.join(DATA_DIR, "insights.json"),
   services: path.join(DATA_DIR, "services.json"),
-  chatbot: path.join(DATA_DIR, "chatbot.json")
+  chatbot: path.join(DATA_DIR, "chatbot.json"),
+  units: path.join(DATA_DIR, "units.json"),
+  projecttypes: path.join(DATA_DIR, "projecttypes.json"),
+  materials: path.join(DATA_DIR, "materials.json"),
+  rooms: path.join(DATA_DIR, "rooms.json")
 };
 
 function ensure() {

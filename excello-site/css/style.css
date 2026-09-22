@@ -272,7 +272,7 @@ em, .it { font-style: italic; font-weight: 300; }
 }
 .brand__sub { font-size: 9px; letter-spacing: 0.32em; text-transform: uppercase; opacity: 0.7; margin-top: 4px; }
 
-.nav { display: flex; align-items: center; gap: 36px; }
+.nav { display: flex; align-items: center; gap: 26px; }
 .nav__link {
   position: relative;
   font-size: 11px;
@@ -304,7 +304,7 @@ em, .it { font-style: italic; font-weight: 300; }
 .burger.is-open span:first-child { transform: translateY(3.5px) rotate(45deg); }
 .burger.is-open span:last-child { transform: translateY(-3.5px) rotate(-45deg); }
 
-@media (max-width: 900px) {
+@media (max-width: 1140px) {
   .nav, .header .btn { display: none; }
   .burger { display: flex; }
 }
@@ -1313,3 +1313,231 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
 
 /* A hairline gold rule under the header when solid, for a refined edge. */
 .header.is-solid { border-bottom: 1px solid rgba(168,134,90,0.22); }
+
+
+/* ==========================================================================
+   ADDENDUM 8 — Aathavan availability + Construction cost calculator
+   ========================================================================== */
+
+/* ---- Small shared helpers ---------------------------------------------- */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.btn--sm { padding: 9px 16px; font-size: 10px; }
+.btn--ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+.btn--ghost:hover { border-color: var(--fg); }
+.cta__text { max-width: 620px; margin: 18px auto 0; }
+:focus-visible { outline: 2px solid var(--bronze); outline-offset: 3px; }
+
+/* ---- Form controls (both tools) ---------------------------------------- */
+.avail-field select, #landVal, .croom__qty {
+  font-family: var(--font-sans); font-size: 14px; color: var(--fg);
+  background: var(--cream); border: 1px solid var(--line); border-radius: 2px;
+  padding: 11px 14px; outline: none; transition: border-color 0.3s var(--ease);
+}
+.avail-field select:focus, #landVal:focus, .croom__qty:focus { border-color: var(--bronze); }
+
+/* ==========================================================================
+   AATHAVAN AVAILABILITY
+   ========================================================================== */
+.avail-meta {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+  background: var(--line); border: 1px solid var(--line); border-radius: 3px;
+  overflow: hidden; margin-bottom: 30px;
+}
+.avail-meta__item { background: var(--cream); padding: 20px 22px; display: flex; flex-direction: column; gap: 6px; }
+.avail-meta__k { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+.avail-meta__v { font-family: var(--font-serif); font-size: 22px; line-height: 1.1; }
+
+.avail-bar { display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: flex-end; margin-bottom: 26px; }
+.avail-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip {
+  font-family: var(--font-sans); font-size: 11px; letter-spacing: 0.08em;
+  padding: 10px 16px; border: 1px solid var(--line); border-radius: 100px;
+  background: transparent; color: var(--fg); cursor: pointer;
+  transition: background 0.3s var(--ease), border-color 0.3s var(--ease), color 0.3s var(--ease);
+}
+.chip:hover { border-color: var(--bronze-2); }
+.chip.is-active { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.avail-selects { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+.avail-field { display: flex; flex-direction: column; gap: 7px; }
+.avail-field span { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.avail-reset { align-self: flex-end; }
+
+/* Responsive table -> cards */
+.avail-results { margin-bottom: 26px; }
+.utable { width: 100%; border-collapse: collapse; font-size: 14px; }
+.utable caption { text-align: left; }
+.utable thead th {
+  text-align: left; font-family: var(--font-sans); font-weight: 600;
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted);
+  padding: 0 16px 14px; border-bottom: 1px solid var(--line);
+}
+.utable tbody td { padding: 18px 16px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.utable__row.is-sold, .utable__row.is-reserved { color: var(--muted); }
+.utable__no { font-family: var(--font-serif); font-size: 20px; color: var(--fg); }
+.utable__badge {
+  display: inline-block; margin-left: 6px; font-family: var(--font-sans);
+  font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 100px; vertical-align: middle;
+}
+.utable__badge.is-reserved, .utable__state.is-reserved { color: #8a6a37; background: rgba(168,134,90,0.12); }
+.utable__badge.is-sold, .utable__state.is-sold { color: #a2493e; background: rgba(176,90,79,0.12); }
+.utable__state { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; padding: 6px 12px; border-radius: 100px; }
+.utable__cta { text-align: right; white-space: nowrap; }
+
+.avail-empty { padding: 46px 24px; text-align: center; border: 1px dashed var(--line); border-radius: 3px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.avail-empty a { text-decoration: underline; }
+.avail-disclaimer { font-size: 12px; color: var(--muted); line-height: 1.6; max-width: 760px; }
+
+/* Payment structure (on dark section) */
+.avail-pay { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 22px; }
+.avail-pay__step { border: 1px solid var(--line); border-radius: 3px; padding: 26px 24px; display: flex; flex-direction: column; gap: 14px; }
+.avail-pay__n { font-family: var(--font-serif); font-size: 34px; color: var(--bronze-2); line-height: 1; }
+.avail-pay__t { font-size: 15px; }
+
+.avail-contact { display: flex; flex-wrap: wrap; gap: 8px 26px; justify-content: center; margin-top: 30px; font-size: 13px; color: var(--muted); }
+.avail-contact a { color: var(--fg); }
+
+/* ==========================================================================
+   CONSTRUCTION COST CALCULATOR (wizard)
+   ========================================================================== */
+.cwiz { max-width: 960px; margin: 0 auto; }
+.cwiz__steps {
+  list-style: none; margin: 0 0 34px; padding: 0 0 18px;
+  display: flex; flex-wrap: wrap; gap: 8px 22px; border-bottom: 1px solid var(--line);
+}
+.cwiz__steps li {
+  display: flex; align-items: center; gap: 9px; font-size: 12px; color: var(--muted);
+  cursor: default; letter-spacing: 0.02em;
+}
+.cwiz__steps li[data-s] { cursor: pointer; }
+.cwiz__steps li span {
+  width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--line);
+  display: inline-flex; align-items: center; justify-content: center; font-size: 12px;
+  transition: background 0.3s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease);
+}
+.cwiz__steps li.is-active { color: var(--fg); }
+.cwiz__steps li.is-active span { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.cwiz__steps li.is-done span { background: var(--bronze); color: #fff; border-color: var(--bronze); }
+
+.cstep { border: 0; padding: 0; margin: 0; display: none; }
+.cstep.is-active { display: block; animation: cfade 0.4s var(--ease-out); }
+@keyframes cfade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.cstep__title { font-family: var(--font-serif); font-size: clamp(24px, 3.5vw, 34px); padding: 0; }
+.cstep__hint { color: var(--muted); font-size: 14px; margin: 8px 0 24px; max-width: 640px; }
+.cstep__badge { display: inline-block; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #8a6a37; background: rgba(168,134,90,0.12); padding: 6px 12px; border-radius: 100px; margin-bottom: 20px; }
+.cstep__err { color: var(--danger, #a2493e); font-size: 13px; margin-top: 16px; }
+
+/* Radio option cards */
+.copts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.copt {
+  display: flex; gap: 12px; align-items: flex-start; cursor: pointer;
+  border: 1px solid var(--line); border-radius: 3px; padding: 16px 18px; background: var(--cream);
+  transition: border-color 0.3s var(--ease), background 0.3s var(--ease);
+}
+.copt:hover { border-color: var(--bronze-2); }
+.copt input { margin-top: 3px; accent-color: var(--bronze); }
+.copt:has(input:checked) { border-color: var(--bronze); background: rgba(168,134,90,0.08); }
+.copt__body { display: flex; flex-direction: column; gap: 4px; }
+.copt__title { font-size: 15px; }
+.copt__rate { font-size: 12px; color: var(--bronze); }
+.copt__note { font-size: 11px; color: var(--muted); }
+
+/* Land extent */
+.cfield-inline { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.cfield { display: flex; flex-direction: column; gap: 8px; }
+.cfield span { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+#landVal { width: 180px; font-family: var(--font-serif); font-size: 22px; }
+.cunit { font-size: 14px; color: var(--fg); align-self: flex-end; padding-bottom: 12px; }
+.cconv { font-size: 13px; color: var(--muted); align-self: flex-end; padding-bottom: 12px; }
+
+/* Rooms */
+.crooms { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.croom { display: flex; align-items: center; justify-content: space-between; gap: 14px; border: 1px solid var(--line); border-radius: 3px; padding: 14px 16px; background: var(--cream); }
+.croom__label { display: flex; flex-direction: column; gap: 3px; }
+.croom__name { font-size: 14px; }
+.croom__area { font-size: 11px; color: var(--muted); }
+.croom__stepper { display: flex; align-items: center; gap: 6px; }
+.croom__btn { width: 34px; height: 34px; border: 1px solid var(--line); background: transparent; border-radius: 50%; font-size: 18px; line-height: 1; cursor: pointer; color: var(--fg); transition: border-color 0.2s, background 0.2s; }
+.croom__btn:hover { border-color: var(--bronze); }
+.croom__qty { width: 56px; text-align: center; -moz-appearance: textfield; }
+.crooms__total { margin-top: 20px; font-size: 14px; color: var(--muted); }
+.crooms__total strong { font-family: var(--font-serif); font-size: 20px; color: var(--fg); }
+
+/* Estimate */
+.cest__head { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.cest__kpi { border: 1px solid var(--line); border-radius: 3px; padding: 20px 22px; display: flex; flex-direction: column; gap: 6px; }
+.cest__k { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.cest__v { font-family: var(--font-serif); font-size: 26px; }
+.cest__total { margin: 16px 0; padding: 26px; border-radius: 4px; background: var(--dark); color: #efe8dc; display: flex; flex-direction: column; gap: 6px; }
+.cest__total .cest__k { opacity: 0.7; }
+.cest__big { font-family: var(--font-serif); font-size: clamp(34px, 6vw, 50px); line-height: 1; }
+.cest__range { font-size: 13px; opacity: 0.85; }
+.cest__break { border-top: 1px solid var(--line); padding-top: 8px; }
+.crow { display: flex; justify-content: space-between; gap: 18px; font-size: 14px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.crow:last-child { border-bottom: 0; }
+.crow span:first-child { color: var(--muted); }
+.crow span:last-child { text-align: right; }
+.crow--total { font-family: var(--font-serif); font-size: 20px; }
+.crow--total span:first-child { color: var(--fg); }
+.cest__note { font-size: 11px; color: var(--muted); margin-top: 14px; line-height: 1.6; }
+
+/* Summary sheet */
+.csheet { border: 1px solid var(--line); border-radius: 4px; padding: 34px; background: var(--cream); }
+.csheet__brand { display: flex; flex-direction: column; gap: 3px; padding-bottom: 20px; border-bottom: 2px solid var(--fg); margin-bottom: 20px; }
+.csheet__brand strong { font-family: var(--font-serif); font-size: 26px; }
+.csheet__brand span { font-size: 12px; color: var(--muted); letter-spacing: 0.04em; }
+.csheet__date { margin-top: 4px; }
+.csheet__h { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin: 24px 0 6px; }
+.csheet__grid { display: flex; flex-direction: column; }
+.csheet__disc { font-size: 11px; color: var(--muted); line-height: 1.6; margin-top: 22px; }
+.csheet__contact { display: flex; flex-wrap: wrap; gap: 6px 24px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; }
+.csummary__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+
+/* Wizard nav */
+.cwiz__nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 34px; padding-top: 24px; border-top: 1px solid var(--line); }
+.cwiz__count { font-size: 12px; color: var(--muted); letter-spacing: 0.08em; }
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 860px) {
+  .avail-meta { grid-template-columns: 1fr; }
+  .avail-bar { flex-direction: column; align-items: stretch; }
+  .avail-selects { justify-content: space-between; }
+  .avail-pay { grid-template-columns: 1fr; }
+  .cest__head { grid-template-columns: 1fr; }
+
+  /* Table -> stacked cards */
+  .utable, .utable thead, .utable tbody, .utable tr, .utable td { display: block; width: 100%; }
+  .utable thead { position: absolute; left: -9999px; }
+  .utable__row { border: 1px solid var(--line); border-radius: 3px; padding: 8px 4px; margin-bottom: 14px; }
+  .utable tbody td { display: flex; justify-content: space-between; gap: 16px; padding: 10px 16px; border-bottom: 1px solid var(--line); text-align: right; }
+  .utable tbody td:last-child { border-bottom: 0; }
+  .utable tbody td::before { content: attr(data-label); color: var(--muted); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; text-align: left; align-self: center; }
+  .utable__cta { justify-content: flex-end; }
+  .utable__cta .btn { width: auto; }
+}
+@media (max-width: 520px) {
+  .avail-selects { flex-direction: column; align-items: stretch; }
+  .avail-field select { width: 100%; }
+  .copts, .crooms { grid-template-columns: 1fr; }
+  .csheet { padding: 22px; }
+}
+
+/* ==========================================================================
+   PRINT — planning summary only
+   ========================================================================== */
+@media print {
+  .header, .footer-wrap, .fabs, .chat, .preloader, .cursor, .cwiz__steps,
+  .cwiz__nav, .no-print, .hero, .cstep__title, .cstep__hint { display: none !important; }
+  .cstep { display: none !important; }
+  .cstep[data-step="6"] { display: block !important; }
+  body, main, .section { margin: 0 !important; padding: 0 !important; background: #fff !important; color: #000 !important; }
+  .csheet { border: 0; padding: 0; background: #fff; }
+  .csheet__brand { border-color: #000; }
+  .crow { border-color: #ddd; }
+  a { color: #000 !important; text-decoration: none; }
+}

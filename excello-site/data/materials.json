@@ -1,0 +1,35 @@
+[
+  {
+    "id": "seed-0",
+    "order": 0,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-0",
+    "title": "Standard",
+    "multiplier": "1.00",
+    "note": "Baseline finish. PLACEHOLDER multiplier \u2014 confirm."
+  },
+  {
+    "id": "seed-1",
+    "order": 1,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-1",
+    "title": "Semi-luxury",
+    "multiplier": "1.20",
+    "note": "PLACEHOLDER multiplier \u2014 confirm."
+  },
+  {
+    "id": "seed-2",
+    "order": 2,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-2",
+    "title": "Luxury",
+    "multiplier": "1.45",
+    "note": "PLACEHOLDER multiplier \u2014 confirm."
+  }
+]

@@ -41,7 +41,33 @@
     { k: "heroAbout", label: "About page hero image", type: "image" },
     { k: "heroServices", label: "Services page hero image", type: "image" },
     { k: "heroProjects", label: "Projects page hero image", type: "image" },
-    { k: "heroContact", label: "Contact page hero image", type: "image" }
+    { k: "heroContact", label: "Contact page hero image", type: "image" },
+    { k: "__avail", label: "Aathavan unit-availability page", type: "heading" },
+    { k: "heroAvailability", label: "Availability page hero image", type: "image" },
+    { k: "availabilityProject", label: "Development name (e.g. Aathavan by Excello)" },
+    { k: "availabilityLocation", label: "Location line" },
+    { k: "availabilityHeading", label: "Heading (H1)" },
+    { k: "availabilityIntro", label: "Intro description", type: "textarea" },
+    { k: "availabilityNote", label: "Small note (e.g. Availability checked daily)" },
+    { k: "aathavanPricePerSqFt", label: "Standard price per sq.ft (numbers only)" },
+    { k: "availabilityDisclaimer", label: "Availability disclaimer", type: "textarea" },
+    { k: "availabilityPay1", label: "Payment structure — line 1" },
+    { k: "availabilityPay2", label: "Payment structure — line 2" },
+    { k: "availabilityPay3", label: "Payment structure — line 3" },
+    { k: "availabilityCtaTitle", label: "Help CTA — title" },
+    { k: "availabilityCtaLead", label: "Help CTA — lead line" },
+    { k: "availabilityCtaText", label: "Help CTA — supporting text", type: "textarea" },
+    { k: "__calc", label: "Construction cost calculator", type: "heading" },
+    { k: "heroCalculator", label: "Calculator page hero image", type: "image" },
+    { k: "calcHeading", label: "Heading (H1)" },
+    { k: "calcIntro", label: "Intro description", type: "textarea" },
+    { k: "calcCurrency", label: "Currency code (e.g. LKR)" },
+    { k: "calcRangePct", label: "Estimate range +/- (percent, e.g. 10)" },
+    { k: "calcLandUnit", label: "Land extent unit (e.g. perches)" },
+    { k: "calcProfFeesPct", label: "Professional fees % (0 = off — CONFIRM with client)" },
+    { k: "calcContingencyPct", label: "Contingency % (0 = off — CONFIRM with client)" },
+    { k: "calcAreaNote", label: "Note about how construction area is derived", type: "textarea" },
+    { k: "calcDisclaimer", label: "Calculator disclaimer", type: "textarea" }
   ];
 
   var FIELDS = {
@@ -87,16 +113,60 @@
       { k: "answer", label: "Answer", type: "textarea", big: true },
       { k: "quick", label: "Show as a quick-reply button in the chat", type: "bool" },
       { k: "published", label: "Active (chatbot uses this)", type: "bool" }
+    ],
+    units: [
+      { k: "title", label: "Residence number (e.g. AATH-206)", type: "text", req: true },
+      { k: "type", label: "Type label (e.g. Type 6)", type: "text", half: true },
+      { k: "floor", label: "Floor", type: "number", half: true },
+      { k: "configuration", label: "Configuration", type: "select", options: [
+        { v: "2 Bedroom", label: "2 Bedroom" },
+        { v: "3 Bedroom", label: "3 Bedroom" },
+        { v: "3 Bedroom + Maid's", label: "3 Bedroom + Maid's" }
+      ] },
+      { k: "area", label: "Area (sq ft)", type: "number", half: true },
+      { k: "pricePerSqFt", label: "Price / sq.ft (blank = use standard rate)", type: "number", half: true },
+      { k: "status", label: "Status", type: "select", options: [
+        { v: "available", label: "Available" }, { v: "reserved", label: "Reserved" }, { v: "sold", label: "Sold" }
+      ] },
+      { k: "published", label: "Published (visible on the site)", type: "bool" }
+    ],
+    projecttypes: [
+      { k: "title", label: "Project type name", type: "text", req: true },
+      { k: "baseRate", label: "Base construction rate (currency / sq ft)", type: "number" },
+      { k: "note", label: "Note (shown to the visitor)", type: "textarea" },
+      { k: "published", label: "Active (calculator uses this)", type: "bool" }
+    ],
+    materials: [
+      { k: "title", label: "Finish level name (e.g. Standard, Luxury)", type: "text", req: true },
+      { k: "multiplier", label: "Cost multiplier (e.g. 1.00, 1.20)", type: "number" },
+      { k: "note", label: "Note (shown to the visitor)", type: "textarea" },
+      { k: "published", label: "Active (calculator uses this)", type: "bool" }
+    ],
+    rooms: [
+      { k: "title", label: "Room / space name", type: "text", req: true },
+      { k: "area", label: "Default area each (sq ft)", type: "number" },
+      { k: "note", label: "Note (optional)", type: "textarea" },
+      { k: "published", label: "Active (calculator uses this)", type: "bool" }
     ]
   };
   var LABELS = {
     projects: { plural: "Projects", one: "project" },
     insights: { plural: "Insights", one: "insight" },
     services: { plural: "Services", one: "service" },
-    chatbot: { plural: "Chatbot", one: "Q&A" }
+    chatbot: { plural: "Chatbot", one: "Q&A" },
+    units: { plural: "Aathavan Units", one: "unit" },
+    projecttypes: { plural: "Calc · Project Types", one: "project type" },
+    materials: { plural: "Calc · Finish Levels", one: "finish level" },
+    rooms: { plural: "Calc · Rooms", one: "room" }
   };
-  /* Defaults for a brand-new item, per collection (e.g. chatbot quick = off). */
-  var NEW_DEFAULTS = { chatbot: { published: true, quick: false } };
+  /* Defaults for a brand-new item, per collection. */
+  var NEW_DEFAULTS = {
+    chatbot: { published: true, quick: false },
+    units: { published: true, status: "available", configuration: "3 Bedroom" },
+    projecttypes: { published: true },
+    materials: { published: true, multiplier: "1.00" },
+    rooms: { published: true }
+  };
 
   /* ---- API ---- */
   function api(method, url, body, isForm) {
@@ -161,6 +231,10 @@
           '<button class="tab ' + (state.coll === "projects" ? "is-active" : "") + '" data-coll="projects">Projects</button>' +
           '<button class="tab ' + (state.coll === "insights" ? "is-active" : "") + '" data-coll="insights">Insights</button>' +
           '<button class="tab ' + (state.coll === "services" ? "is-active" : "") + '" data-coll="services">Services</button>' +
+          '<button class="tab ' + (state.coll === "units" ? "is-active" : "") + '" data-coll="units">Aathavan Units</button>' +
+          '<button class="tab ' + (state.coll === "projecttypes" ? "is-active" : "") + '" data-coll="projecttypes">Calc · Types</button>' +
+          '<button class="tab ' + (state.coll === "materials" ? "is-active" : "") + '" data-coll="materials">Calc · Finishes</button>' +
+          '<button class="tab ' + (state.coll === "rooms" ? "is-active" : "") + '" data-coll="rooms">Calc · Rooms</button>' +
           '<button class="tab ' + (state.coll === "chatbot" ? "is-active" : "") + '" data-coll="chatbot">Chatbot</button>' +
           '<button class="tab ' + (state.coll === "site" ? "is-active" : "") + '" data-coll="site">Site details</button>' +
         "</div>" +
@@ -188,8 +262,19 @@
   function renderList() {
     if (!state.items.length) return '<div class="list"><div class="empty">Nothing here yet. Click “New” to add the first one.</div></div>';
     return '<div class="list">' + state.items.map(function (it) {
-      var meta = [it.category, it.location || it.date, it.year].filter(Boolean).map(esc).join(" · ");
-      if (!meta && (it.tagline || it.card || it.answer)) meta = esc((it.tagline || it.card || it.answer).slice(0, 64));
+      var meta;
+      if (state.coll === "units") {
+        meta = [it.configuration, it.floor ? "Floor " + it.floor : "", it.area ? it.area + " sq.ft" : "", it.status].filter(Boolean).map(esc).join(" · ");
+      } else if (state.coll === "projecttypes") {
+        meta = [it.baseRate ? esc(it.baseRate) + " / sq ft" : "", esc(it.note || "").slice(0, 48)].filter(Boolean).join(" · ");
+      } else if (state.coll === "materials") {
+        meta = [it.multiplier ? "×" + esc(it.multiplier) : "", esc(it.note || "").slice(0, 48)].filter(Boolean).join(" · ");
+      } else if (state.coll === "rooms") {
+        meta = [it.area ? esc(it.area) + " sq ft each" : "", esc(it.note || "").slice(0, 40)].filter(Boolean).join(" · ");
+      } else {
+        meta = [it.category, it.location || it.date, it.year].filter(Boolean).map(esc).join(" · ");
+        if (!meta && (it.tagline || it.card || it.answer)) meta = esc((it.tagline || it.card || it.answer).slice(0, 64));
+      }
       var thumb = it.cover ? '<img src="' + esc(it.cover) + '" alt="">' : "";
       return '<div class="row">' +
         '<div class="row__thumb">' + thumb + "</div>" +
@@ -274,6 +359,13 @@
   function fieldHtml(f, item) {
     var v = item[f.k];
     if (f.type === "text") return '<div class="field"><label>' + f.label + (f.req ? " *" : "") + '</label><input type="text" data-k="' + f.k + '" value="' + esc(v || "") + '"></div>';
+    if (f.type === "number") return '<div class="field"><label>' + f.label + (f.req ? " *" : "") + '</label><input type="number" step="any" data-k="' + f.k + '" value="' + esc(v == null ? "" : v) + '"></div>';
+    if (f.type === "select") {
+      var opts = (f.options || []).map(function (o) {
+        return '<option value="' + esc(o.v) + '"' + (String(v) === String(o.v) ? " selected" : "") + ">" + esc(o.label) + "</option>";
+      }).join("");
+      return '<div class="field"><label>' + f.label + '</label><select data-k="' + f.k + '">' + opts + "</select></div>";
+    }
     if (f.type === "textarea") return '<div class="field"><label>' + f.label + '</label><textarea class="' + (f.big ? "big" : "") + '" data-k="' + f.k + '">' + esc(v || "") + "</textarea></div>";
     if (f.type === "bool") return '<div class="field"><label class="check"><input type="checkbox" data-k="' + f.k + '" ' + (v !== false ? "checked" : "") + "> " + f.label + "</label></div>";
     if (f.type === "image") return '<div class="field"><label>' + f.label + '</label><div class="cover" data-cover>' + (v ? '<img src="' + esc(v) + '">' : "") + '</div><div class="uploader" data-up="' + f.k + '">Click or drop an image here</div></div>';

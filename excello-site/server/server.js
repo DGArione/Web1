@@ -16,7 +16,7 @@ if (!fs.existsSync(UPLOADS)) fs.mkdirSync(UPLOADS, { recursive: true });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const COLLS = { projects: 1, insights: 1, services: 1, chatbot: 1 };
+const COLLS = { projects: 1, insights: 1, services: 1, chatbot: 1, units: 1, projecttypes: 1, materials: 1, rooms: 1 };
 
 /* Base path so the whole app can run under a sub-folder (e.g. served at
    rapidsolutions.live/excello-site). Set BASE_PATH=excello-site to enable it;
@@ -170,6 +170,11 @@ r.get(["/insights", "/insights.html"], function (req, res) {
 /* Clean URLs for the static pages (also served with the .html alias). */
 r.get(["/about", "/about.html"], servePage("about.html"));
 r.get(["/contact", "/contact.html"], servePage("contact.html"));
+/* Unit availability + cost calculator: data-driven pages that render client-side
+   from /api/units and /api/rates, so the shells are served like the other pages
+   (the <base> tag + hero-image injection apply). */
+r.get(["/availability", "/availability.html"], servePage("availability.html"));
+r.get(["/calculator", "/calculator.html"], servePage("calculator.html"));
 r.get("/project/:slug", function (req, res, next) {
   const p = store.getBySlug("projects", req.params.slug);
   if (!p || p.published === false) return next();
@@ -194,6 +199,10 @@ r.get("/api/projects", function (req, res) { res.json(store.list("projects", { p
 r.get("/api/insights", function (req, res) { res.json(store.list("insights", { publishedOnly: true })); });
 r.get("/api/services", function (req, res) { res.json(store.list("services", { publishedOnly: true })); });
 r.get("/api/chatbot", function (req, res) { res.json(store.list("chatbot", { publishedOnly: true })); });
+r.get("/api/units", function (req, res) { res.json(store.list("units", { publishedOnly: true })); });
+r.get("/api/projecttypes", function (req, res) { res.json(store.list("projecttypes", { publishedOnly: true })); });
+r.get("/api/materials", function (req, res) { res.json(store.list("materials", { publishedOnly: true })); });
+r.get("/api/rooms", function (req, res) { res.json(store.list("rooms", { publishedOnly: true })); });
 
 /* ---- Site settings (company details, socials, form endpoint, SEO) -------- */
 const SITE = path.join(ROOT, "data", "site.json");
@@ -204,7 +213,17 @@ const SITE_KEYS = ["companyName", "tagline", "phone", "whatsapp", "whatsappText"
      optional image overrides; and each page's hero image. */
   "homeFeatured", "homeFeaturedImage", "homeSelectedA", "homeSelectedImageA",
   "homeSelectedB", "homeSelectedImageB",
-  "heroAbout", "heroServices", "heroProjects", "heroContact"];
+  "heroAbout", "heroServices", "heroProjects", "heroContact",
+  /* Aathavan unit-availability page (all copy + the standard price/sq.ft). */
+  "heroAvailability", "availabilityProject", "availabilityLocation",
+  "availabilityHeading", "availabilityIntro", "availabilityNote",
+  "aathavanPricePerSqFt", "availabilityDisclaimer",
+  "availabilityPay1", "availabilityPay2", "availabilityPay3",
+  "availabilityCtaTitle", "availabilityCtaLead", "availabilityCtaText",
+  /* Construction cost calculator (copy + global, configurable factors). */
+  "heroCalculator", "calcHeading", "calcIntro", "calcCurrency", "calcRangePct",
+  "calcLandUnit", "calcProfFeesPct", "calcContingencyPct",
+  "calcAreaNote", "calcDisclaimer"];
 function readSite() { try { return JSON.parse(fs.readFileSync(SITE, "utf8")) || {}; } catch (e) { return {}; } }
 function writeSite(obj) {
   const tmp = SITE + ".tmp";
@@ -327,7 +346,8 @@ if (BASE) {
 const KNOWN_FIRST = {
   "": 1, "index.html": 1, "about": 1, "about.html": 1, "services": 1, "services.html": 1,
   "projects": 1, "projects.html": 1, "insights": 1, "insights.html": 1, "contact": 1,
-  "contact.html": 1, "project": 1, "insight": 1, "admin": 1, "api": 1, "js": 1, "css": 1,
+  "contact.html": 1, "availability": 1, "availability.html": 1, "calculator": 1,
+  "calculator.html": 1, "project": 1, "insight": 1, "admin": 1, "api": 1, "js": 1, "css": 1,
   "img": 1, "uploads": 1, "favicon.ico": 1, "favicon.svg": 1, "robots.txt": 1, "sitemap.xml": 1,
   "apple-touch-icon.png": 1
 };
