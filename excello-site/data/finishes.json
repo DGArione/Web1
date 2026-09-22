@@ -1,0 +1,62 @@
+[
+  {
+    "id": "seed-0",
+    "order": 0,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-0",
+    "title": "Essential",
+    "rate": "18500",
+    "desc": "Cost-conscious standard finishes",
+    "pending": false
+  },
+  {
+    "id": "seed-1",
+    "order": 1,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-1",
+    "title": "Modern",
+    "rate": "24000",
+    "desc": "Contemporary design and improved materials",
+    "pending": false
+  },
+  {
+    "id": "seed-2",
+    "order": 2,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-2",
+    "title": "Premium",
+    "rate": "35000",
+    "desc": "Higher-grade finishes and detailing",
+    "pending": false
+  },
+  {
+    "id": "seed-3",
+    "order": 3,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-3",
+    "title": "Traditional",
+    "rate": "28000",
+    "desc": "Craft-led detailing and increased timber",
+    "pending": false
+  },
+  {
+    "id": "seed-4",
+    "order": 4,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-4",
+    "title": "Bespoke",
+    "rate": "45000",
+    "desc": "Custom design and specialist sourcing",
+    "pending": false
+  }
+]

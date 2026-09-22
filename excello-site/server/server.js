@@ -16,7 +16,7 @@ if (!fs.existsSync(UPLOADS)) fs.mkdirSync(UPLOADS, { recursive: true });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const COLLS = { projects: 1, insights: 1, services: 1, chatbot: 1, units: 1, projecttypes: 1, materials: 1, rooms: 1 };
+const COLLS = { projects: 1, insights: 1, services: 1, chatbot: 1, units: 1, projecttypes: 1, finishes: 1, materials: 1, rooms: 1 };
 
 /* Base path so the whole app can run under a sub-folder (e.g. served at
    rapidsolutions.live/excello-site). Set BASE_PATH=excello-site to enable it;
@@ -201,6 +201,7 @@ r.get("/api/services", function (req, res) { res.json(store.list("services", { p
 r.get("/api/chatbot", function (req, res) { res.json(store.list("chatbot", { publishedOnly: true })); });
 r.get("/api/units", function (req, res) { res.json(store.list("units", { publishedOnly: true })); });
 r.get("/api/projecttypes", function (req, res) { res.json(store.list("projecttypes", { publishedOnly: true })); });
+r.get("/api/finishes", function (req, res) { res.json(store.list("finishes", { publishedOnly: true })); });
 r.get("/api/materials", function (req, res) { res.json(store.list("materials", { publishedOnly: true })); });
 r.get("/api/rooms", function (req, res) { res.json(store.list("rooms", { publishedOnly: true })); });
 
@@ -222,7 +223,7 @@ const SITE_KEYS = ["companyName", "tagline", "phone", "whatsapp", "whatsappText"
   "availabilityCtaTitle", "availabilityCtaLead", "availabilityCtaText",
   /* Construction cost calculator (copy + global, configurable factors). */
   "heroCalculator", "calcHeading", "calcIntro", "calcCurrency", "calcRangePct",
-  "calcLandUnit", "calcProfFeesPct", "calcContingencyPct",
+  "calcLandUnit", "calcCoverage", "calcProfFeesPct", "calcContingencyPct",
   "calcAreaNote", "calcDisclaimer"];
 function readSite() { try { return JSON.parse(fs.readFileSync(SITE, "utf8")) || {}; } catch (e) { return {}; } }
 function writeSite(obj) {
@@ -262,6 +263,29 @@ r.post("/api/enquiry", function (req, res) {
   res.json({ ok: true });
 });
 r.get("/api/admin/enquiries", auth.requireAuth, function (req, res) { res.json(readEnquiries()); });
+
+/* ---- Calculator: capture estimate leads to data/estimates.json ----------- */
+const ESTIMATES = path.join(ROOT, "data", "estimates.json");
+function readEstimates() { try { return JSON.parse(fs.readFileSync(ESTIMATES, "utf8")); } catch (e) { return []; } }
+r.post("/api/estimate", function (req, res) {
+  const b = req.body || {};
+  const name = clip(b.name, 120), email = clip(b.email, 160), phone = clip(b.phone, 60);
+  if (!name || !phone || !email) return res.status(400).json({ error: "Please add your name, contact number and email." });
+  const list = readEstimates();
+  list.unshift({
+    id: Date.now().toString(36) + crypto.randomBytes(3).toString("hex"),
+    at: new Date().toISOString(),
+    name: name, email: email, phone: phone, location: clip(b.location, 160),
+    projectType: clip(b.projectType, 120), finish: clip(b.finish, 120),
+    area: clip(b.area, 40), total: clip(b.total, 60),
+    summary: clip(b.summary, 4000)
+  });
+  const tmp = ESTIMATES + ".tmp";
+  fs.writeFileSync(tmp, JSON.stringify(list.slice(0, 500), null, 2));
+  fs.renameSync(tmp, ESTIMATES);
+  res.json({ ok: true });
+});
+r.get("/api/admin/estimates", auth.requireAuth, function (req, res) { res.json(readEstimates()); });
 
 /* ---- Auth --------------------------------------------------------------- */
 r.post("/admin/login", function (req, res) {

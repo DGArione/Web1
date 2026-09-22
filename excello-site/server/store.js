@@ -11,6 +11,7 @@ const FILES = {
   chatbot: path.join(DATA_DIR, "chatbot.json"),
   units: path.join(DATA_DIR, "units.json"),
   projecttypes: path.join(DATA_DIR, "projecttypes.json"),
+  finishes: path.join(DATA_DIR, "finishes.json"),
   materials: path.join(DATA_DIR, "materials.json"),
   rooms: path.join(DATA_DIR, "rooms.json")
 };

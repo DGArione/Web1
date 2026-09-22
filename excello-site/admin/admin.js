@@ -64,6 +64,7 @@
     { k: "calcCurrency", label: "Currency code (e.g. LKR)" },
     { k: "calcRangePct", label: "Estimate range +/- (percent, e.g. 10)" },
     { k: "calcLandUnit", label: "Land extent unit (e.g. perches)" },
+    { k: "calcCoverage", label: "Site coverage % for capacity check (e.g. 65)" },
     { k: "calcProfFeesPct", label: "Professional fees % (0 = off — CONFIRM with client)" },
     { k: "calcContingencyPct", label: "Contingency % (0 = off — CONFIRM with client)" },
     { k: "calcAreaNote", label: "Note about how construction area is derived", type: "textarea" },
@@ -121,7 +122,7 @@
       { k: "configuration", label: "Configuration", type: "select", options: [
         { v: "2 Bedroom", label: "2 Bedroom" },
         { v: "3 Bedroom", label: "3 Bedroom" },
-        { v: "3 Bedroom + Maid's", label: "3 Bedroom + Maid's" }
+        { v: "3 Bedroom + Maid's Room", label: "3 Bedroom + Maid's Room" }
       ] },
       { k: "area", label: "Area (sq ft)", type: "number", half: true },
       { k: "pricePerSqFt", label: "Price / sq.ft (blank = use standard rate)", type: "number", half: true },
@@ -131,20 +132,35 @@
       { k: "published", label: "Published (visible on the site)", type: "bool" }
     ],
     projecttypes: [
-      { k: "title", label: "Project type name", type: "text", req: true },
-      { k: "baseRate", label: "Base construction rate (currency / sq ft)", type: "number" },
-      { k: "note", label: "Note (shown to the visitor)", type: "textarea" },
+      { k: "title", label: "Project direction name", type: "text", req: true },
+      { k: "subtitle", label: "Sub-line (shown on the card)", type: "text" },
+      { k: "mode", label: "Behaviour", type: "select", options: [
+        { v: "calculator", label: "Continue in the calculator" },
+        { v: "whatsapp", label: "Open WhatsApp (feasibility review)" },
+        { v: "call", label: "Request a call (contact page)" }
+      ] },
       { k: "published", label: "Active (calculator uses this)", type: "bool" }
     ],
-    materials: [
-      { k: "title", label: "Finish level name (e.g. Standard, Luxury)", type: "text", req: true },
-      { k: "multiplier", label: "Cost multiplier (e.g. 1.00, 1.20)", type: "number" },
-      { k: "note", label: "Note (shown to the visitor)", type: "textarea" },
+    finishes: [
+      { k: "title", label: "Finish level name (e.g. Essential, Premium)", type: "text", req: true },
+      { k: "rate", label: "Rate (currency / sq.ft)", type: "number" },
+      { k: "desc", label: "Description (shown on the row)", type: "text" },
+      { k: "pending", label: "Pending review (shown but not selectable)", type: "bool" },
       { k: "published", label: "Active (calculator uses this)", type: "bool" }
     ],
     rooms: [
       { k: "title", label: "Room / space name", type: "text", req: true },
-      { k: "area", label: "Default area each (sq ft)", type: "number" },
+      { k: "areaSmall", label: "Small allowance (sq ft)", type: "number", half: true },
+      { k: "areaMedium", label: "Medium allowance (sq ft)", type: "number", half: true },
+      { k: "areaLarge", label: "Large allowance (sq ft)", type: "number", half: true },
+      { k: "note", label: "Note (optional)", type: "textarea" },
+      { k: "published", label: "Active (calculator uses this)", type: "bool" }
+    ],
+    materials: [
+      { k: "title", label: "Influence name (e.g. Walling, Windows)", type: "text", req: true },
+      { k: "options", label: "Options (comma-separated). Leave blank for a yes/no toggle.", type: "textarea" },
+      { k: "toggle", label: "Show as a yes/no toggle instead of a dropdown", type: "bool" },
+      { k: "adjustPct", label: "Cost adjustment % when selected (0 = none — CONFIRM)", type: "number" },
       { k: "note", label: "Note (optional)", type: "textarea" },
       { k: "published", label: "Active (calculator uses this)", type: "bool" }
     ]
@@ -155,17 +171,19 @@
     services: { plural: "Services", one: "service" },
     chatbot: { plural: "Chatbot", one: "Q&A" },
     units: { plural: "Aathavan Units", one: "unit" },
-    projecttypes: { plural: "Calc · Project Types", one: "project type" },
-    materials: { plural: "Calc · Finish Levels", one: "finish level" },
-    rooms: { plural: "Calc · Rooms", one: "room" }
+    projecttypes: { plural: "Calc · Project Direction", one: "option" },
+    finishes: { plural: "Calc · Finish Levels", one: "finish level" },
+    rooms: { plural: "Calc · Rooms", one: "room" },
+    materials: { plural: "Calc · Materials", one: "influence" }
   };
   /* Defaults for a brand-new item, per collection. */
   var NEW_DEFAULTS = {
     chatbot: { published: true, quick: false },
     units: { published: true, status: "available", configuration: "3 Bedroom" },
-    projecttypes: { published: true },
-    materials: { published: true, multiplier: "1.00" },
-    rooms: { published: true }
+    projecttypes: { published: true, mode: "calculator" },
+    finishes: { published: true, pending: false },
+    rooms: { published: true },
+    materials: { published: true, toggle: false, adjustPct: "0" }
   };
 
   /* ---- API ---- */
@@ -232,9 +250,10 @@
           '<button class="tab ' + (state.coll === "insights" ? "is-active" : "") + '" data-coll="insights">Insights</button>' +
           '<button class="tab ' + (state.coll === "services" ? "is-active" : "") + '" data-coll="services">Services</button>' +
           '<button class="tab ' + (state.coll === "units" ? "is-active" : "") + '" data-coll="units">Aathavan Units</button>' +
-          '<button class="tab ' + (state.coll === "projecttypes" ? "is-active" : "") + '" data-coll="projecttypes">Calc · Types</button>' +
-          '<button class="tab ' + (state.coll === "materials" ? "is-active" : "") + '" data-coll="materials">Calc · Finishes</button>' +
+          '<button class="tab ' + (state.coll === "projecttypes" ? "is-active" : "") + '" data-coll="projecttypes">Calc · Direction</button>' +
+          '<button class="tab ' + (state.coll === "finishes" ? "is-active" : "") + '" data-coll="finishes">Calc · Finishes</button>' +
           '<button class="tab ' + (state.coll === "rooms" ? "is-active" : "") + '" data-coll="rooms">Calc · Rooms</button>' +
+          '<button class="tab ' + (state.coll === "materials" ? "is-active" : "") + '" data-coll="materials">Calc · Materials</button>' +
           '<button class="tab ' + (state.coll === "chatbot" ? "is-active" : "") + '" data-coll="chatbot">Chatbot</button>' +
           '<button class="tab ' + (state.coll === "site" ? "is-active" : "") + '" data-coll="site">Site details</button>' +
         "</div>" +
@@ -266,11 +285,13 @@
       if (state.coll === "units") {
         meta = [it.configuration, it.floor ? "Floor " + it.floor : "", it.area ? it.area + " sq.ft" : "", it.status].filter(Boolean).map(esc).join(" · ");
       } else if (state.coll === "projecttypes") {
-        meta = [it.baseRate ? esc(it.baseRate) + " / sq ft" : "", esc(it.note || "").slice(0, 48)].filter(Boolean).join(" · ");
-      } else if (state.coll === "materials") {
-        meta = [it.multiplier ? "×" + esc(it.multiplier) : "", esc(it.note || "").slice(0, 48)].filter(Boolean).join(" · ");
+        meta = [esc(it.subtitle || ""), it.mode ? "→ " + esc(it.mode) : ""].filter(Boolean).join(" · ");
+      } else if (state.coll === "finishes") {
+        meta = [it.rate ? esc(it.rate) + " / sq.ft" : "", esc(it.desc || "").slice(0, 48), it.pending ? "PENDING" : ""].filter(Boolean).join(" · ");
       } else if (state.coll === "rooms") {
-        meta = [it.area ? esc(it.area) + " sq ft each" : "", esc(it.note || "").slice(0, 40)].filter(Boolean).join(" · ");
+        meta = [it.areaSmall ? "S " + esc(it.areaSmall) : "", it.areaMedium ? "M " + esc(it.areaMedium) : "", it.areaLarge ? "L " + esc(it.areaLarge) : ""].filter(Boolean).join(" · ");
+      } else if (state.coll === "materials") {
+        meta = [it.toggle ? "toggle" : (it.options ? esc(it.options).slice(0, 40) : ""), (it.adjustPct && it.adjustPct !== "0") ? "+" + esc(it.adjustPct) + "%" : ""].filter(Boolean).join(" · ");
       } else {
         meta = [it.category, it.location || it.date, it.year].filter(Boolean).map(esc).join(" · ");
         if (!meta && (it.tagline || it.card || it.answer)) meta = esc((it.tagline || it.card || it.answer).slice(0, 64));

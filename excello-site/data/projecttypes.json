@@ -6,9 +6,9 @@
     "updatedAt": 1789328685770,
     "published": true,
     "slug": "opt-0",
-    "title": "New house construction",
-    "baseRate": "8500",
-    "note": "PLACEHOLDER rate \u2014 confirm with client."
+    "title": "House",
+    "subtitle": "Single-family residence",
+    "mode": "calculator"
   },
   {
     "id": "seed-1",
@@ -17,9 +17,9 @@
     "updatedAt": 1789328685770,
     "published": true,
     "slug": "opt-1",
-    "title": "House renovation / remodel",
-    "baseRate": "6500",
-    "note": "PLACEHOLDER rate \u2014 confirm with client."
+    "title": "Mini apartment",
+    "subtitle": "Up to four floors \u00b7 guided feasibility",
+    "mode": "calculator"
   },
   {
     "id": "seed-2",
@@ -28,9 +28,9 @@
     "updatedAt": 1789328685770,
     "published": true,
     "slug": "opt-2",
-    "title": "Apartment / multi-unit",
-    "baseRate": "9000",
-    "note": "PLACEHOLDER rate \u2014 confirm with client."
+    "title": "Mid-size apartment",
+    "subtitle": "Speak with us for a tailored feasibility review",
+    "mode": "whatsapp"
   },
   {
     "id": "seed-3",
@@ -39,8 +39,8 @@
     "updatedAt": 1789328685770,
     "published": true,
     "slug": "opt-3",
-    "title": "Commercial building",
-    "baseRate": "9500",
-    "note": "PLACEHOLDER rate \u2014 confirm with client."
+    "title": "Custom / I have no idea",
+    "subtitle": "Tell us what you are thinking and request a call",
+    "mode": "call"
   }
 ]

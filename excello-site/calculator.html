@@ -17,102 +17,143 @@
 <body>
   <script src="js/layout.js"></script>
 
-  <main>
-    <section class="hero hero--page container">
-      <div class="hero__bg">
-        <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=2200&q=80" data-hero="calculator" alt="Architectural plans for a Sri Lankan home">
+  <main class="planner-main">
+    <section class="planner container">
+      <!-- Progress -->
+      <div class="planner__bar">
+        <span class="planner__step" id="pStepLabel">Step 1 of 7</span>
+        <span class="planner__section" id="pSectionLabel">Project</span>
+        <span class="planner__pct" id="pPct">14%</span>
+        <div class="planner__track"><i id="pTrack"></i></div>
       </div>
-      <div class="hero__content">
-        <p class="label hero__label" data-hero-fade>Construction cost planner</p>
-        <h1 class="h-display hero__title" data-split data-calc="heading">Plan with clarity before you <em>build.</em></h1>
-        <div class="hero__bottom">
-          <p class="hero__sub" data-hero-fade data-calc="intro">Create an indicative early-stage construction budget from your project type, land extent, room programme and material choices.</p>
-          <div class="hero__scroll" data-hero-fade><i></i> Scroll</div>
-        </div>
-      </div>
-    </section>
 
-    <section class="section container">
-      <div class="cwiz" id="cwiz" data-reveal>
-        <!-- Progress -->
-        <ol class="cwiz__steps" id="cwizSteps" aria-label="Calculator steps">
-          <li data-s="1"><span>1</span> Project type</li>
-          <li data-s="2"><span>2</span> Land extent</li>
-          <li data-s="3"><span>3</span> Rooms</li>
-          <li data-s="4"><span>4</span> Finish</li>
-          <li data-s="5"><span>5</span> Estimate</li>
-          <li data-s="6"><span>6</span> Summary</li>
-        </ol>
-
-        <form class="cwiz__body" id="cwizForm" novalidate>
-          <!-- STEP 1 — PROJECT TYPE -->
-          <fieldset class="cstep is-active" data-step="1">
-            <legend class="cstep__title">What are you planning to build?</legend>
-            <p class="cstep__hint">Choose the project type. Base construction rates are configurable.</p>
-            <div class="copts" id="typeOpts" role="radiogroup" aria-label="Project type"></div>
-            <p class="cstep__err" id="err1" role="alert" hidden></p>
-          </fieldset>
-
-          <!-- STEP 2 — LAND EXTENT -->
-          <fieldset class="cstep" data-step="2">
-            <legend class="cstep__title">Land extent</legend>
-            <p class="cstep__hint" data-calc="areaNote">Construction area is estimated from your room programme. Land extent is captured for context.</p>
-            <div class="cfield-inline">
-              <label class="cfield">
-                <span>Land extent</span>
-                <input type="number" id="landVal" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 10">
-              </label>
-              <span class="cunit" id="landUnit">perches</span>
-              <span class="cconv" id="landConv" aria-live="polite"></span>
+      <div class="planner__panel">
+        <form id="pForm" novalidate>
+          <!-- STEP 1 — PROJECT DIRECTION -->
+          <section class="pstep is-active" data-step="1" data-name="Project" aria-label="Project direction">
+            <p class="pkick">01 · Project direction</p>
+            <div class="phead">
+              <h1 class="ptitle">What are you planning?</h1>
+              <p class="pnote">Select a guided calculator or speak with Excello when the project needs a custom feasibility review.</p>
             </div>
-            <p class="cstep__err" id="err2" role="alert" hidden></p>
-          </fieldset>
+            <div class="pdivider"></div>
+            <div class="pcards" id="typeCards" role="radiogroup" aria-label="Project direction"></div>
+          </section>
 
-          <!-- STEP 3 — ROOM PROGRAMME -->
-          <fieldset class="cstep" data-step="3">
-            <legend class="cstep__title">Room &amp; space programme</legend>
-            <p class="cstep__hint">Set how many of each space you need. Estimated construction area updates as you go.</p>
-            <div class="crooms" id="roomOpts"></div>
-            <div class="crooms__total">Estimated construction area: <strong id="roomArea">0 sq.ft</strong></div>
-            <p class="cstep__err" id="err3" role="alert" hidden></p>
-          </fieldset>
+          <!-- STEP 2 — SPECIFICATION -->
+          <section class="pstep" data-step="2" data-name="Specification" aria-label="Finish level">
+            <p class="pkick">02 · Specification</p>
+            <div class="phead">
+              <h1 class="ptitle">Choose the finish level.</h1>
+              <p class="pnote">Rates marked pending stay unavailable until they are professionally reviewed.</p>
+            </div>
+            <div class="pdivider"></div>
+            <div class="pfinishes" id="finishRows" role="radiogroup" aria-label="Finish level"></div>
+          </section>
 
-          <!-- STEP 4 — MATERIAL / FINISH -->
-          <fieldset class="cstep" data-step="4">
-            <legend class="cstep__title">Material &amp; finish level</legend>
-            <p class="cstep__hint">This adjusts the cost per square foot. Multipliers are configurable.</p>
-            <div class="copts" id="materialOpts" role="radiogroup" aria-label="Finish level"></div>
-            <p class="cstep__err" id="err4" role="alert" hidden></p>
-          </fieldset>
+          <!-- STEP 3 — SITE -->
+          <section class="pstep" data-step="3" data-name="Site" aria-label="Site and form">
+            <p class="pkick">03 · Site and form</p>
+            <div class="phead">
+              <h1 class="ptitle">Set the land and building.</h1>
+              <p class="pnote" id="coverageNote">A simple 65% coverage assumption is used only as an early capacity check.</p>
+            </div>
+            <div class="pdivider"></div>
+            <div class="psite">
+              <div class="psite__card">
+                <p class="pcard-label">Land extent</p>
+                <div class="pland"><span id="landNum">10</span><small id="landUnit">perches</small></div>
+                <input type="range" id="landRange" min="2" max="80" step="1" value="10" aria-label="Land extent in perches">
+                <div class="pland__scale"><span>2</span><span id="landMax">80 perches</span></div>
+              </div>
+              <div class="psite__card">
+                <p class="pcard-label">Number of floors</p>
+                <div class="pfloors" id="floorBtns" role="group" aria-label="Number of floors"></div>
+                <p class="pcard-label" style="margin-top:22px">Roof form</p>
+                <div class="proof" id="roofBtns" role="group" aria-label="Roof form">
+                  <button type="button" class="proof__btn is-active" data-roof="Flat / box roof" aria-pressed="true">Flat / box roof</button>
+                  <button type="button" class="proof__btn" data-roof="Pitched roof" aria-pressed="false">Pitched roof</button>
+                </div>
+              </div>
+            </div>
+            <div class="psite__strip">
+              <div><span class="pcard-label">Approximate land area</span><strong id="landArea">2,723 sq.ft</strong></div>
+              <div><span class="pcard-label">Simple capacity allowance</span><strong id="capacity">1,770 sq.ft</strong></div>
+            </div>
+          </section>
 
-          <!-- STEP 5 — ESTIMATE -->
-          <fieldset class="cstep" data-step="5">
-            <legend class="cstep__title">Your indicative estimate</legend>
-            <p class="cstep__badge">Indicative estimate — not a quotation</p>
-            <div class="cestimate" id="estimate"></div>
-          </fieldset>
+          <!-- STEP 4 — ROOMS -->
+          <section class="pstep" data-step="4" data-name="Rooms" aria-label="Room programme">
+            <p class="pkick">04 · Room programme</p>
+            <div class="phead">
+              <h1 class="ptitle">Shape the spaces you need.</h1>
+              <p class="pnote">Assign rooms by floor and choose a simple small, medium or large allowance.</p>
+            </div>
+            <div class="pdivider"></div>
+            <div class="pfloor-tabs" id="floorTabs" role="tablist" aria-label="Floors"></div>
+            <div class="prooms" id="roomList"></div>
+            <button type="button" class="proom-add" id="addRoom">+ Add room to <span id="addRoomFloor">Ground</span></button>
+            <div class="prooms__total">Estimated construction area: <strong id="roomArea">0 sq.ft</strong></div>
+          </section>
 
-          <!-- STEP 6 — SUMMARY -->
-          <fieldset class="cstep" data-step="6">
-            <legend class="cstep__title">Planning summary</legend>
-            <p class="cstep__hint">Review your plan, then print or save it as a PDF from your browser.</p>
-            <div class="csummary" id="summary"></div>
-            <div class="csummary__actions no-print">
+          <!-- STEP 5 — MATERIALS -->
+          <section class="pstep" data-step="5" data-name="Materials" aria-label="Material assumptions">
+            <p class="pkick">05 · Material assumptions</p>
+            <div class="phead">
+              <h1 class="ptitle">Refine the cost influences.</h1>
+              <p class="pnote">Selections apply transparent adjustments to the selected base rate.</p>
+            </div>
+            <div class="pdivider"></div>
+            <div class="pmaterials" id="materialGrid"></div>
+          </section>
+
+          <!-- STEP 6 — YOUR DETAILS -->
+          <section class="pstep" data-step="6" data-name="Your details" aria-label="Your details">
+            <p class="pkick">06 · Your details</p>
+            <div class="phead">
+              <h1 class="ptitle">Where should we send your estimate?</h1>
+              <p class="pnote">Complete these details to view your personalised estimate. Excello may contact you once to help review the assumptions.</p>
+            </div>
+            <div class="pdivider"></div>
+            <div class="pdetails">
+              <label class="pfield"><span>Full name</span><input type="text" id="dName" autocomplete="name" placeholder="Your full name"></label>
+              <label class="pfield"><span>Contact number</span><input type="tel" id="dPhone" autocomplete="tel" placeholder="+94 77 000 0000"></label>
+              <label class="pfield"><span>Email address</span><input type="email" id="dEmail" autocomplete="email" placeholder="name@example.com"></label>
+              <label class="pfield"><span>Project location</span><input type="text" id="dLocation" placeholder="City or district"></label>
+            </div>
+            <label class="pconsent"><input type="checkbox" id="dConsent"> <span>I agree that Excello may store these details and contact me about my project. I understand this calculator provides an indicative estimate, not a quotation.</span></label>
+            <div class="pinfo"><strong>Your information stays with Excello.</strong><span>It is used only for this estimate and relevant project follow-up.</span></div>
+            <p class="pstep__err" id="errDetails" role="alert" hidden></p>
+          </section>
+
+          <!-- STEP 7 — ESTIMATE -->
+          <section class="pstep" data-step="7" data-name="Estimate" aria-label="Estimate">
+            <p class="pkick">07 · Estimate</p>
+            <div class="phead">
+              <h1 class="ptitle">Your indicative estimate.</h1>
+              <p class="pnote">An indicative early-stage figure — not a quotation. Print or save it for your planning.</p>
+            </div>
+            <div class="pdivider"></div>
+            <div id="estimate"></div>
+            <div class="pest-actions no-print">
               <button class="btn btn--solid" type="button" id="printBtn">Print / save as PDF</button>
-              <a class="btn" id="summaryWa" href="#" target="_blank" rel="noopener" data-magnetic>Send to Excello <svg class="arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 13 13 1M4 1h9v9"/></svg></a>
+              <a class="btn" id="estWa" href="#" target="_blank" rel="noopener" data-magnetic>Send to Excello <svg class="arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 13 13 1M4 1h9v9"/></svg></a>
             </div>
-          </fieldset>
-
-          <!-- Nav -->
-          <div class="cwiz__nav no-print">
-            <button class="btn btn--ghost" type="button" id="cBack" disabled>Back</button>
-            <span class="cwiz__count"><span id="cNow">1</span> / 6</span>
-            <button class="btn btn--solid" type="button" id="cNext">Next</button>
-          </div>
+          </section>
         </form>
       </div>
+
+      <!-- Nav -->
+      <div class="planner__nav no-print">
+        <button class="pnav-back" type="button" id="pBack" disabled>&larr; Back</button>
+        <button class="pnav-save" type="button" id="pSave">Save locally</button>
+        <button class="pnav-next" type="button" id="pNext">Continue <span aria-hidden="true">↗</span></button>
+      </div>
+      <p class="planner__foot">Designed for early planning, not final costing.</p>
     </section>
   </main>
+
+  <div class="ptoast" id="pToast" role="status" aria-live="polite" hidden></div>
 
   <script src="js/vendor/gsap.min.js"></script>
   <script src="js/vendor/ScrollTrigger.min.js"></script>

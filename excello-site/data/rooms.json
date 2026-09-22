@@ -6,9 +6,10 @@
     "updatedAt": 1789328685770,
     "published": true,
     "slug": "opt-0",
-    "title": "Bedroom",
-    "area": "150",
-    "note": "Default area per room (sq ft) \u2014 configurable."
+    "title": "Master bedroom",
+    "areaSmall": "150",
+    "areaMedium": "200",
+    "areaLarge": "260"
   },
   {
     "id": "seed-1",
@@ -17,9 +18,10 @@
     "updatedAt": 1789328685770,
     "published": true,
     "slug": "opt-1",
-    "title": "Bathroom",
-    "area": "55",
-    "note": "Default area per room (sq ft) \u2014 configurable."
+    "title": "Bedroom",
+    "areaSmall": "110",
+    "areaMedium": "150",
+    "areaLarge": "200"
   },
   {
     "id": "seed-2",
@@ -28,9 +30,10 @@
     "updatedAt": 1789328685770,
     "published": true,
     "slug": "opt-2",
-    "title": "Living room",
-    "area": "220",
-    "note": "Default area per room (sq ft) \u2014 configurable."
+    "title": "Bathroom",
+    "areaSmall": "40",
+    "areaMedium": "55",
+    "areaLarge": "75"
   },
   {
     "id": "seed-3",
@@ -40,8 +43,9 @@
     "published": true,
     "slug": "opt-3",
     "title": "Kitchen",
-    "area": "120",
-    "note": "Default area per room (sq ft) \u2014 configurable."
+    "areaSmall": "80",
+    "areaMedium": "120",
+    "areaLarge": "160"
   },
   {
     "id": "seed-4",
@@ -50,9 +54,10 @@
     "updatedAt": 1789328685770,
     "published": true,
     "slug": "opt-4",
-    "title": "Dining",
-    "area": "140",
-    "note": "Default area per room (sq ft) \u2014 configurable."
+    "title": "Pantry",
+    "areaSmall": "40",
+    "areaMedium": "60",
+    "areaLarge": "90"
   },
   {
     "id": "seed-5",
@@ -61,9 +66,10 @@
     "updatedAt": 1789328685770,
     "published": true,
     "slug": "opt-5",
-    "title": "Pantry",
-    "area": "60",
-    "note": "Default area per room (sq ft) \u2014 configurable."
+    "title": "Living",
+    "areaSmall": "150",
+    "areaMedium": "220",
+    "areaLarge": "300"
   },
   {
     "id": "seed-6",
@@ -72,9 +78,10 @@
     "updatedAt": 1789328685770,
     "published": true,
     "slug": "opt-6",
-    "title": "Maid's room",
-    "area": "80",
-    "note": "Default area per room (sq ft) \u2014 configurable."
+    "title": "Dining",
+    "areaSmall": "100",
+    "areaMedium": "140",
+    "areaLarge": "190"
   },
   {
     "id": "seed-7",
@@ -83,9 +90,10 @@
     "updatedAt": 1789328685770,
     "published": true,
     "slug": "opt-7",
-    "title": "Garage / parking",
-    "area": "180",
-    "note": "Default area per room (sq ft) \u2014 configurable."
+    "title": "TV room",
+    "areaSmall": "120",
+    "areaMedium": "160",
+    "areaLarge": "220"
   },
   {
     "id": "seed-8",
@@ -94,9 +102,10 @@
     "updatedAt": 1789328685770,
     "published": true,
     "slug": "opt-8",
-    "title": "Balcony / verandah",
-    "area": "90",
-    "note": "Default area per room (sq ft) \u2014 configurable."
+    "title": "Powder room",
+    "areaSmall": "25",
+    "areaMedium": "35",
+    "areaLarge": "45"
   },
   {
     "id": "seed-9",
@@ -105,8 +114,57 @@
     "updatedAt": 1789328685770,
     "published": true,
     "slug": "opt-9",
-    "title": "Staircase / circulation",
-    "area": "100",
-    "note": "Default area per room (sq ft) \u2014 configurable."
+    "title": "Laundry",
+    "areaSmall": "40",
+    "areaMedium": "60",
+    "areaLarge": "80"
+  },
+  {
+    "id": "seed-10",
+    "order": 10,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-10",
+    "title": "Staff room",
+    "areaSmall": "60",
+    "areaMedium": "80",
+    "areaLarge": "110"
+  },
+  {
+    "id": "seed-11",
+    "order": 11,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-11",
+    "title": "Garage \u00b7 1 car",
+    "areaSmall": "150",
+    "areaMedium": "180",
+    "areaLarge": "220"
+  },
+  {
+    "id": "seed-12",
+    "order": 12,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-12",
+    "title": "Garage \u00b7 2 cars",
+    "areaSmall": "300",
+    "areaMedium": "360",
+    "areaLarge": "430"
+  },
+  {
+    "id": "seed-13",
+    "order": 13,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-13",
+    "title": "Other",
+    "areaSmall": "80",
+    "areaMedium": "120",
+    "areaLarge": "180"
   }
 ]

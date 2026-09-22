@@ -3,4 +3,5 @@ uploads/*
 !uploads/.gitkeep
 data/settings.json
 data/enquiries.json
+data/estimates.json
 *.log

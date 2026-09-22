@@ -6,9 +6,10 @@
     "updatedAt": 1789328685770,
     "published": true,
     "slug": "opt-0",
-    "title": "Standard",
-    "multiplier": "1.00",
-    "note": "Baseline finish. PLACEHOLDER multiplier \u2014 confirm."
+    "title": "Walling",
+    "options": "Brickwork,Block work,AAC blocks",
+    "toggle": false,
+    "adjustPct": "0"
   },
   {
     "id": "seed-1",
@@ -17,9 +18,10 @@
     "updatedAt": 1789328685770,
     "published": true,
     "slug": "opt-1",
-    "title": "Semi-luxury",
-    "multiplier": "1.20",
-    "note": "PLACEHOLDER multiplier \u2014 confirm."
+    "title": "Windows",
+    "options": "Aluminium,Timber,uPVC",
+    "toggle": false,
+    "adjustPct": "0"
   },
   {
     "id": "seed-2",
@@ -28,8 +30,45 @@
     "updatedAt": 1789328685770,
     "published": true,
     "slug": "opt-2",
-    "title": "Luxury",
-    "multiplier": "1.45",
-    "note": "PLACEHOLDER multiplier \u2014 confirm."
+    "title": "Doors",
+    "options": "Solid timber,Engineered,Flush",
+    "toggle": false,
+    "adjustPct": "0"
+  },
+  {
+    "id": "seed-3",
+    "order": 3,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-3",
+    "title": "Floor finish",
+    "options": "Tiles,Porcelain,Timber,Terrazzo",
+    "toggle": false,
+    "adjustPct": "0"
+  },
+  {
+    "id": "seed-4",
+    "order": 4,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-4",
+    "title": "Fittings",
+    "options": "Standard,Premium",
+    "toggle": false,
+    "adjustPct": "0"
+  },
+  {
+    "id": "seed-5",
+    "order": 5,
+    "createdAt": 1789328685770,
+    "updatedAt": 1789328685770,
+    "published": true,
+    "slug": "opt-5",
+    "title": "Finished ceilings",
+    "options": "",
+    "toggle": true,
+    "adjustPct": "0"
   }
 ]
