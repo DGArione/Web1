@@ -19,10 +19,8 @@
     { href: "/about", label: "About", num: "02", match: ["/about", "/about.html"] },
     { href: "/services", label: "Services", num: "03", match: ["/services", "/services.html"] },
     { href: "/projects", label: "Projects", num: "04", match: ["/projects", "/projects.html", "/project/"] },
-    { href: "/availability", label: "Availability", num: "05", match: ["/availability", "/availability.html"] },
-    { href: "/calculator", label: "Calculator", num: "06", match: ["/calculator", "/calculator.html"] },
-    { href: "/insights", label: "Insights", num: "07", match: ["/insights", "/insights.html", "/insight/"] },
-    { href: "/contact", label: "Contact", num: "08", match: ["/contact", "/contact.html"] }
+    { href: "/insights", label: "Insights", num: "05", match: ["/insights", "/insights.html", "/insight/"] },
+    { href: "/contact", label: "Contact", num: "06", match: ["/contact", "/contact.html"] }
   ];
   function isActive(l) {
     return l.match.some(function (m) { return m.slice(-1) === "/" && m !== "/" ? path.indexOf(m) === 0 : path === m; });
@@ -81,6 +79,11 @@
 
   var footer =
     '<div class="footer-wrap"><footer class="footer" id="footer">' +
+    '<div class="footer__cta">' +
+      '<div><p class="footer__eyebrow">Start a project</p>' +
+      '<h2 class="footer__head">Let’s build something<br>considered.</h2></div>' +
+      '<a class="btn footer__btn" href="' + B + '/contact" data-magnetic>Start a conversation ' + arrow + "</a>" +
+    "</div>" +
     '<div class="footer__top">' +
     '<div class="footer__col"><p class="footer__tag">Thoughtfully designed. Precisely built.</p></div>' +
     '<div class="footer__col"><h4>Navigate</h4><ul>' +
@@ -94,6 +97,9 @@
     '<li><a href="https://lk.linkedin.com/company/excello-developers-pvt-ltd" target="_blank" rel="noopener" data-site="linkedin">LinkedIn</a></li>' +
     '<li data-site-item="instagram" hidden><a href="#" target="_blank" rel="noopener" data-site="instagram">Instagram</a></li>' +
     "</ul></div>" +
+    "</div>" +
+    '<div class="footer__wordmark" aria-hidden="true">' +
+    "EXCELLO".split("").map(function (c) { return "<span>" + c + "</span>"; }).join("") +
     "</div>" +
     '<div class="footer__bottom"><span>&copy; ' + new Date().getFullYear() + ' Excello Developers (Pvt) Ltd. All rights reserved.</span><span>Mount Lavinia · Colombo · Sri Lanka</span><span class="footer__credit">Developed by <a href="https://rapidsolutions.live" target="_blank" rel="noopener">RapidSolutions</a></span></div>' +
     "</footer></div>";
