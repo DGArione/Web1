@@ -226,7 +226,9 @@ const SITE_KEYS = ["companyName", "tagline", "phone", "whatsapp", "whatsappText"
   /* Construction cost calculator (copy + global, configurable factors). */
   "heroCalculator", "calcHeading", "calcIntro", "calcCurrency", "calcRangePct",
   "calcLandUnit", "calcCoverage", "calcProfFeesPct", "calcContingencyPct",
-  "calcAreaNote", "calcDisclaimer"];
+  "calcAreaNote", "calcDisclaimer",
+  "calcSplitSubstructure", "calcSplitStructure", "calcSplitRoof", "calcSplitFinishes", "calcSplitMEP",
+  "calcSavingsMin", "calcSavingsMax", "calcSavingsText"];
 function readSite() { try { return JSON.parse(fs.readFileSync(SITE, "utf8")) || {}; } catch (e) { return {}; } }
 function writeSite(obj) {
   const tmp = SITE + ".tmp";

@@ -1749,3 +1749,33 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
 .detail__prose th { font-family: var(--font-sans); font-weight: 600; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--sand-2); }
 .detail__prose th p, .detail__prose td p { margin: 0; font-size: 14px; }
 .detail__prose blockquote { margin: 1.4em 0; padding-left: 18px; border-left: 3px solid var(--bronze-2); font-family: var(--font-serif); font-size: 1.25rem; }
+
+/* ADDENDUM 13 — calculator estimate ending (matches the old PDF layout) */
+.pest { display: flex; flex-direction: column; gap: 22px; }
+.pest__eyebrow { display: block; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--bronze); }
+.pest__cost .pest__big { display: block; font-family: var(--font-serif); font-weight: 500; font-size: clamp(40px, 8vw, 68px); line-height: 1; margin-top: 8px; color: var(--fg); }
+.pest__range { display: block; font-size: 13px; color: var(--muted); margin-top: 10px; }
+.pest__kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 20px 0; }
+.pest__kpi { border: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.pest__kpi span { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.pest__kpi strong { font-family: var(--font-serif); font-weight: 500; font-size: clamp(20px, 2.6vw, 26px); }
+.pest__card { border: 1px solid var(--line); border-radius: 6px; padding: clamp(20px, 3vw, 30px); }
+.pest__h { font-family: var(--font-serif); font-weight: 500; font-size: clamp(1.4rem, 2.4vw, 1.9rem); margin: 4px 0 12px; }
+.pest__row { display: flex; justify-content: space-between; gap: 18px; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.pest__row:last-child { border-bottom: 0; }
+.pest__row span:first-child { color: var(--muted); }
+.pest__row span:last-child { font-family: var(--font-serif); font-size: 16px; text-align: right; }
+.pest__important { font-size: 11px; line-height: 1.7; color: var(--muted); }
+.pest__important strong { color: var(--fg); }
+.pest__plan { border-top: 1px solid var(--line); padding-top: clamp(24px, 4vw, 40px); }
+.pest__plan-head { font-family: var(--font-serif); font-weight: 400; font-size: clamp(1.8rem, 4.6vw, 3rem); line-height: 1.06; color: var(--stone); margin: 10px 0 14px; max-width: 20ch; }
+.pest__plan-text { font-size: 13px; color: var(--muted); max-width: 58ch; margin-bottom: 20px; }
+.pest__phone { display: inline-block; font-family: var(--font-serif); font-size: clamp(1.4rem, 3vw, 2rem); color: var(--fg); }
+.pest__phone:hover { color: var(--bronze); }
+.pest-actions .btn { min-width: 0; }
+@media (max-width: 560px) { .pest__kpis { grid-template-columns: 1fr; gap: 14px; } }
+@media print {
+  .pest__card { border: 1px solid #ddd; break-inside: avoid; }
+  .pest__plan-head { color: #6b6b6b; }
+  .pest__phone { color: #000 !important; }
+}

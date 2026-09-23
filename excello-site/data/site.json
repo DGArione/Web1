@@ -48,5 +48,13 @@
   "calcProfFeesPct": "0",
   "calcContingencyPct": "0",
   "calcAreaNote": "Construction area is estimated from your room programme. Land extent is captured for context and does not change the estimate unless configured.",
-  "calcDisclaimer": "This is an indicative early-stage estimate only, not a formal quotation. Final construction costs depend on design, site conditions, specification, approvals and prevailing market rates. Contact Excello for a detailed proposal."
+  "calcDisclaimer": "This is an indicative early-stage planning estimate, not a quotation, BOQ, tender price, valuation, professional cost plan or planning approval. Exact UDA zoning, plot coverage, FAR, street lines, floor limits, parking and permitted use must be confirmed for the parcel. Actual costs depend on site conditions, design, structure, MEP systems, approvals, finishes, procurement, taxes, escalation and contractor pricing.",
+  "calcSplitSubstructure": "7",
+  "calcSplitStructure": "42",
+  "calcSplitRoof": "14",
+  "calcSplitFinishes": "26",
+  "calcSplitMEP": "11",
+  "calcSavingsMin": "25",
+  "calcSavingsMax": "35",
+  "calcSavingsText": "Proper planning, professional consultation and coordinated execution can help reduce avoidable construction costs."
 }

@@ -68,7 +68,16 @@
     { k: "calcProfFeesPct", label: "Professional fees % (0 = off — CONFIRM with client)" },
     { k: "calcContingencyPct", label: "Contingency % (0 = off — CONFIRM with client)" },
     { k: "calcAreaNote", label: "Note about how construction area is derived", type: "textarea" },
-    { k: "calcDisclaimer", label: "Calculator disclaimer", type: "textarea" }
+    { k: "calcDisclaimer", label: "Calculator disclaimer (the 'Important' note)", type: "textarea" },
+    { k: "__calcsplit", label: "Estimate breakdown split (% of total — should add to 100)", type: "heading" },
+    { k: "calcSplitSubstructure", label: "Earthwork & substructure %" },
+    { k: "calcSplitStructure", label: "Structural shell %" },
+    { k: "calcSplitRoof", label: "Roofing & ceiling %" },
+    { k: "calcSplitFinishes", label: "Finishes & interior %" },
+    { k: "calcSplitMEP", label: "MEP systems & fixtures %" },
+    { k: "calcSavingsMin", label: "Savings claim — lower % (e.g. 25)" },
+    { k: "calcSavingsMax", label: "Savings claim — upper % (e.g. 35)" },
+    { k: "calcSavingsText", label: "Savings supporting line", type: "textarea" }
   ];
 
   var FIELDS = {

@@ -254,42 +254,67 @@
     }
     return out;
   }
-  function crow(a, b, tot) { return '<div class="crow' + (tot ? " crow--total" : "") + '"><span>' + a + "</span><span>" + b + "</span></div>"; }
+  function prow(a, b) { return '<div class="pest__row"><span>' + a + "</span><span>" + b + "</span></div>"; }
+  /* Cost breakdown by component (configurable % of total — should add to 100). */
+  function breakdown(total) {
+    var items = [
+      ["Earthwork & substructure", num(SITE.calcSplitSubstructure) || 7],
+      ["Structural shell", num(SITE.calcSplitStructure) || 42],
+      ["Roofing & ceiling", num(SITE.calcSplitRoof) || 14],
+      ["Finishes & interior", num(SITE.calcSplitFinishes) || 26],
+      ["MEP systems & fixtures", num(SITE.calcSplitMEP) || 11]
+    ];
+    return items.map(function (it) { return { label: it[0], amount: total * it[1] / 100 }; });
+  }
+  function estWaMsg(e) {
+    return "Hello Excello, I used the construction cost planner.\nProject: " + (selectedType() ? selectedType().title : "-") +
+      "\nFinish: " + (selectedFinish() ? selectedFinish().title : "-") + "\nBuilt-up area: " + grouped(e.area) + " sq.ft\nIndicative total: " + money(e.total) + ".\nPlease help review the assumptions.";
+  }
   function renderEstimate() {
     var e = computeEstimate();
     if (!(e.area > 0) || !e.ratePerSqft) { $("estimate").innerHTML = '<p class="body body--muted">Add rooms and a finish level to see your estimate.</p>'; return; }
-    var over = e.area > e.capacity;
-    var rs = roomSummary().map(function (g) { return '<div class="crow"><span>' + esc(g.floor) + "</span><span>" + esc(g.parts.join(", ")) + "</span></div>"; }).join("");
-    var assum = crow("Base rate (" + esc(selectedFinish() ? selectedFinish().title : "") + ")", money(e.baseRate) + " / sq.ft");
-    if (e.adjPct) assum += crow("Material adjustment", "+" + e.adjPct + "%");
-    assum += crow("Applied rate", money(e.ratePerSqft) + " / sq.ft");
-    if (e.profPct) assum += crow("Professional fees", e.profPct + "%");
-    if (e.contPct) assum += crow("Contingency", e.contPct + "%");
-    assum += crow("Estimate range", "± " + e.rangePct + "%");
-    assum += crow("Site capacity allowance", grouped(e.capacity) + " sq.ft");
+    var brk = breakdown(e.total).map(function (b) { return prow(esc(b.label), money(b.amount)); }).join("");
+    var assume =
+      prow("Project", esc(selectedType() ? selectedType().title : "—")) +
+      prow("Specification", esc(selectedFinish() ? selectedFinish().title : "—")) +
+      prow("Land", state.land + " " + esc(SITE.calcLandUnit || "perches")) +
+      prow("Floors", String(state.floors)) +
+      prow("Base rate", money(e.baseRate) + " / sq.ft");
+    var smin = num(SITE.calcSavingsMin) || 25, smax = num(SITE.calcSavingsMax) || 35;
+    var phone = SITE.phone || "+94 77 022 2000";
+    var d = (SITE.whatsapp || "").replace(/[^\d]/g, "");
+    var waHref = d ? "https://wa.me/" + d + "?text=" + encodeURIComponent("Hello Excello, please help me plan and reduce my construction cost.") : (B || "") + "/contact";
     $("estimate").innerHTML =
       '<div class="pest">' +
-        '<span class="pest__badge">Indicative estimate — not a quotation</span>' +
+        '<div class="pest__cost">' +
+          '<span class="pest__eyebrow">Indicative construction cost</span>' +
+          '<strong class="pest__big">' + moneyM(e.total) + "</strong>" +
+          '<span class="pest__range">Planning range ' + moneyM(e.low) + " – " + moneyM(e.high) + "</span>" +
+        "</div>" +
         '<div class="pest__kpis">' +
-          '<div class="pest__kpi"><span>Construction area</span><strong>' + grouped(e.area) + ' sq.ft</strong></div>' +
-          '<div class="pest__kpi"><span>Cost per sq.ft</span><strong>' + money(e.ratePerSqft) + '</strong></div>' +
+          '<div class="pest__kpi"><span>Built-up area</span><strong>' + grouped(e.area) + ' sq.ft</strong></div>' +
+          '<div class="pest__kpi"><span>Effective rate</span><strong>' + money(e.ratePerSqft) + ' / sq.ft</strong></div>' +
         "</div>" +
-        '<div class="pest__total"><span>Estimated construction cost</span><strong>' + money(e.total) + '</strong><em>Likely range ' + moneyM(e.low) + " – " + moneyM(e.high) + "</em></div>" +
-        (over ? '<p class="pest__warn">Your programme exceeds the simple capacity allowance for this plot and floor count — consider more floors or a larger plot.</p>' : "") +
-        '<div class="pest__break">' +
-          crow("Project direction", esc(selectedType() ? selectedType().title : "—")) +
-          crow("Finish level", esc(selectedFinish() ? selectedFinish().title : "—")) +
-          crow("Floors / roof", state.floors + " · " + esc(state.roof)) +
-          crow("Land extent", state.land + " " + esc(SITE.calcLandUnit || "perches")) +
-          rs + assum +
+        '<div class="pest__card">' +
+          '<span class="pest__eyebrow">System allowance</span><h3 class="pest__h">Indicative breakdown</h3>' +
+          '<div class="pest__rows">' + brk + "</div>" +
         "</div>" +
-        '<p class="pest__disc" id="estDisc"></p>' +
+        '<div class="pest__card">' +
+          '<span class="pest__eyebrow">Project summary</span><h3 class="pest__h">Current assumptions</h3>' +
+          '<div class="pest__rows">' + assume + "</div>" +
+        "</div>" +
+        '<p class="pest__important"><strong>Important:</strong> <span id="estDisc"></span></p>' +
+        '<div class="pest__plan">' +
+          '<span class="pest__eyebrow">Plan before you build</span>' +
+          '<h2 class="pest__plan-head">Your estimated cost could be ' + smin + "%–" + smax + '% lower.</h2>' +
+          '<p class="pest__plan-text" id="estSavings"></p>' +
+          '<span class="pest__eyebrow">Speak with Excello on WhatsApp</span>' +
+          '<a class="pest__phone" href="' + waHref + '"' + (d ? ' target="_blank" rel="noopener"' : "") + ">" + esc(phone) + "</a>" +
+        "</div>" +
       "</div>";
-    $("estDisc").textContent = SITE.calcDisclaimer || "This is an indicative early-stage estimate only, not a formal quotation.";
-    var d = (SITE.whatsapp || "").replace(/[^\d]/g, "");
-    var msg = "Hello Excello, I used the construction cost planner.\nProject: " + (selectedType() ? selectedType().title : "-") +
-      "\nFinish: " + (selectedFinish() ? selectedFinish().title : "-") + "\nArea: " + grouped(e.area) + " sq.ft\nIndicative total: " + money(e.total) + ".\nPlease help review the assumptions.";
-    $("estWa").setAttribute("href", d ? "https://wa.me/" + d + "?text=" + encodeURIComponent(msg) : (B || "") + "/contact");
+    $("estDisc").textContent = SITE.calcDisclaimer || "This is an indicative early-stage planning estimate, not a quotation.";
+    $("estSavings").textContent = SITE.calcSavingsText || "Proper planning, professional consultation and coordinated execution can help reduce avoidable construction costs.";
+    $("estWa").setAttribute("href", d ? "https://wa.me/" + d + "?text=" + encodeURIComponent(estWaMsg(e)) : (B || "") + "/contact");
     if (!d) $("estWa").removeAttribute("target");
   }
 
@@ -354,6 +379,15 @@
   $("pBack").addEventListener("click", back);
   $("pSave").addEventListener("click", save);
   $("printBtn").addEventListener("click", function () { window.print(); });
+  $("shareBtn").addEventListener("click", function () {
+    var e = computeEstimate();
+    var text = "Excello construction estimate — " + (selectedType() ? selectedType().title : "") + ", " +
+      (selectedFinish() ? selectedFinish().title : "") + ", " + grouped(e.area) + " sq.ft: " + money(e.total) + " (indicative).";
+    var url = location.href;
+    if (navigator.share) { navigator.share({ title: "Excello Construction Cost Estimate", text: text, url: url }).catch(function () {}); }
+    else if (navigator.clipboard) { navigator.clipboard.writeText(text + " " + url).then(function () { toast("Estimate copied to clipboard."); }).catch(function () { toast("Could not copy."); }); }
+    else { toast("Sharing is not supported on this browser."); }
+  });
   $("landRange").addEventListener("input", function () { state.land = num(this.value); $("landNum").textContent = state.land; updateSiteStrip(); });
   $("addRoom").addEventListener("click", function () {
     if (!ROOMS.length) return toast("No rooms configured.");
