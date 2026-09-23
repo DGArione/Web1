@@ -1714,3 +1714,8 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
   .pest__total { background: #fff !important; color: #000 !important; border: 1px solid #000; }
   a { color: #000 !important; }
 }
+
+/* ADDENDUM 10 — contact tool buttons + centre the planner */
+.hero__tools { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; }
+.planner { margin-left: auto; margin-right: auto; }
+@media (max-width: 560px) { .hero__tools .btn { width: 100%; justify-content: center; } }

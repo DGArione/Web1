@@ -171,11 +171,15 @@
     services: { plural: "Services", one: "service" },
     chatbot: { plural: "Chatbot", one: "Q&A" },
     units: { plural: "Aathavan Units", one: "unit" },
-    projecttypes: { plural: "Calc · Project Direction", one: "option" },
-    finishes: { plural: "Calc · Finish Levels", one: "finish level" },
-    rooms: { plural: "Calc · Rooms", one: "room" },
-    materials: { plural: "Calc · Materials", one: "influence" }
+    projecttypes: { plural: "Project types", one: "project type" },
+    finishes: { plural: "Finish levels", one: "finish level" },
+    rooms: { plural: "Rooms", one: "room" },
+    materials: { plural: "Materials (doors, windows, etc.)", one: "material influence" }
   };
+  /* The four calculator collections live under one top-level "Calculator" tab. */
+  var CALC_COLLS = ["projecttypes", "finishes", "rooms", "materials"];
+  var CALC_SUB = { projecttypes: "Project types", finishes: "Finish levels", rooms: "Rooms", materials: "Materials" };
+  function inCalc(c) { return CALC_COLLS.indexOf(c) !== -1; }
   /* Defaults for a brand-new item, per collection. */
   var NEW_DEFAULTS = {
     chatbot: { published: true, quick: false },
@@ -250,13 +254,14 @@
           '<button class="tab ' + (state.coll === "insights" ? "is-active" : "") + '" data-coll="insights">Insights</button>' +
           '<button class="tab ' + (state.coll === "services" ? "is-active" : "") + '" data-coll="services">Services</button>' +
           '<button class="tab ' + (state.coll === "units" ? "is-active" : "") + '" data-coll="units">Aathavan Units</button>' +
-          '<button class="tab ' + (state.coll === "projecttypes" ? "is-active" : "") + '" data-coll="projecttypes">Calc · Direction</button>' +
-          '<button class="tab ' + (state.coll === "finishes" ? "is-active" : "") + '" data-coll="finishes">Calc · Finishes</button>' +
-          '<button class="tab ' + (state.coll === "rooms" ? "is-active" : "") + '" data-coll="rooms">Calc · Rooms</button>' +
-          '<button class="tab ' + (state.coll === "materials" ? "is-active" : "") + '" data-coll="materials">Calc · Materials</button>' +
+          '<button class="tab ' + (inCalc(state.coll) ? "is-active" : "") + '" data-coll="' + (inCalc(state.coll) ? state.coll : "projecttypes") + '">Calculator</button>' +
           '<button class="tab ' + (state.coll === "chatbot" ? "is-active" : "") + '" data-coll="chatbot">Chatbot</button>' +
           '<button class="tab ' + (state.coll === "site" ? "is-active" : "") + '" data-coll="site">Site details</button>' +
         "</div>" +
+        (inCalc(state.coll)
+          ? '<div class="subtabs">' + CALC_COLLS.map(function (c) { return '<button class="subtab ' + (state.coll === c ? "is-active" : "") + '" data-subcoll="' + c + '">' + CALC_SUB[c] + "</button>"; }).join("") + "</div>" +
+            '<p class="subhint">One calculator, edited part by part. Add or change project types, finish levels &amp; rates, rooms and their sizes, and material options — including door and window types — one by one.</p>'
+          : "") +
         (state.coll === "site"
           ? '<div class="head"><h2>Site details</h2></div>' + renderSite()
           : '<div class="head"><h2>' + LABELS[state.coll].plural + " <span style=\"color:var(--muted);font-family:var(--sans);font-size:14px\">(" + state.items.length + ')</span></h2><button class="btn" id="newBtn">+ New ' + LABELS[state.coll].one + "</button></div>" + renderList()) +
@@ -271,6 +276,9 @@
     if (newBtn) newBtn.onclick = function () { openEditor(null); };
     Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (t) {
       t.onclick = function () { state.coll = t.dataset.coll; state.items = []; loadItems(); };
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-subcoll]"), function (t) {
+      t.onclick = function () { state.coll = t.dataset.subcoll; state.items = []; loadItems(); };
     });
     if (state.coll === "site") bindSite();
     Array.prototype.forEach.call(document.querySelectorAll("[data-edit]"), function (b) { b.onclick = function () { openEditor(b.dataset.edit); }; });
