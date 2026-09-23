@@ -78,6 +78,7 @@
       { k: "location", label: "Location", type: "text", half: true },
       { k: "year", label: "Year", type: "text", half: true },
       { k: "status", label: "Status", type: "text", half: true },
+      { k: "services", label: "Services", type: "text" },
       { k: "excerpt", label: "Short excerpt", type: "textarea" },
       { k: "body", label: "Body (blank line = new paragraph)", type: "textarea", big: true },
       { k: "cover", label: "Cover image", type: "image" },

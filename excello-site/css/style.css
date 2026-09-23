@@ -1732,3 +1732,20 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
 .footer__btn::before { background: var(--bronze); }
 .footer__btn:hover { color: var(--cream); }
 @media (max-width: 620px) { .footer__cta { align-items: flex-start; } .footer__btn { width: 100%; justify-content: center; } }
+
+/* ADDENDUM 12 — rich CMS article/project prose (headings, links, lists, tables) */
+.detail__prose h2 { font-family: var(--font-serif); font-weight: 500; font-size: clamp(1.5rem, 2.6vw, 2.1rem); line-height: 1.15; margin: 1.6em 0 0.5em; }
+.detail__prose h3 { font-family: var(--font-serif); font-weight: 500; font-size: clamp(1.2rem, 2vw, 1.5rem); margin: 1.3em 0 0.4em; }
+.detail__prose--wide h2, .detail__prose--wide h3 { max-width: 68ch; margin-left: auto; margin-right: auto; }
+.detail__prose a { color: var(--bronze); text-decoration: underline; text-underline-offset: 3px; }
+.detail__prose a:hover { color: var(--fg); }
+.detail__prose ul, .detail__prose ol { max-width: 62ch; margin: 0 0 1.2em; padding-left: 1.3em; }
+.detail__prose--wide ul, .detail__prose--wide ol { max-width: 68ch; margin-left: auto; margin-right: auto; }
+.detail__prose li { font-size: 16px; line-height: 1.8; margin-bottom: 0.4em; }
+.detail__prose strong { font-weight: 600; }
+.detail__prose figure { margin: 1.6em auto; max-width: 68ch; overflow-x: auto; }
+.detail__prose table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.detail__prose th, .detail__prose td { text-align: left; padding: 12px 14px; border: 1px solid var(--line); vertical-align: top; }
+.detail__prose th { font-family: var(--font-sans); font-weight: 600; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: var(--sand-2); }
+.detail__prose th p, .detail__prose td p { margin: 0; font-size: 14px; }
+.detail__prose blockquote { margin: 1.4em 0; padding-left: 18px; border-left: 3px solid var(--bronze-2); font-family: var(--font-serif); font-size: 1.25rem; }

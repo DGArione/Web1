@@ -15,6 +15,14 @@ function bodyHtml(text) {
   });
   return blocks.join("\n");
 }
+/* Body may be rich HTML (from the CMS export) or plain text. Owner-authored
+   content is trusted, so pass HTML through as-is; otherwise wrap plain text into
+   paragraphs. Detected by the presence of a block/inline tag. */
+function richBody(text) {
+  const s = String(text == null ? "" : text);
+  if (/<\/?(p|h[1-6]|ul|ol|li|table|thead|tbody|tr|td|th|figure|blockquote|br|a|strong|em|img)\b/i.test(s)) return s;
+  return bodyHtml(s);
+}
 function cover(url, alt, cls) {
   cls = cls || "";
   if (url) return '<img src="' + esc(url) + '" alt="' + esc(alt) + '"' + (cls ? ' class="' + cls + '"' : "") + '>';
@@ -172,7 +180,7 @@ function homeSelected(items) {
 /* ---- Detail bodies ------------------------------------------------------- */
 function projectDetail(p) {
   const facts = [
-    ["Category", p.category], ["Location", p.location], ["Year", p.year], ["Status", p.status]
+    ["Category", p.category], ["Location", p.location], ["Year", p.year], ["Status", p.status], ["Services", p.services]
   ].filter(function (f) { return f[1]; }).map(function (f) {
     return '<div class="fact"><p class="label">' + esc(f[0]) + '</p><p class="fact__v">' + esc(f[1]) + "</p></div>";
   }).join("");
@@ -180,11 +188,11 @@ function projectDetail(p) {
     return '<div class="media media--parallax media--clip media--ratio-landscape" data-parallax="8">' + cover(u, p.title) + "</div>";
   }).join("\n");
   return { title: p.title, cover: p.cover, kicker: [p.category, p.location].filter(Boolean).join(" · "),
-    facts: facts, body: bodyHtml(p.body), gallery: gallery, excerpt: p.excerpt || "" };
+    facts: facts, body: richBody(p.body), gallery: gallery, excerpt: p.excerpt || "" };
 }
 function insightDetail(a) {
   return { title: a.title, cover: a.cover, kicker: [a.category, a.date].filter(Boolean).join(" · "),
-    body: bodyHtml(a.body), excerpt: a.excerpt || "" };
+    body: richBody(a.body), excerpt: a.excerpt || "" };
 }
 
 module.exports = { BASE, esc, projectCards, insightSlides, serviceCards, serviceBlocks, homeFeatured, homeSelected, projectDetail, insightDetail, bodyHtml, cover };
