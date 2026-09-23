@@ -43,6 +43,10 @@ if (FORCE_PREFIX) {
   });
 }
 
+/* gzip/deflate text responses (HTML/CSS/JS/JSON). Optional: if the package
+   isn't installed the server still runs uncompressed. */
+try { app.use(require("compression")()); } catch (e) { /* compression not installed — skip */ }
+
 app.use(express.json({ limit: "1mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
@@ -361,6 +365,12 @@ r.get(/\.html$/, function (req, res, next) {
     sendPage(res, html, req);
   });
 });
+/* Long-cache the heavy static assets (hero/clip frame sequences, images and the
+   pinned vendor libraries) so repeat visits and navigation don't re-download
+   them. These files are content-stable; replace-and-restart still works because
+   new files have new bytes (and admin uploads use unique filenames). */
+r.use("/img", express.static(path.join(ROOT, "img"), { maxAge: "30d", immutable: true }));
+r.use("/js/vendor", express.static(path.join(ROOT, "js", "vendor"), { maxAge: "30d", immutable: true }));
 /* maxAge 0 + etag: browsers revalidate every load, so edits and redeploys show
    immediately (a 304 is returned when a file is unchanged, so it stays fast). */
 r.use(express.static(ROOT, { extensions: ["html"], etag: true, maxAge: 0 }));
