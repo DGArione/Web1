@@ -558,13 +558,11 @@
       }
       /* Hero: hold the FINISHED frame as a teaser, cut to construction behind a
          cloud cover, then play forward (construction -> finished). Band: linear. */
+      /* Single linear play-through: construction (frame 0) builds straight to
+         the finished home (last frame), exactly once across the scroll. */
       function frameFor(p) {
         var last = count - 1;
-        if (!isHero) return Math.round(p * last);
-        if (p < 0.14) return last;                 // finished-home teaser
-        if (p < 0.22) return 0;                    // construction, hidden by clouds
-        var t = (p - 0.22) / 0.78; if (t > 1) t = 1;
-        return Math.round(t * last);               // forward build to finished
+        return Math.round(p * last);
       }
       /* Batch paints to one per animation frame: ScrollTrigger's onUpdate can
          fire several times between repaints, so we keep only the latest target
@@ -575,7 +573,7 @@
         if (_raf) return;
         _raf = requestAnimationFrame(function () { _raf = 0; paint(_tgt); });
       }
-      var firstIdx = isHero ? count - 1 : 0; /* frame shown at rest */
+      var firstIdx = 0; /* frame shown at rest (construction / "before") */
       /* Priority frames gate the preloader. Keep it small so the site becomes
          interactive fast; the rest of the (now light, ~50 KB) frames stream in
          behind it and fill smoothness without blocking first paint. */
@@ -596,8 +594,7 @@
          exactly the order you scroll through. That way the frames you reach
          first are decoded first, so the scrub never steps waiting on a download. */
       var order = [];
-      if (isHero) { order.push(count - 1); for (var j = 0; j < count - 1; j++) order.push(j); }
-      else { for (var j = 0; j < count; j++) order.push(j); }
+      for (var j = 0; j < count; j++) order.push(j);
       for (var k = 0; k < order.length; k++) (function (k) {
         var idx = order[k];
         var img = new Image(); img.decoding = "async"; frames[idx] = img;
@@ -637,17 +634,12 @@
             }
             var hb = scene.querySelector(".hero__bottom");
             if (hb) { var bo = p < 0.05 ? 1 : 1 - (p - 0.05) / 0.09; gsap.set(hb, { autoAlpha: Math.max(0, Math.min(1, bo)) }); }
-            /* Clouds fully cover the finished->construction cut, then part so
-               the build plays through: finished teaser -> clouds -> ground. */
+            /* Soft ambient clouds at the landing that clear as the build plays
+               through (no cut to hide anymore — the sequence runs once). */
             var cl = scene.querySelector("#heroClouds");
             if (cl) {
-              var o;
-              if (p < 0.02) o = 0;
-              else if (p < 0.14) o = (p - 0.02) / 0.12;   // roll in over the teaser
-              else if (p < 0.24) o = 1;                    // full cover during the cut
-              else if (p < 0.42) o = 1 - (p - 0.24) / 0.18; // part to reveal construction
-              else o = 0;
-              gsap.set(cl, { opacity: Math.max(0, Math.min(1, o)), scale: 1 + 0.14 * Math.max(0, Math.min(1, o)) });
+              var o = p < 0.16 ? 1 - p / 0.16 : 0;
+              gsap.set(cl, { opacity: 0.55 * Math.max(0, Math.min(1, o)), scale: 1 + 0.12 * Math.max(0, Math.min(1, o)) });
             }
           }
         }
