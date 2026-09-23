@@ -615,7 +615,7 @@
       var sticky = scene.hasAttribute("data-seq-sticky");
       ScrollTrigger.create({
         trigger: scene, start: "top top", end: host.dataset.seqEnd || "+=120%",
-        pin: !sticky, scrub: 0.6, invalidateOnRefresh: true, anticipatePin: sticky ? 0 : 1,
+        pin: !sticky, scrub: (mode === "hero" ? 0.9 : 0.6), invalidateOnRefresh: true, anticipatePin: sticky ? 0 : 1,
         onRefresh: function () { sizeCanvas(); redraw(); },
         onUpdate: function (self) {
           progress = self.progress; if (ready) redraw();
