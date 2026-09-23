@@ -93,13 +93,9 @@ function withBase(html, logical) {
   return String(html).replace(/<head([^>]*)>/i, '<head$1>' + s);
 }
 /* Per-page hero images are editable in the admin. Pages carry a {{HERO_X}}
-   token; we swap in the configured image, or fall back to the default. */
-const HERO_DEFAULTS = {
-  ABOUT: "https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=2200&q=80",
-  SERVICES: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=2200&q=80",
-  PROJECTS: "https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=2200&q=80",
-  CONTACT: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=2200&q=80"
-};
+   token; we swap in the configured image. No hardcoded defaults — a page shows
+   a hero image only once one is set in the admin (Site details). */
+const HERO_DEFAULTS = {};
 function applyHeroImages(html) {
   if (html.indexOf("{{HERO_") === -1) return html;
   const site = readSite();
