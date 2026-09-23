@@ -56,5 +56,13 @@
   "calcSplitMEP": "11",
   "calcSavingsMin": "25",
   "calcSavingsMax": "35",
-  "calcSavingsText": "Proper planning, professional consultation and coordinated execution can help reduce avoidable construction costs."
+  "calcSavingsText": "Proper planning, professional consultation and coordinated execution can help reduce avoidable construction costs.",
+  "stat1Num": "44",
+  "stat1Label": "Residences at Aathavan",
+  "stat2Num": "15",
+  "stat2Label": "Rooms at Panimozhi Club House",
+  "stat3Num": "25",
+  "stat3Label": "Acre village at Rudra retreat",
+  "stat4Num": "6",
+  "stat4Label": "Signature projects"
 }

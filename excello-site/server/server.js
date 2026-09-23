@@ -155,6 +155,8 @@ r.get(["/", "/index.html"], function (req, res) {
   html = html.replace("<!--HOME_SELECTED-->", render.homeSelected([
     { p: selA, img: site.homeSelectedImageA }, { p: selB, img: site.homeSelectedImageB }
   ]));
+  /* Home statistics row (four configurable number + label pairs). */
+  html = html.replace("<!--HOME_STATS-->", render.homeStats(site));
   sendPage(res, html, req);
 });
 r.get(["/services", "/services.html"], function (req, res) {
@@ -216,6 +218,9 @@ const SITE_KEYS = ["companyName", "tagline", "phone", "whatsapp", "whatsappText"
      optional image overrides; and each page's hero image. */
   "homeFeatured", "homeFeaturedImage", "homeSelectedA", "homeSelectedImageA",
   "homeSelectedB", "homeSelectedImageB",
+  /* Home statistics row — four number + label pairs. */
+  "stat1Num", "stat1Label", "stat2Num", "stat2Label",
+  "stat3Num", "stat3Label", "stat4Num", "stat4Label",
   "heroAbout", "heroServices", "heroProjects", "heroContact",
   /* Aathavan unit-availability page (all copy + the standard price/sq.ft). */
   "heroAvailability", "availabilityProject", "availabilityLocation",

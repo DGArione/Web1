@@ -144,6 +144,33 @@ function serviceBlocks(list) {
 }
 
 /* ---- Home page: highlighted project + selected work (admin-driven) ------- */
+/* Home statistics row — four configurable number + label pairs (admin-editable
+   via Site details). Numbers count up on scroll via the data-count attribute. */
+function homeStats(site) {
+  site = site || {};
+  var defaults = [
+    { num: "44", label: "Residences at Aathavan" },
+    { num: "15", label: "Rooms at Panimozhi Club House" },
+    { num: "25", label: "Acre village at Rudra retreat" },
+    { num: "6", label: "Signature projects" }
+  ];
+  var out = "";
+  for (var i = 1; i <= 4; i++) {
+    var d = defaults[i - 1];
+    var numRaw = (site["stat" + i + "Num"] != null && site["stat" + i + "Num"] !== "") ? String(site["stat" + i + "Num"]) : d.num;
+    var label = (site["stat" + i + "Label"] != null && site["stat" + i + "Label"] !== "") ? String(site["stat" + i + "Label"]) : d.label;
+    if (!label && !numRaw) continue;
+    /* Split a leading integer (for the count-up) from any prefix/suffix text
+       such as "25+" or "LKR 5M", so non-numeric numbers still render. */
+    var m = String(numRaw).match(/^(\D*)(\d+)(.*)$/);
+    var numCell = m
+      ? esc(m[1]) + '<span data-count="' + m[2] + '">0</span>' + esc(m[3])
+      : esc(numRaw);
+    out += '<div class="stat" data-reveal><div class="stat__num">' + numCell + "</div>" +
+           '<p class="label stat__label">' + esc(label) + "</p></div>";
+  }
+  return out;
+}
 function homeFeatured(p, img) {
   if (!p) return "";
   var src = img || p.cover;
@@ -208,4 +235,4 @@ function insightDetail(a) {
     body: richBody(a.body), excerpt: a.excerpt || "" };
 }
 
-module.exports = { BASE, esc, projectCards, hscrollPanels, insightSlides, serviceCards, serviceBlocks, homeFeatured, homeSelected, projectDetail, insightDetail, bodyHtml, cover };
+module.exports = { BASE, esc, projectCards, hscrollPanels, insightSlides, serviceCards, serviceBlocks, homeFeatured, homeSelected, homeStats, projectDetail, insightDetail, bodyHtml, cover };
