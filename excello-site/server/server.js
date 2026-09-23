@@ -240,6 +240,26 @@ r.put("/api/admin/site", auth.requireAuth, function (req, res) {
   res.json(cur);
 });
 
+/* ---- Page images (per-page image slots, edited in the admin → Page Images) --
+   A simple key -> image-URL map, kept separate from Site details. */
+const IMAGES = path.join(ROOT, "data", "images.json");
+const IMAGE_KEYS = ["about.hero", "about.feature", "about.team1", "about.team2", "about.team3",
+  "services.hero", "projects.hero", "contact.hero", "availability.hero"];
+function readImages() { try { return JSON.parse(fs.readFileSync(IMAGES, "utf8")) || {}; } catch (e) { return {}; } }
+function writeImages(obj) {
+  const tmp = IMAGES + ".tmp";
+  fs.writeFileSync(tmp, JSON.stringify(obj, null, 2));
+  fs.renameSync(tmp, IMAGES);
+}
+r.get("/api/images", function (req, res) { res.json(readImages()); });
+r.get("/api/admin/images", auth.requireAuth, function (req, res) { res.json(readImages()); });
+r.put("/api/admin/images", auth.requireAuth, function (req, res) {
+  const cur = readImages(), body = req.body || {};
+  IMAGE_KEYS.forEach(function (k) { if (typeof body[k] === "string") cur[k] = body[k].slice(0, 2000); });
+  writeImages(cur);
+  res.json(cur);
+});
+
 /* ---- Contact form: capture enquiries to data/enquiries.json -------------- */
 const ENQUIRIES = path.join(ROOT, "data", "enquiries.json");
 function readEnquiries() {

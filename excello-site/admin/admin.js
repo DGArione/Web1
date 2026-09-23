@@ -12,7 +12,22 @@
     } catch (e) {}
     var b = document.querySelector("base"); return b ? (b.getAttribute("href") || "/").replace(/\/+$/, "") : "";
   })();
-  var state = { me: null, coll: "projects", items: [], editing: null, saving: false, site: null };
+  var state = { me: null, coll: "projects", items: [], editing: null, saving: false, site: null, images: null, imgPage: "About" };
+
+  /* Page Images: editable image slots per page (keys match data-img on the pages). */
+  var IMAGE_SLOTS = {
+    About: [
+      { k: "about.hero", label: "Hero image" },
+      { k: "about.feature", label: "Feature image (Design & Build)" },
+      { k: "about.team1", label: "Team — Leadership & Direction" },
+      { k: "about.team2", label: "Team — Architecture & Design" },
+      { k: "about.team3", label: "Team — Engineering, QS & Site" }
+    ],
+    Services: [{ k: "services.hero", label: "Hero image" }],
+    Projects: [{ k: "projects.hero", label: "Hero image" }],
+    Contact: [{ k: "contact.hero", label: "Hero image" }],
+    Availability: [{ k: "availability.hero", label: "Hero image" }]
+  };
 
   var SITE_FIELDS = [
     { k: "companyName", label: "Company name" },
@@ -37,13 +52,7 @@
     { k: "homeSelectedImageA", label: "Selected work — image 1 (optional)", type: "image" },
     { k: "homeSelectedB", label: "Selected work — project 2", type: "project" },
     { k: "homeSelectedImageB", label: "Selected work — image 2 (optional)", type: "image" },
-    { k: "__heroes", label: "Page hero images", type: "heading" },
-    { k: "heroAbout", label: "About page hero image", type: "image" },
-    { k: "heroServices", label: "Services page hero image", type: "image" },
-    { k: "heroProjects", label: "Projects page hero image", type: "image" },
-    { k: "heroContact", label: "Contact page hero image", type: "image" },
     { k: "__avail", label: "Aathavan unit-availability page", type: "heading" },
-    { k: "heroAvailability", label: "Availability page hero image", type: "image" },
     { k: "availabilityProject", label: "Development name (e.g. Aathavan by Excello)" },
     { k: "availabilityLocation", label: "Location line" },
     { k: "availabilityHeading", label: "Heading (H1)" },
@@ -58,7 +67,6 @@
     { k: "availabilityCtaLead", label: "Help CTA — lead line" },
     { k: "availabilityCtaText", label: "Help CTA — supporting text", type: "textarea" },
     { k: "__calc", label: "Construction cost calculator", type: "heading" },
-    { k: "heroCalculator", label: "Calculator page hero image", type: "image" },
     { k: "calcHeading", label: "Heading (H1)" },
     { k: "calcIntro", label: "Intro description", type: "textarea" },
     { k: "calcCurrency", label: "Currency code (e.g. LKR)" },
@@ -224,6 +232,10 @@
         .catch(function () { render(); });
       return;
     }
+    if (state.coll === "images") {
+      api("GET", "/api/admin/images").then(function (m) { state.images = m || {}; render(); }).catch(function () { state.images = {}; render(); });
+      return;
+    }
     api("GET", "/api/admin/" + state.coll).then(function (items) { state.items = items; render(); });
   }
 
@@ -266,6 +278,7 @@
           '<button class="tab ' + (state.coll === "units" ? "is-active" : "") + '" data-coll="units">Aathavan Units</button>' +
           '<button class="tab ' + (inCalc(state.coll) ? "is-active" : "") + '" data-coll="' + (inCalc(state.coll) ? state.coll : "projecttypes") + '">Calculator</button>' +
           '<button class="tab ' + (state.coll === "chatbot" ? "is-active" : "") + '" data-coll="chatbot">Chatbot</button>' +
+          '<button class="tab ' + (state.coll === "images" ? "is-active" : "") + '" data-coll="images">Page Images</button>' +
           '<button class="tab ' + (state.coll === "site" ? "is-active" : "") + '" data-coll="site">Site details</button>' +
         "</div>" +
         (inCalc(state.coll)
@@ -274,6 +287,8 @@
           : "") +
         (state.coll === "site"
           ? '<div class="head"><h2>Site details</h2></div>' + renderSite()
+          : state.coll === "images"
+          ? '<div class="head"><h2>Page Images</h2></div>' + renderImages()
           : '<div class="head"><h2>' + LABELS[state.coll].plural + " <span style=\"color:var(--muted);font-family:var(--sans);font-size:14px\">(" + state.items.length + ')</span></h2><button class="btn" id="newBtn">+ New ' + LABELS[state.coll].one + "</button></div>" + renderList()) +
       "</div>" +
       '<div class="drawer" id="drawer"><div class="drawer__scrim" data-close></div><div class="drawer__panel" id="panel"></div></div>';
@@ -291,6 +306,7 @@
       t.onclick = function () { state.coll = t.dataset.subcoll; state.items = []; loadItems(); };
     });
     if (state.coll === "site") bindSite();
+    if (state.coll === "images") bindImages();
     Array.prototype.forEach.call(document.querySelectorAll("[data-edit]"), function (b) { b.onclick = function () { openEditor(b.dataset.edit); }; });
     Array.prototype.forEach.call(document.querySelectorAll("[data-del]"), function (b) { b.onclick = function () { del(b.dataset.del); }; });
     Array.prototype.forEach.call(document.querySelectorAll("[data-toggle]"), function (b) { b.onclick = function () { togglePublish(b.dataset.toggle); }; });
@@ -374,6 +390,56 @@
     if (btn) btn.onclick = function () {
       api("PUT", "/api/admin/site", state.site).then(function (s) { state.site = s; toast("Site details saved."); }).catch(function (e) { toast(e.message); });
     };
+  }
+
+  /* ---- Page Images (per-page image slots, saved on each change) ---- */
+  function renderImages() {
+    state.images = state.images || {};
+    var pages = Object.keys(IMAGE_SLOTS);
+    if (pages.indexOf(state.imgPage) === -1) state.imgPage = pages[0];
+    var tabs = '<div class="subtabs">' + pages.map(function (p) {
+      return '<button class="subtab ' + (state.imgPage === p ? "is-active" : "") + '" data-imgpage="' + esc(p) + '">' + esc(p) + "</button>";
+    }).join("") + "</div>";
+    var slots = IMAGE_SLOTS[state.imgPage].map(function (f) {
+      var raw = state.images[f.k] || "", v = esc(raw);
+      return '<div class="field" style="max-width:520px">' +
+        '<label>' + esc(f.label) + '</label>' +
+        '<div class="cover" data-imgcover="' + f.k + '">' + (raw ? '<img src="' + v + '">' : "") + "</div>" +
+        '<div class="uploader" data-imgup="' + f.k + '">Click or drop an image here</div>' +
+        (raw ? '<button type="button" class="btn btn--ghost btn--sm" data-imgclear="' + f.k + '" style="margin-top:8px">Remove image</button>' : "") +
+        "</div>";
+    }).join("");
+    return tabs +
+      '<p class="subhint">Change the images on each page here — one by one. Uploads save immediately. Leave a hero empty to use the dark placeholder.</p>' +
+      '<div class="siteform">' + slots + "</div>";
+  }
+  function bindImages() {
+    state.images = state.images || {};
+    Array.prototype.forEach.call(document.querySelectorAll("[data-imgpage]"), function (t) {
+      t.onclick = function () { state.imgPage = t.dataset.imgpage; render(); };
+    });
+    function persist(msg) {
+      api("PUT", "/api/admin/images", state.images).then(function (m) { state.images = m; if (msg) toast(msg); }).catch(function (e) { toast(e.message); });
+    }
+    Array.prototype.forEach.call(document.querySelectorAll("[data-imgup]"), function (u) {
+      var key = u.dataset.imgup;
+      wireUpload(u, false, function (url) {
+        state.images[key] = url;
+        var box = document.querySelector('[data-imgcover="' + key + '"]');
+        if (box) box.innerHTML = '<img src="' + esc(url) + '">';
+        persist("Image updated.");
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-imgclear]"), function (b) {
+      b.onclick = function () {
+        var key = b.dataset.imgclear;
+        state.images[key] = "";
+        var box = document.querySelector('[data-imgcover="' + key + '"]');
+        if (box) box.innerHTML = "";
+        b.style.display = "none";
+        persist("Image removed.");
+      };
+    });
   }
 
   /* ---- Editor ---- */

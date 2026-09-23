@@ -175,14 +175,23 @@
       });
     });
     document.querySelectorAll(".fab--wa").forEach(function (el) { el.setAttribute("href", waHref(s)); });
-    /* Per-page hero image override (set in the admin). Falls back to the
-       default already in the markup. Works even if the page is served as a
-       static file, since it applies from the /api/site fetch. */
-    document.querySelectorAll("img[data-hero]").forEach(function (el) {
-      var key = "hero" + el.getAttribute("data-hero").replace(/^./, function (c) { return c.toUpperCase(); });
-      if (s[key]) el.setAttribute("src", s[key]);
+  }
+
+  /* ---- Per-page images (admin → Page Images), keyed by data-img -----------
+     Each editable image carries data-img="<page>.<slot>". We swap its src from
+     /api/images when a value is set; otherwise the markup's own src (if any)
+     stays, and empty heroes fall back to the dark hero background. */
+  function applyImages(map) {
+    if (!map) return;
+    document.querySelectorAll("img[data-img]").forEach(function (el) {
+      var v = map[el.getAttribute("data-img")];
+      if (v) el.setAttribute("src", v);
     });
   }
+  window.__imagesPromise = fetch(B + "/api/images")
+    .then(function (r) { return r.ok ? r.json() : {}; })
+    .then(function (m) { applyImages(m); return m; })
+    .catch(function () { return {}; });
 
   /* Social/SEO tags. The per-page <title> and <meta name="description"> stay
      authoritative; this adds Open Graph + Twitter + canonical on top, using the

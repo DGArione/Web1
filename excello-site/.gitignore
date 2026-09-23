@@ -5,3 +5,4 @@ data/settings.json
 data/enquiries.json
 data/estimates.json
 *.log
+data/images.json
