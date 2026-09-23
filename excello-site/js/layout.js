@@ -98,9 +98,6 @@
     '<li data-site-item="instagram" hidden><a href="#" target="_blank" rel="noopener" data-site="instagram">Instagram</a></li>' +
     "</ul></div>" +
     "</div>" +
-    '<div class="footer__wordmark" aria-hidden="true">' +
-    "EXCELLO".split("").map(function (c) { return "<span>" + c + "</span>"; }).join("") +
-    "</div>" +
     '<div class="footer__bottom"><span>&copy; ' + new Date().getFullYear() + ' Excello Developers (Pvt) Ltd. All rights reserved.</span><span>Mount Lavinia · Colombo · Sri Lanka</span><span class="footer__credit">Developed by <a href="https://rapidsolutions.live" target="_blank" rel="noopener">RapidSolutions</a></span></div>' +
     "</footer></div>";
 
