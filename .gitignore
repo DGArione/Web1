@@ -1,0 +1,4 @@
+
+# Build artifact — the packaged site zip is generated on demand, not tracked
+excello-site.zip
+*.zip
