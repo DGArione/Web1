@@ -1784,3 +1784,8 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
    until an admin hero image is set (removes the old hardcoded Unsplash defaults). */
 .hero--page .hero__bg { background-color: var(--dark); }
 .hero--page .hero__bg img:not([src]) { display: none; }
+
+/* ADDENDUM 15 — empty per-page image slots show a neutral placeholder, no default */
+img[data-img]:not([src]) { display: none; }
+.media { background-color: var(--sand-2); }
+.person .media, .about .media, .media--ratio-portrait, .media--ratio-wide { background-color: var(--sand-2); }

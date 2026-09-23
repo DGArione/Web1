@@ -203,12 +203,17 @@
      --------------------------------------------------------------------- */
   var header = document.getElementById("header");
   function setHeader() { /* header now stays visible; kept for callers */ }
+  /* Pages without a dark hero (e.g. Insights, Calculator) start on the light
+     background, where the blend-mode transparent header is unreadable — so keep
+     the solid (dark-on-light) header on those pages at all times. */
+  var noHero = !document.querySelector(".hero");
+  if (noHero && header) header.classList.add("is-solid");
   ScrollTrigger.create({
     start: 40,
     onUpdate: function (self) {
       var s = self.scroll();
       header.classList.toggle("is-compact", s > 60);
-      header.classList.toggle("is-solid", s > 60);
+      header.classList.toggle("is-solid", noHero || s > 60);
     }
   });
 
