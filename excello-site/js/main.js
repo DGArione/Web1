@@ -241,6 +241,7 @@
      Page transition (fade curtain between internal pages)
      --------------------------------------------------------------------- */
   var curtain = document.createElement("div");
+  curtain.className = "page-curtain";
   curtain.style.cssText = "position:fixed;inset:0;background:#1d1e1a;z-index:950;pointer-events:none;transform:translateY(101%)";
   body.appendChild(curtain);
   document.addEventListener("click", function (e) {

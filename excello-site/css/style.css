@@ -1704,7 +1704,7 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
 
 /* Print — estimate only */
 @media print {
-  .header, .footer-wrap, .fabs, .chat, .preloader, .cursor, .planner__bar,
+  .header, .menu, .burger, .footer-wrap, .fabs, .chat, .preloader, .cursor, .page-curtain, .planner__bar,
   .planner__nav, .planner__foot, .ptoast, .no-print, .pest-actions { display: none !important; }
   .pstep { display: none !important; }
   .pstep[data-step="7"] { display: block !important; }
