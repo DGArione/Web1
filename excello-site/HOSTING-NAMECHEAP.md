@@ -37,13 +37,29 @@ cPanel → **Setup Node.js App** → **Create Application**:
 | Node.js version | newest available (18 or 20) |
 | Application mode | **Production** |
 | Application root | the folder with `package.json`, e.g. `Web/excello-site` |
-| Application URL | your domain (serve at the **root**, not a subfolder) |
+| Application URL | your domain — root **or** a subfolder (see below) |
 | Application startup file | `server/server.js` |
 
 Click **Create**.
 
-> Serve it at the domain **root**. The site’s links are absolute (`/`,
-> `/projects`, `/img/...`), so a subfolder would break them.
+> **Root or subfolder both work.** The site uses relative links plus an injected
+> `<base>` tag and runtime path detection, so it can be served at the domain
+> root (`rapidsolutions.live/`) **or** under a subfolder
+> (`rapidsolutions.live/excello-site/`).
+>
+> **To serve under `/excello-site`:** set **Application URL** to your domain with
+> `excello-site` in the path, so **Passenger mounts the Node app at
+> `/excello-site`**. Everything — pages, `/excello-site/admin`, `/excello-site/api/*`
+> — is then served by Node under that prefix.
+>
+> ⚠️ **Common mistake:** uploading the plain HTML files into
+> `public_html/excello-site` **and** running the Node app at the domain root.
+> Then Apache serves the static pages at `/excello-site/...` while the Node app
+> (admin, API, dynamic pages) lives at the **root** — so `/excello-site/admin`
+> fails and `/admin` appears at the root instead. Fix: mount the **Node app**
+> at `/excello-site` (Application URL above) and delete the duplicate static
+> upload from `public_html/excello-site`. Do not edit an existing app's
+> **Application Root** — only the Application URL.
 
 ---
 
