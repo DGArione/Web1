@@ -144,6 +144,8 @@ r.get(["/", "/index.html"], function (req, res) {
   const bySlug = function (slug) { return projects.filter(function (p) { return p.slug === slug; })[0]; };
   const cards = render.serviceCards(store.list("services", { publishedOnly: true }));
   let html = injectPage("index.html", "<!--HOME_SERVICES-->", cards);
+  /* Horizontal "selected projects" scroller — first six published projects. */
+  html = html.replace("<!--HOME_HSCROLL-->", render.hscrollPanels(projects.slice(0, 6)));
   /* Highlighted project (falls back to the first project). */
   const feat = bySlug(site.homeFeatured) || projects[0];
   html = html.replace("<!--HOME_FEATURED-->", render.homeFeatured(feat, site.homeFeaturedImage));

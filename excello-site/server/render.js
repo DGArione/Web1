@@ -47,6 +47,19 @@ function projectCards(list) {
   }).join("\n");
 }
 
+/* ---- Home: horizontal "selected projects" scroller ---------------------- */
+function hscrollPanels(list) {
+  if (!list.length) return "";
+  return list.map(function (p) {
+    var loc = [p.location, p.category].filter(Boolean).map(esc).join(" · ");
+    return '' +
+      '<a class="panel" href="project/' + esc(p.slug) + '" data-cursor="view">' +
+        '<div class="media">' + cover(p.cover, p.title) + "</div>" +
+        '<div class="panel__meta"><span class="panel__title">' + esc(p.title) + '</span><span class="panel__loc">' + loc + "</span></div>" +
+      "</a>";
+  }).join("\n");
+}
+
 /* ---- Insights: theater slider ------------------------------------------- */
 function insightSlides(list) {
   if (!list.length) return '<div class="theater__empty"><p class="body">No insights yet. Add them in the admin panel.</p></div>';
@@ -195,4 +208,4 @@ function insightDetail(a) {
     body: richBody(a.body), excerpt: a.excerpt || "" };
 }
 
-module.exports = { BASE, esc, projectCards, insightSlides, serviceCards, serviceBlocks, homeFeatured, homeSelected, projectDetail, insightDetail, bodyHtml, cover };
+module.exports = { BASE, esc, projectCards, hscrollPanels, insightSlides, serviceCards, serviceBlocks, homeFeatured, homeSelected, projectDetail, insightDetail, bodyHtml, cover };
