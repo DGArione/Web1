@@ -624,10 +624,6 @@
           progress = self.progress; if (ready) redraw();
           if (mode === "hero") {
             var p = self.progress;
-            /* Crisp static poster at rest; fade it out under the cloud cover as
-               the build begins, so the landing is sharp and swap-free. */
-            var poster = scene.querySelector("[data-hero-poster]");
-            if (poster) { var po = p < 0.05 ? 1 : (p > 0.15 ? 0 : 1 - (p - 0.05) / 0.10); gsap.set(poster, { autoAlpha: Math.max(0, Math.min(1, po)) }); }
             var c = scene.querySelector(".hero__content");
             if (c) { var o = p < 0.72 ? 1 : 1 - (p - 0.72) / 0.28; gsap.set(c, { autoAlpha: Math.max(0, o), y: -50 * Math.max(0, p - 0.5) }); }
             /* Swap the headline slowly through the build phases (long crossfade),

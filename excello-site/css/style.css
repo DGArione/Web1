@@ -726,8 +726,7 @@ em, .it { font-style: italic; font-weight: 300; }
    frames decode (the canvas paints over it once ready). */
 .hero--seq .hero__bg { position: absolute; inset: 0; background: var(--ink) url("../img/hero.webp") center/cover no-repeat; }
 .hero--seq .hero__bg .seq__canvas { position: absolute; inset: 0; object-fit: cover; }
-.hero__poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 2; will-change: opacity; pointer-events: none; }
-.seq-band .seq { background: var(--ink) url("../img/band.webp") center/cover no-repeat; }
+.seq-band .seq { background: var(--ink); }
 .hero--seq .hero__bg::after { z-index: 2; }
 .hero--seq .hero__content { z-index: 3; }
 

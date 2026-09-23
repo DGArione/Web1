@@ -19,19 +19,12 @@
 
   <main>
     <!-- HERO -->
-    <section class="hero hero--seq container" data-seq-scene>
-      <div class="hero__bg seq" data-seq="img/hero-seq" data-frames="288" data-ext="webp" data-seq-mode="hero" data-seq-end="+=300%">
-        <img class="hero__poster" data-hero-poster src="img/hero-poster.webp" alt="Excello finished residence interior" width="1920" height="1080" fetchpriority="high" decoding="async">
-        <canvas class="seq__canvas"></canvas>
-      </div>
-      <div class="hero__clouds" id="heroClouds" aria-hidden="true">
-        <span class="hero__cloud hc1"></span><span class="hero__cloud hc2"></span>
-        <span class="hero__cloud hc3"></span><span class="hero__cloud hc4"></span>
-        <span class="hero__cloud hc5"></span>
+    <section class="hero hero--page container">
+      <div class="hero__bg">
+        <img src="img/hero-bedroom.webp" alt="Excello finished residence interior" width="1672" height="941" fetchpriority="high" decoding="async">
       </div>
       <div class="hero__content">
         <p class="label hero__label" data-hero-fade>Boutique Design &amp; Build · Mount Lavinia, Colombo</p>
-        <div class="seq__loader" data-seq-loader aria-hidden="true">Loading <b>0</b>%</div>
         <h1 class="h-display hero__title" data-split>Thoughtfully designed. <em>Precisely built.</em></h1>
         <div class="hero__bottom">
           <div>
@@ -144,9 +137,10 @@
 
     <!-- CINEMATIC BAND + overlap: the stats panel slides up over the band -->
     <div class="stack">
-      <section class="seq-band is-sticky" data-seq-scene>
-        <div class="seq-band__bg" aria-hidden="true">
-          <img src="img/band.webp" alt="" width="1920" height="1080" loading="lazy" decoding="async">
+      <section class="seq-band is-sticky" data-seq-scene data-seq-sticky>
+        <div class="seq" data-seq="img/hero-seq" data-frames="288" data-ext="webp" data-seq-mode="band" data-seq-end="+=150%">
+          <canvas class="seq__canvas"></canvas>
+          <div class="seq__loader" data-seq-loader aria-hidden="true">Loading <b>0</b>%</div>
         </div>
         <div class="seq-band__overlay">
           <p class="label" style="color: rgba(248,244,236,0.82);" data-reveal><span class="num">(—)</span>In motion</p>
