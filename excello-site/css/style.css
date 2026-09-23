@@ -735,7 +735,10 @@ em, .it { font-style: italic; font-weight: 300; }
 .seq-band .seq { position: absolute; inset: 0; }
 .seq-band .seq__canvas { position: absolute; inset: 0; object-fit: cover; }
 .seq-band__bg { position: absolute; inset: 0; overflow: hidden; }
-.seq-band__bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.seq-band__bg img { width: 100%; height: 100%; object-fit: cover; display: block;
+  transform: scale(1.06); animation: bandZoom 26s ease-in-out infinite alternate; will-change: transform; }
+@keyframes bandZoom { from { transform: scale(1.06); } to { transform: scale(1.14) translateY(-1.5%); } }
+@media (prefers-reduced-motion: reduce) { .seq-band__bg img { animation: none; } }
 .seq-band__overlay {
   position: absolute; inset: 0; z-index: 3;
   display: flex; flex-direction: column; justify-content: flex-end;

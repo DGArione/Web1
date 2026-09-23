@@ -143,10 +143,9 @@
 
     <!-- CINEMATIC BAND + overlap: the stats panel slides up over the band -->
     <div class="stack">
-      <section class="seq-band is-sticky" data-seq-scene data-seq-sticky>
-        <div class="seq" data-seq="img/clip-seq" data-frames="144" data-ext="webp" data-seq-mode="band" data-seq-end="+=100%">
-          <canvas class="seq__canvas"></canvas>
-          <div class="seq__loader" data-seq-loader aria-hidden="true">Loading <b>0</b>%</div>
+      <section class="seq-band is-sticky" data-seq-scene>
+        <div class="seq-band__bg" aria-hidden="true">
+          <img src="img/band.webp" alt="" width="1920" height="1080" loading="lazy" decoding="async">
         </div>
         <div class="seq-band__overlay">
           <p class="label" style="color: rgba(248,244,236,0.82);" data-reveal><span class="num">(—)</span>In motion</p>
