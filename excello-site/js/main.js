@@ -478,7 +478,7 @@
       var bg = hero.querySelector(".hero__bg img");
       if (bg) tl.to(bg, { scale: 1, duration: 2.2, ease: "power3.out" }, 0);
       hero.querySelectorAll("[data-split]").forEach(function (el, i) {
-        if (el._heroLines) tl.to(el._heroLines, { yPercent: 0, duration: 1.4, stagger: 0.1, onComplete: function () { unclip(el); } }, 0.35 + i * 0.15);
+        if (el._heroLines) tl.to(el._heroLines, { yPercent: 0, duration: 1.4, stagger: 0.1, onComplete: function () { unclip(el); el._introDone = true; } }, 0.35 + i * 0.15);
       });
       tl.from(hero.querySelectorAll("[data-hero-fade]"), { opacity: 0, y: 24, duration: 1.2, stagger: 0.12 }, 0.7);
       tl.from(header, { yPercent: -100, opacity: 0, duration: 1, ease: "power3.out" }, 0.5);
@@ -509,9 +509,9 @@
       var heroTitle = isHero ? scene.querySelector(".hero__title") : null;
       var heroPhrases = [
         'Thoughtfully designed. <em>Precisely built.</em>',
-        'Every home begins with <em>a clear idea.</em>',
-        'We build it, <em>stage by stage.</em>',
-        'From first question to <em>final handover.</em>'
+        'It begins with the land, <em>and a clear idea.</em>',
+        'Shaped with intent, <em>stage by stage.</em>',
+        'Until it becomes <em>home.</em>'
       ];
       if (heroTitle) heroTitle._phase = 0;
       var loaderWrap = (mode === "hero" ? scene : host).querySelector("[data-seq-loader]");
@@ -666,8 +666,20 @@
               else co = 0;
               gsap.set(cl, { opacity: Math.max(0, Math.min(1, co)), scale: 1 + 0.14 * Math.max(0, Math.min(1, co)) });
             }
-            /* Single fixed headline; fade the content out near the very end so
-               the finished home fills the frame before the next section. */
+            /* Headline narrates the build as you scroll — swaps through phases
+               with a gentle crossfade (never a snap). */
+            if (heroTitle && heroTitle._introDone) {
+              var phase = p < 0.16 ? 0 : p < 0.42 ? 1 : p < 0.68 ? 2 : 3;
+              if (heroTitle._phase !== phase) {
+                heroTitle._phase = phase;
+                gsap.to(heroTitle, { autoAlpha: 0, duration: 0.5, ease: "power2.inOut", overwrite: true, onComplete: function () {
+                  heroTitle.innerHTML = heroPhrases[phase];
+                  gsap.to(heroTitle, { autoAlpha: 1, duration: 0.75, ease: "power2.out", overwrite: true });
+                } });
+              }
+            }
+            /* Fade the whole hero content out near the very end so the finished
+               home fills the frame before the next section. */
             var c = scene.querySelector(".hero__content");
             if (c) { var o = p < 0.8 ? 1 : 1 - (p - 0.8) / 0.2; gsap.set(c, { autoAlpha: Math.max(0, o), y: -40 * Math.max(0, p - 0.62) }); }
           }
