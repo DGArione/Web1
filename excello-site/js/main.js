@@ -525,7 +525,7 @@
         /* Photographic background frames don't need retina; 1x (capped) keeps
            the per-frame draw cheap so the scroll scrub stays smooth on hi-dpi
            screens, where 2x would mean pushing 4x the pixels every frame. */
-        var dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+        var dpr = Math.min(window.devicePixelRatio || 1, 1);
         var w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
         if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
       }
@@ -554,6 +554,13 @@
         ctx.fillStyle = "#151613"; ctx.fillRect(0, 0, cw, ch);
         ctx.drawImage(img, x, y, w, h);
         if (mode === "hero") drawStamp(sx(iw, sc, x), sy(ih, sc, y), 0.042 * iw * sc);
+        /* Warm a few frames ahead (both directions) so the next scrub steps are
+           already decoded, without pre-decoding (and pinning) the whole set. */
+        for (var wa = 1; wa <= 5; wa++) {
+          var ni = wantIdx + wa, pi = wantIdx - wa;
+          if (ni < count && frames[ni] && frames[ni].complete && frames[ni].decode) frames[ni].decode().catch(function(){});
+          if (pi >= 0 && frames[pi] && frames[pi].complete && frames[pi].decode) frames[pi].decode().catch(function(){});
+        }
       }
       /* Watermark cover: a small brand stamp drawn over the source-video mark */
       function sx(iw, sc, x) { return x + 0.891 * iw * sc; }
@@ -619,9 +626,14 @@
         var idx = order[k];
         var img = new Image(); img.decoding = "async"; frames[idx] = img;
         function done() { onFrame(idx, k); }
-        /* Decode the frame to a ready bitmap up front (while loading, off the
-           scroll path) so painting it during the scrub never blocks on decode. */
-        img.onload = function () { if (img.decode) img.decode().then(done, done); else done(); };
+        /* Only pre-decode the small priority window; decoding ALL frames up front
+           pinned ~2.4GB of bitmaps at 1920x1080 and caused scroll lag. The rest
+           decode on demand (browser-managed, evictable), and paint() warms a few
+           frames ahead so the scrub stays smooth without hoarding memory. */
+        img.onload = function () {
+          if (img.decode && k < need + 4) { img.decode().then(done, done); }
+          else done();
+        };
         img.onerror = done;
         img.src = url(idx);
       })(k);
@@ -632,7 +644,7 @@
       var sticky = scene.hasAttribute("data-seq-sticky");
       ScrollTrigger.create({
         trigger: scene, start: "top top", end: host.dataset.seqEnd || "+=120%",
-        pin: !sticky, scrub: (mode === "hero" ? 0.9 : 0.6), invalidateOnRefresh: true, anticipatePin: sticky ? 0 : 1,
+        pin: !sticky, scrub: 0.6, invalidateOnRefresh: true, anticipatePin: sticky ? 0 : 1,
         onRefresh: function () { sizeCanvas(); redraw(); },
         onUpdate: function (self) {
           progress = self.progress; if (ready) redraw();
