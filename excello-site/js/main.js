@@ -573,12 +573,16 @@
         ctx.stroke();
         ctx.restore();
       }
-      /* Single clean pass: the build plays once, construction (frame 0) -> the
-         finished home (last frame), linearly across the scroll. No teaser, no
-         cloud cover, no repeat. */
+      /* Flow: rest on the static poster (finished home). On scroll the clouds
+         roll in over a short intro (frame held at the construction start behind
+         them), then the build plays once, construction -> finished, across the
+         rest of the scroll. */
       function frameFor(p) {
         var last = count - 1;
-        return Math.round(p * last);
+        if (!isHero) return Math.round(p * last);
+        if (p < 0.14) return 0;                    // held under poster + clouds
+        var t = (p - 0.14) / 0.86; if (t > 1) t = 1;
+        return Math.round(t * last);               // build to finished
       }
       /* Batch paints to one per animation frame: ScrollTrigger's onUpdate can
          fire several times between repaints, so we keep only the latest target
@@ -634,10 +638,26 @@
           progress = self.progress; if (ready) redraw();
           if (mode === "hero") {
             var p = self.progress;
-            /* Single fixed headline; only fade the content out near the very end
-               so the finished home fills the frame before the next section. */
+            /* Static poster (finished home) at rest; fades out as the clouds
+               cover, so the build is revealed behind them. */
+            var poster = scene.querySelector("[data-hero-poster]");
+            if (poster) { var po = p < 0.04 ? 1 : (p > 0.12 ? 0 : 1 - (p - 0.04) / 0.08); gsap.set(poster, { autoAlpha: Math.max(0, Math.min(1, po)) }); }
+            /* Clouds: roll in over the poster, briefly cover, then part to reveal
+               the construction start — kept short so there's no long white gap. */
+            var cl = scene.querySelector("#heroClouds");
+            if (cl) {
+              var co;
+              if (p < 0.02) co = 0;
+              else if (p < 0.07) co = (p - 0.02) / 0.05;   // roll in
+              else if (p < 0.11) co = 1;                    // brief full cover
+              else if (p < 0.18) co = 1 - (p - 0.11) / 0.07; // part to reveal build
+              else co = 0;
+              gsap.set(cl, { opacity: Math.max(0, Math.min(1, co)), scale: 1 + 0.14 * Math.max(0, Math.min(1, co)) });
+            }
+            /* Single fixed headline; fade the content out near the very end so
+               the finished home fills the frame before the next section. */
             var c = scene.querySelector(".hero__content");
-            if (c) { var o = p < 0.78 ? 1 : 1 - (p - 0.78) / 0.22; gsap.set(c, { autoAlpha: Math.max(0, o), y: -40 * Math.max(0, p - 0.6) }); }
+            if (c) { var o = p < 0.8 ? 1 : 1 - (p - 0.8) / 0.2; gsap.set(c, { autoAlpha: Math.max(0, o), y: -40 * Math.max(0, p - 0.62) }); }
           }
         }
       });
