@@ -15,7 +15,7 @@ const TPL = path.join(__dirname, "templates");
 if (!fs.existsSync(UPLOADS)) fs.mkdirSync(UPLOADS, { recursive: true });
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT, 10) || 3000;
 const COLLS = { projects: 1, insights: 1, services: 1, chatbot: 1, units: 1, projecttypes: 1, finishes: 1, materials: 1, rooms: 1 };
 
 /* Base path so the whole app can run under a sub-folder (e.g. served at
@@ -429,7 +429,28 @@ app.use(function (req, res, next) {
 });
 app.use("/", r);
 
-app.listen(PORT, function () {
-  console.log("Excello site + admin running on http://localhost:" + PORT + (BASE || "") + "/");
-  if (auth.usesDefaultPassword()) console.log("  Admin: " + (BASE || "") + "/admin  (user: " + auth.currentUser() + ", default password 'excello-admin' — change it in the panel)");
-});
+/* Start the server. If the chosen port is already taken (e.g. another copy is
+   already running, or a previous run didn't close), try the next few ports and
+   report clearly instead of crashing with a raw stack trace. */
+function startServer(port, attemptsLeft) {
+  const server = app.listen(port, function () {
+    console.log("Excello site + admin running on http://localhost:" + port + (BASE || "") + "/");
+    if (auth.usesDefaultPassword()) console.log("  Admin: " + (BASE || "") + "/admin  (user: " + auth.currentUser() + ", default password 'excello-admin' — change it in the panel)");
+  });
+  server.on("error", function (err) {
+    if (err && err.code === "EADDRINUSE") {
+      if (attemptsLeft > 0) {
+        console.warn("Port " + port + " is already in use — trying " + (port + 1) + " …");
+        startServer(port + 1, attemptsLeft - 1);
+      } else {
+        console.error("\nCould not start: port " + PORT + " (and the next few) are in use.\n" +
+          "The site is probably ALREADY running in another window — just open http://localhost:" + PORT + "/ in your browser.\n" +
+          "Or run it on a different port, e.g.:  set PORT=3005 && npm start\n");
+        process.exit(1);
+      }
+    } else {
+      throw err;
+    }
+  });
+}
+startServer(PORT, 10);
