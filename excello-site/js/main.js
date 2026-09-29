@@ -573,18 +573,12 @@
         ctx.stroke();
         ctx.restore();
       }
-      /* Hero: hold the FINISHED frame as a teaser, cut to construction behind a
-         cloud cover, then play forward (construction -> finished). Band: linear. */
-      /* Hero: rest on the finished home (last frame) as the static poster;
-         on scroll the clouds roll in, cut to the construction start (frame 0)
-         behind the cover, then the build plays forward once back to finished. */
+      /* Single clean pass: the build plays once, construction (frame 0) -> the
+         finished home (last frame), linearly across the scroll. No teaser, no
+         cloud cover, no repeat. */
       function frameFor(p) {
         var last = count - 1;
-        if (!isHero) return Math.round(p * last);
-        if (p < 0.14) return last;                 // finished-home teaser (poster)
-        if (p < 0.22) return 0;                    // construction, hidden by clouds
-        var t = (p - 0.22) / 0.78; if (t > 1) t = 1;
-        return Math.round(t * last);               // forward build to finished
+        return Math.round(p * last);
       }
       /* Batch paints to one per animation frame: ScrollTrigger's onUpdate can
          fire several times between repaints, so we keep only the latest target
@@ -595,7 +589,7 @@
         if (_raf) return;
         _raf = requestAnimationFrame(function () { _raf = 0; paint(_tgt); });
       }
-      var firstIdx = isHero ? count - 1 : 0; /* hero rests on the finished home */
+      var firstIdx = 0; /* rests on the opening frame; build plays forward once */
       /* Priority frames gate the preloader. Keep it small so the site becomes
          interactive fast; the rest of the (now light, ~50 KB) frames stream in
          behind it and fill smoothness without blocking first paint. */
@@ -616,8 +610,7 @@
          exactly the order you scroll through. That way the frames you reach
          first are decoded first, so the scrub never steps waiting on a download. */
       var order = [];
-      if (isHero) { order.push(count - 1); for (var j = 0; j < count - 1; j++) order.push(j); }
-      else { for (var j = 0; j < count; j++) order.push(j); }
+      for (var j = 0; j < count; j++) order.push(j);
       for (var k = 0; k < order.length; k++) (function (k) {
         var idx = order[k];
         var img = new Image(); img.decoding = "async"; frames[idx] = img;
@@ -641,38 +634,10 @@
           progress = self.progress; if (ready) redraw();
           if (mode === "hero") {
             var p = self.progress;
-            /* Crisp static poster at rest; fade it out under the cloud cover as
-               the build begins, so the landing is sharp and swap-free. */
-            var poster = scene.querySelector("[data-hero-poster]");
-            if (poster) { var po = p < 0.05 ? 1 : (p > 0.15 ? 0 : 1 - (p - 0.05) / 0.10); gsap.set(poster, { autoAlpha: Math.max(0, Math.min(1, po)) }); }
+            /* Single fixed headline; only fade the content out near the very end
+               so the finished home fills the frame before the next section. */
             var c = scene.querySelector(".hero__content");
-            if (c) { var o = p < 0.72 ? 1 : 1 - (p - 0.72) / 0.28; gsap.set(c, { autoAlpha: Math.max(0, o), y: -50 * Math.max(0, p - 0.5) }); }
-            /* Swap the headline slowly through the build phases (long crossfade),
-               so the wording changes gently as you scroll — never a snap. */
-            if (heroTitle) {
-              var phase = p < 0.18 ? 0 : p < 0.40 ? 1 : p < 0.60 ? 2 : 3;
-              if (heroTitle._phase !== phase) {
-                heroTitle._phase = phase;
-                gsap.to(heroTitle, { autoAlpha: 0, duration: 0.55, ease: "power2.inOut", overwrite: true, onComplete: function () {
-                  heroTitle.innerHTML = heroPhrases[phase];
-                  gsap.to(heroTitle, { autoAlpha: 1, duration: 0.8, ease: "power2.out", overwrite: true });
-                } });
-              }
-            }
-            var hb = scene.querySelector(".hero__bottom");
-            if (hb) { var bo = p < 0.05 ? 1 : 1 - (p - 0.05) / 0.09; gsap.set(hb, { autoAlpha: Math.max(0, Math.min(1, bo)) }); }
-            /* Clouds roll in over the finished poster, fully cover the cut to
-               construction, then part so the build plays through to finished. */
-            var cl = scene.querySelector("#heroClouds");
-            if (cl) {
-              var o;
-              if (p < 0.02) o = 0;
-              else if (p < 0.14) o = (p - 0.02) / 0.12;   // roll in over the teaser
-              else if (p < 0.24) o = 1;                    // full cover during the cut
-              else if (p < 0.42) o = 1 - (p - 0.24) / 0.18; // part to reveal construction
-              else o = 0;
-              gsap.set(cl, { opacity: Math.max(0, Math.min(1, o)), scale: 1 + 0.14 * Math.max(0, Math.min(1, o)) });
-            }
+            if (c) { var o = p < 0.78 ? 1 : 1 - (p - 0.78) / 0.22; gsap.set(c, { autoAlpha: Math.max(0, o), y: -40 * Math.max(0, p - 0.6) }); }
           }
         }
       });

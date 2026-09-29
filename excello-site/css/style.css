@@ -1142,7 +1142,9 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
   background: color-mix(in srgb, var(--paper) 86%, transparent);
   -webkit-backdrop-filter: saturate(1.2) blur(14px);
   backdrop-filter: saturate(1.2) blur(14px);
-  border-bottom: 1px solid var(--rule);
+  /* Soft shadow instead of a hard 1px rule, so no sharp line shows across the hero. */
+  border-bottom: 0;
+  box-shadow: 0 10px 30px -18px rgba(16, 16, 12, 0.5);
 }
 .header.is-solid .brand__sub { opacity: 0.6; }
 .header.is-solid .nav__link::after { background: currentColor; }
