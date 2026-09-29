@@ -391,9 +391,9 @@ em, .it { font-style: italic; font-weight: 300; }
   content: "";
   position: absolute;
   inset: 0;
-  /* Darkens only the lower half for text legibility; fully transparent up top
-     so no band or edge can appear behind the header. */
-  background: linear-gradient(to top, rgba(21, 22, 19, 0.86) 0%, rgba(21, 22, 19, 0.28) 45%, rgba(21, 22, 19, 0.10) 78%, rgba(21, 22, 19, 0.42) 100%);
+  /* Smooth, monotonic shade — darkest at the bottom, fading evenly to near
+     transparent at the top, with no dip/rise so no horizontal band appears. */
+  background: linear-gradient(to top, rgba(21, 22, 19, 0.86) 0%, rgba(21, 22, 19, 0.5) 34%, rgba(21, 22, 19, 0.22) 66%, rgba(21, 22, 19, 0.08) 100%);
 }
 .hero__content { position: relative; z-index: 1; }
 .hero__label { color: rgba(248, 244, 236, 0.85); }
@@ -1149,7 +1149,7 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
 
 /* Hero text stays legible over bright frames */
 .hero__content { text-shadow: 0 1px 2px rgba(16, 16, 12, 0.45), 0 2px 30px rgba(16, 16, 12, 0.5); }
-.hero--seq .hero__bg::after { background: linear-gradient(to top, rgba(16,16,12,0.82) 0%, rgba(16,16,12,0.28) 46%, rgba(16,16,12,0.34) 100%); }
+.hero--seq .hero__bg::after { background: linear-gradient(to top, rgba(16,16,12,0.84) 0%, rgba(16,16,12,0.5) 34%, rgba(16,16,12,0.24) 66%, rgba(16,16,12,0.08) 100%); }
 /* A soft dark plate sits behind the hero text so the scroll-narrated lines
    read clearly even during the near-white cloud frames. */
 .hero--seq .hero__content { position: relative; }
