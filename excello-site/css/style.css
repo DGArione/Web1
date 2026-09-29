@@ -258,8 +258,11 @@ em, .it { font-style: italic; font-weight: 300; }
   justify-content: space-between;
   padding: 26px var(--gutter);
   transition: padding 0.5s var(--ease);
-  mix-blend-mode: difference;
-  color: #fff;
+  /* No mix-blend-mode: it created an isolated compositing layer whose bottom
+     edge showed as a sharp full-width line across the hero. Plain light text
+     with a soft shadow stays legible over the (dark) hero instead. */
+  color: var(--cream);
+  text-shadow: 0 1px 12px rgba(16, 16, 12, 0.45);
 }
 .header.is-compact { padding-top: 16px; padding-bottom: 16px; }
 
@@ -1139,6 +1142,7 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
 .header.is-solid {
   mix-blend-mode: normal;
   color: var(--ink);
+  text-shadow: none;
   background: color-mix(in srgb, var(--paper) 86%, transparent);
   -webkit-backdrop-filter: saturate(1.2) blur(14px);
   backdrop-filter: saturate(1.2) blur(14px);
@@ -1157,10 +1161,12 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
 .hero--seq .hero__content { position: relative; }
 .hero--seq .hero__content::before {
   content: ""; position: absolute; z-index: -1; pointer-events: none;
-  left: -10vw; right: -6vw; top: -8vh; bottom: -10vh;
-  background: radial-gradient(120% 92% at 24% 58%,
-    rgba(14, 14, 10, 0.6) 0%, rgba(14, 14, 10, 0.42) 34%,
-    rgba(14, 14, 10, 0.16) 60%, rgba(14, 14, 10, 0) 78%);
+  /* Box extends well beyond the text so the radial reaches full transparent
+     inside it — no hard clip line at the box edges. */
+  left: -30vw; right: -20vw; top: -70vh; bottom: -40vh;
+  background: radial-gradient(46% 42% at 22% 74%,
+    rgba(14, 14, 10, 0.6) 0%, rgba(14, 14, 10, 0.4) 30%,
+    rgba(14, 14, 10, 0.14) 52%, rgba(14, 14, 10, 0) 66%);
 }
 .hero__label { color: rgba(250,246,238,0.95) !important; }
 
@@ -1320,11 +1326,13 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
 .hero--seq .hero__bg::after {
   background:
     linear-gradient(105deg, rgba(15,13,10,0.62) 0%, rgba(15,13,10,0.18) 46%, rgba(15,13,10,0) 66%),
-    linear-gradient(to top, rgba(15,13,10,0.86) 0%, rgba(15,13,10,0.30) 40%, rgba(15,13,10,0.10) 70%, rgba(15,13,10,0.22) 100%);
+    /* Monotonic top-to-bottom shade — darkest at the bottom, fading smoothly to
+       near-transparent at the top with NO dip/rise, so no horizontal band line. */
+    linear-gradient(to top, rgba(15,13,10,0.86) 0%, rgba(15,13,10,0.42) 38%, rgba(15,13,10,0.16) 70%, rgba(15,13,10,0.04) 100%);
 }
 
-/* A hairline gold rule under the header when solid, for a refined edge. */
-.header.is-solid { border-bottom: 1px solid rgba(168,134,90,0.22); }
+/* No rule/border under the solid header — a hard line showed across the hero. */
+.header.is-solid { border-bottom: 0; }
 
 
 /* ==========================================================================
