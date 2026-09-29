@@ -337,6 +337,23 @@
         .to(img, { scale: 1, duration: 1.7, ease: "power3.out" }, 0.08);
     });
 
+    /* Project gallery — staggered GSAP load-in of the uniform cards. Each card
+       fades and rises as its row scrolls into view; above-the-fold cards play
+       on load. Reduced-motion users get them shown normally (no opacity set). */
+    if (!reduce) {
+      var pcards = gsap.utils.toArray("[data-project-card]");
+      if (pcards.length) {
+        gsap.set(pcards, { autoAlpha: 0, y: 48 });
+        ScrollTrigger.batch(pcards, {
+          start: "top 90%",
+          once: true,
+          onEnter: function (els) {
+            gsap.to(els, { autoAlpha: 1, y: 0, duration: 1.0, ease: "power3.out", stagger: 0.12, overwrite: true });
+          }
+        });
+      }
+    }
+
     /* Counters */
     document.querySelectorAll("[data-count]").forEach(function (el) {
       var target = parseFloat(el.dataset.count);

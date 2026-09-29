@@ -30,17 +30,16 @@ function cover(url, alt, cls) {
 }
 
 /* ---- Projects gallery ---------------------------------------------------- */
-const CARD_PATTERN = ["card--7", "card--5 card--push", "card--5", "card--7 card--push", "card--4", "card--4 card--push", "card--4"];
 function projectCards(list) {
   if (!list.length) return '<p class="body body--muted">No projects yet. Add them in the admin panel.</p>';
   return list.map(function (p, i) {
-    const size = CARD_PATTERN[i % CARD_PATTERN.length];
-    const ratio = size.indexOf("card--7") === 0 || size.indexOf("card--8") === 0 ? "media--ratio-landscape" : "media--ratio-portrait";
     const tag = [p.category, p.location].filter(Boolean).map(esc).join(" · ");
     const excerpt = p.excerpt ? '<p class="body body--muted" style="font-size:13px;">' + esc(p.excerpt) + "</p>" : "";
+    /* Uniform grid: every card the same width and ratio, revealed with a
+       staggered GSAP load animation (see [data-project-card] in main.js). */
     return '' +
-      '<a class="card ' + size + '" href="project/' + esc(p.slug) + '" data-cursor="view">' +
-        '<div class="media media--parallax media--clip ' + ratio + '" data-parallax="8">' + cover(p.cover, p.title) + "</div>" +
+      '<a class="card card--grid" href="project/' + esc(p.slug) + '" data-cursor="view" data-project-card style="--i:' + i + '">' +
+        '<div class="media media--parallax media--clip media--ratio-portrait" data-parallax="8">' + cover(p.cover, p.title) + "</div>" +
         '<div class="card__meta"><span class="card__title">' + esc(p.title) + '</span><span class="card__tag">' + tag + "</span></div>" +
         excerpt +
       "</a>";
