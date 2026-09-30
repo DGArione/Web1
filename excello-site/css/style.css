@@ -1809,17 +1809,3 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
 img[data-img]:not([src]) { display: none; }
 .media { background-color: var(--sand-2); }
 .person .media, .about .media, .media--ratio-portrait, .media--ratio-wide { background-color: var(--sand-2); }
-
-/* ADDENDUM 16 — hero hand-off: the next section lifts in as a distinct panel
-   over the releasing (dark) hero, with a soft rounded top edge + shadow. */
-.hero-next {
-  position: relative;
-  z-index: 3;
-  background: var(--bg);
-  border-top-left-radius: clamp(16px, 2.6vw, 36px);
-  border-top-right-radius: clamp(16px, 2.6vw, 36px);
-  box-shadow: 0 -28px 60px -34px rgba(16, 16, 12, 0.5);
-}
-@media (prefers-reduced-motion: reduce) {
-  .hero-next { border-radius: 0; box-shadow: none; }
-}

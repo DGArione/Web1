@@ -697,21 +697,11 @@
          .pin-spacer at runtime, so an adjacent-sibling selector would miss. */
       var afterHero = document.querySelector("[data-hero-next]");
       if (afterHero) {
-        afterHero.classList.add("hero-next");
         gsap.set(afterHero, { transformOrigin: "50% 100%", willChange: "transform" });
-        /* The next section rises up as a distinct panel over the releasing hero,
-           travelling faster than the scroll (parallax) and settling into place. */
         gsap.fromTo(afterHero,
-          { yPercent: 26, scale: 1.08, autoAlpha: 0.3 },
+          { yPercent: 16, scale: 1.05, autoAlpha: 0.55 },
           { yPercent: 0, scale: 1, autoAlpha: 1, ease: "none",
-            scrollTrigger: { trigger: afterHero, start: "top bottom", end: "top 38%", scrub: 0.6 } });
-        /* Inner content drifts up a touch slower, for a layered parallax feel. */
-        var afterInner = afterHero.querySelector(".grid, .container, .section__head") || afterHero.firstElementChild;
-        if (afterInner) {
-          gsap.fromTo(afterInner,
-            { yPercent: 12 }, { yPercent: -4, ease: "none",
-              scrollTrigger: { trigger: afterHero, start: "top bottom", end: "top top", scrub: 0.8 } });
-        }
+            scrollTrigger: { trigger: afterHero, start: "top bottom", end: "top 45%", scrub: 0.5 } });
       }
     }
 
