@@ -688,22 +688,13 @@
     });
 
     /* ------------------------------------------------------------------
-       Hero hand-off: the first section after the pinned hero rises into
-       view with a parallax lift + soft fade as the hero releases, so the
-       next section "comes in" rather than just scrolling up flatly.
+       Hero hand-off: the section after the hero must FULLY, OPAQUELY cover it
+       as it scrolls in — no transform/opacity on the section itself (those
+       leave a gap or let the hero show through). It just gets a solid
+       background + higher z-index; only its inner content reveals (data-reveal).
        ------------------------------------------------------------------ */
-    if (!reduce) {
-      /* Target by marker, not sibling: ScrollTrigger's pin wraps the hero in a
-         .pin-spacer at runtime, so an adjacent-sibling selector would miss. */
-      var afterHero = document.querySelector("[data-hero-next]");
-      if (afterHero) {
-        gsap.set(afterHero, { transformOrigin: "50% 100%", willChange: "transform" });
-        gsap.fromTo(afterHero,
-          { yPercent: 16, scale: 1.05, autoAlpha: 0.55 },
-          { yPercent: 0, scale: 1, autoAlpha: 1, ease: "none",
-            scrollTrigger: { trigger: afterHero, start: "top bottom", end: "top 45%", scrub: 0.5 } });
-      }
-    }
+    var afterHero = document.querySelector("[data-hero-next]");
+    if (afterHero) afterHero.classList.add("hero-cover");
 
     /* ------------------------------------------------------------------
        Layered parallax (clouds and any decorative [data-py]/[data-px]).

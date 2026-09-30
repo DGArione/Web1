@@ -1809,3 +1809,11 @@ body.is-dark .cta .h-display em { -webkit-text-stroke-color: var(--cream); }
 img[data-img]:not([src]) { display: none; }
 .media { background-color: var(--sand-2); }
 .person .media, .about .media, .media--ratio-portrait, .media--ratio-wide { background-color: var(--sand-2); }
+
+/* ADDENDUM 17 — the section after the hero fully, opaquely covers it (no
+   see-through). Solid background + higher z-index than the hero; no transform. */
+.hero-cover {
+  position: relative;
+  z-index: 4;
+  background: var(--bg);
+}
