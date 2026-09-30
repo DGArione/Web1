@@ -838,6 +838,7 @@ body.is-dark .sky { color: var(--ink); }
   z-index: 2;
   background: var(--bg);
   box-shadow: 0 -50px 90px rgba(21, 22, 19, 0.16);
+  transition: background-color 0.9s var(--ease);
 }
 .stats-over { padding-top: clamp(48px, 6vw, 90px); }
 
@@ -1819,6 +1820,7 @@ img[data-img]:not([src]) { display: none; }
   position: relative;
   z-index: 4;
   background: var(--bg);
+  transition: background-color 0.9s var(--ease);
   margin-top: -100svh;
   min-height: 100svh;
   display: flex;
