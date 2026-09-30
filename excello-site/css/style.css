@@ -1810,10 +1810,27 @@ img[data-img]:not([src]) { display: none; }
 .media { background-color: var(--sand-2); }
 .person .media, .about .media, .media--ratio-portrait, .media--ratio-wide { background-color: var(--sand-2); }
 
-/* ADDENDUM 17 — the section after the hero fully, opaquely covers it (no
-   see-through). Solid background + higher z-index than the hero; no transform. */
+/* ADDENDUM 17 — the section after the hero slides UP OVER it at the end of the
+   hero scroll, as a solid full-screen layer (no see-through). It is pulled up by
+   one viewport (negative margin) so while the hero is still pinned it rises over
+   it from the bottom; being full-height + opaque + above the hero (z-index), it
+   covers the hero completely with no gap. */
 .hero-cover {
   position: relative;
   z-index: 4;
   background: var(--bg);
+  margin-top: -100svh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-top-left-radius: clamp(16px, 2.6vw, 40px);
+  border-top-right-radius: clamp(16px, 2.6vw, 40px);
+  box-shadow: 0 -30px 70px -30px rgba(16, 16, 12, 0.55);
+}
+@supports not (height: 100svh) {
+  .hero-cover { margin-top: -100vh; min-height: 100vh; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-cover { margin-top: 0; min-height: 0; display: block; border-radius: 0; box-shadow: none; }
 }
