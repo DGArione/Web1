@@ -697,20 +697,16 @@
          .pin-spacer at runtime, so an adjacent-sibling selector would miss. */
       var afterHero = document.querySelector("[data-hero-next]");
       if (afterHero) {
+        /* The next section overlaps the pinned hero (via CSS: negative top margin
+           + high z-index + solid bg), so as the hero finishes it slides up over it
+           from the bottom like a new layer. Its inner content drifts a touch for
+           a layered parallax feel as it rises. */
         afterHero.classList.add("hero-next");
-        gsap.set(afterHero, { transformOrigin: "50% 100%", willChange: "transform" });
-        /* The next section rises up as a distinct panel over the releasing hero,
-           travelling faster than the scroll (parallax) and settling into place. */
-        gsap.fromTo(afterHero,
-          { yPercent: 26, scale: 1.08, autoAlpha: 0.3 },
-          { yPercent: 0, scale: 1, autoAlpha: 1, ease: "none",
-            scrollTrigger: { trigger: afterHero, start: "top bottom", end: "top 38%", scrub: 0.6 } });
-        /* Inner content drifts up a touch slower, for a layered parallax feel. */
-        var afterInner = afterHero.querySelector(".grid, .container, .section__head") || afterHero.firstElementChild;
+        var afterInner = afterHero.querySelector(".grid, .section__head") || afterHero.firstElementChild;
         if (afterInner) {
           gsap.fromTo(afterInner,
-            { yPercent: 12 }, { yPercent: -4, ease: "none",
-              scrollTrigger: { trigger: afterHero, start: "top bottom", end: "top top", scrub: 0.8 } });
+            { yPercent: 10 }, { yPercent: 0, ease: "none",
+              scrollTrigger: { trigger: afterHero, start: "top bottom", end: "top 55%", scrub: 0.7 } });
         }
       }
     }

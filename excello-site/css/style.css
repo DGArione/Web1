@@ -1810,16 +1810,20 @@ img[data-img]:not([src]) { display: none; }
 .media { background-color: var(--sand-2); }
 .person .media, .about .media, .media--ratio-portrait, .media--ratio-wide { background-color: var(--sand-2); }
 
-/* ADDENDUM 16 — hero hand-off: the next section lifts in as a distinct panel
-   over the releasing (dark) hero, with a soft rounded top edge + shadow. */
+/* ADDENDUM 16 — hero hand-off: the next section slides UP OVER the pinned hero
+   like a new layer coming from the bottom. It's pulled up by one viewport with a
+   negative top margin and sits above the hero (z-index + solid bg), so while the
+   hero is still pinned it gets covered from the bottom edge upward. */
 .hero-next {
   position: relative;
-  z-index: 3;
+  z-index: 6;
+  margin-top: -100svh;
   background: var(--bg);
-  border-top-left-radius: clamp(16px, 2.6vw, 36px);
-  border-top-right-radius: clamp(16px, 2.6vw, 36px);
-  box-shadow: 0 -28px 60px -34px rgba(16, 16, 12, 0.5);
+  border-top-left-radius: clamp(16px, 2.6vw, 40px);
+  border-top-right-radius: clamp(16px, 2.6vw, 40px);
+  box-shadow: 0 -30px 70px -30px rgba(16, 16, 12, 0.55);
 }
+@supports not (height: 100svh) { .hero-next { margin-top: -100vh; } }
 @media (prefers-reduced-motion: reduce) {
-  .hero-next { border-radius: 0; box-shadow: none; }
+  .hero-next { margin-top: 0; border-radius: 0; box-shadow: none; }
 }
