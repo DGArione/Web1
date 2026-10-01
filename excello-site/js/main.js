@@ -609,7 +609,13 @@
       /* Priority frames gate the preloader. Keep it small so the site becomes
          interactive fast; the rest of the (now light, ~50 KB) frames stream in
          behind it and fill smoothness without blocking first paint. */
-      var need = (mode === "hero") ? Math.min(count, 16) : 0, priorityLoaded = 0;
+      /* Preload the FIRST HALF of the hero before the preloader finishes, so the
+         opening scroll scrubs smoothly the moment the site appears instead of
+         stalling while frames stream in. These frames are only DOWNLOADED here
+         (held compressed, cheap on memory); only a small rolling window is
+         decoded to bitmaps (see DECODE_AHEAD) to avoid pinning ~GBs of pixels. */
+      var need = (mode === "hero") ? Math.ceil(count * 0.5) : 0, priorityLoaded = 0;
+      var DECODE_AHEAD = 18; /* how many opening frames to pre-decode (not just download) */
       if (mode === "hero") window.__heroReady = 0;
       function onFrame(idx, k) {
         loaded++;
@@ -629,7 +635,7 @@
          them in scroll order (0..last), a few at a time, and the scrubber can
          jump a specific frame to the front via ensure() when you scroll ahead. */
       for (var j = 0; j < count; j++) { var im = new Image(); im.decoding = "async"; frames[j] = im; }
-      var inflight = 0, nextK = 0, MAX = 6, started = new Array(count);
+      var inflight = 0, nextK = 0, MAX = 8, started = new Array(count);
       function load(idx, k) {
         if (started[idx]) return;
         started[idx] = true; inflight++;
@@ -640,7 +646,7 @@
            decode on demand (browser-managed, evictable), and paint() warms a few
            frames ahead so the scrub stays smooth without hoarding memory. */
         img.onload = function () {
-          if (img.decode && idx < need + 4) { img.decode().then(done, done); }
+          if (img.decode && idx < DECODE_AHEAD) { img.decode().then(done, done); }
           else done();
         };
         img.onerror = done;
@@ -817,7 +823,7 @@
        more. The bar climbs honestly from the start on a gentle time floor
        (reaching ~97% only after ~9s) and real frame-load progress overrides
        that when it's faster; a hard cap guarantees the site appears regardless. */
-    var HARD_CAP = 12000;
+    var HARD_CAP = 22000;
 
     /* Remove the overlay for good — idempotent and fully guarded so a thrown
        error in any single step can never leave the preloader covering the site,
@@ -848,8 +854,11 @@
     function tick(now) {
       var el = now - start;
       var heroReady = (typeof window.__heroReady === "number") ? window.__heroReady : null;
-      var timeFloor = Math.min(0.97, el / 9000);
-      var target = heroReady != null ? Math.max(heroReady, timeFloor) : Math.min(1, el / 1600);
+      /* On the hero page the number now tracks REAL frame loading (download of
+         the first half) so 100% genuinely means the hero is ready; a tiny time
+         floor only keeps the bar from sitting at 0 during the first fetch. */
+      var timeFloor = heroReady != null ? Math.min(0.2, el / 4000) : Math.min(1, el / 1600);
+      var target = heroReady != null ? Math.max(heroReady, timeFloor) : timeFloor;
       if (target > 1) target = 1;
       shown += (target - shown) * 0.08;
       if (shown > 0.999) shown = 1;
