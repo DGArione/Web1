@@ -534,6 +534,11 @@
       function paint(i) {
         i = i < 0 ? 0 : (i > count - 1 ? count - 1 : i);
         wantIdx = i; /* the exact frame we want; may fall back to a neighbour below */
+        /* If we've scrolled ahead of the background stream, pull the frame we
+           need (and a few after it) to the front of the load queue so it
+           resolves now instead of waiting its turn. */
+        ensure(i);
+        for (var es = 1; es <= 4; es++) ensure(i + es);
         /* If the exact target frame hasn't decoded yet, draw the nearest frame
            that has, instead of freezing on the last one. Motion keeps flowing
            (just briefly coarser) and sharpens to the exact frame the instant it
@@ -604,7 +609,7 @@
       /* Priority frames gate the preloader. Keep it small so the site becomes
          interactive fast; the rest of the (now light, ~50 KB) frames stream in
          behind it and fill smoothness without blocking first paint. */
-      var need = (mode === "hero") ? Math.min(count, 30) : 0, priorityLoaded = 0;
+      var need = (mode === "hero") ? Math.min(count, 16) : 0, priorityLoaded = 0;
       if (mode === "hero") window.__heroReady = 0;
       function onFrame(idx, k) {
         loaded++;
@@ -616,27 +621,40 @@
            so a coarse neighbour sharpens to the exact frame the instant it decodes. */
         if (idx === wantIdx || idx === cur || cur === -1) redraw();
       }
-      /* Load in the order the scrub visits: the resting teaser (last frame)
-         first so the hero appears, then the forward build 0..last — which is
-         exactly the order you scroll through. That way the frames you reach
-         first are decoded first, so the scrub never steps waiting on a download. */
-      var order = [];
-      for (var j = 0; j < count; j++) order.push(j);
-      for (var k = 0; k < order.length; k++) (function (k) {
-        var idx = order[k];
-        var img = new Image(); img.decoding = "async"; frames[idx] = img;
-        function done() { onFrame(idx, k); }
+      /* Create an <img> holder for every frame up front so the scrubber can
+         reference any frame, but DON'T fetch them all at once: firing 288
+         requests floods the browser's ~6-connections-per-host limit, so the
+         opening frames the preloader waits on queue behind the rest and first
+         paint stalls for many seconds. Instead a small concurrency pool fetches
+         them in scroll order (0..last), a few at a time, and the scrubber can
+         jump a specific frame to the front via ensure() when you scroll ahead. */
+      for (var j = 0; j < count; j++) { var im = new Image(); im.decoding = "async"; frames[j] = im; }
+      var inflight = 0, nextK = 0, MAX = 6, started = new Array(count);
+      function load(idx, k) {
+        if (started[idx]) return;
+        started[idx] = true; inflight++;
+        var img = frames[idx];
+        function done() { inflight--; onFrame(idx, k == null ? idx : k); pump(); }
         /* Only pre-decode the small priority window; decoding ALL frames up front
            pinned ~2.4GB of bitmaps at 1920x1080 and caused scroll lag. The rest
            decode on demand (browser-managed, evictable), and paint() warms a few
            frames ahead so the scrub stays smooth without hoarding memory. */
         img.onload = function () {
-          if (img.decode && k < need + 4) { img.decode().then(done, done); }
+          if (img.decode && idx < need + 4) { img.decode().then(done, done); }
           else done();
         };
         img.onerror = done;
         img.src = url(idx);
-      })(k);
+      }
+      function pump() {
+        while (inflight < MAX && nextK < count) {
+          var idx = nextK++;
+          if (!started[idx]) load(idx, idx);
+        }
+      }
+      /* Load a specific frame now (jumps the queue) if it hasn't started yet. */
+      function ensure(idx) { if (idx >= 0 && idx < count && !started[idx]) load(idx, idx); }
+      pump();
       window.addEventListener("resize", function () { sizeCanvas(); redraw(); });
 
       if (reduce) { sizeCanvas(); if (frames[0].complete) redraw(); else frames[0].addEventListener("load", function () { ready = true; sizeCanvas(); redraw(); }); return; }
@@ -792,18 +810,29 @@
 
     /* Progress: follows real hero-frame loading (falls back to time on other pages) */
     var start = performance.now(), shown = 0, finished = false;
+    /* Never freeze the loader on screen: a slow host can't park it at 90% any
+       more. The bar climbs honestly from the start on a gentle time floor
+       (reaching ~97% only after ~9s) and real frame-load progress overrides
+       that when it's faster; a hard cap guarantees the site appears regardless. */
+    var HARD_CAP = 12000;
     function tick(now) {
       var el = now - start;
       var heroReady = (typeof window.__heroReady === "number") ? window.__heroReady : null;
-      var timeFloor = Math.min(1, el / 1600);
-      /* fill toward 90% on time, then let real load complete the last 10% */
-      var target = heroReady != null ? Math.max(heroReady, Math.min(timeFloor, 0.9)) : timeFloor;
-      shown += (target - shown) * 0.09;
+      var timeFloor = Math.min(0.97, el / 9000);
+      var target = heroReady != null ? Math.max(heroReady, timeFloor) : Math.min(1, el / 1600);
+      if (target > 1) target = 1;
+      shown += (target - shown) * 0.08;
+      if (shown > 0.999) shown = 1;
       var pct = Math.round(shown * 100);
       if (countEl) countEl.textContent = pct;
       if (bar) gsap.set(bar, { scaleX: shown });
       if (roll && words) gsap.set(roll, { y: -(Math.min(words - 1, Math.floor(shown * words)) * 1.5) + "em" });
-      var ready = pct >= 99 && (heroReady == null ? el > 1400 : (heroReady >= 1 || el > 8000));
+      /* Done when the opening frames are in AND the bar has caught up, OR after
+         the hard cap — the cap is NOT gated behind the percentage, so it always
+         fires and the loader can never hang. */
+      var ready = (heroReady == null)
+        ? (pct >= 99 && el > 1400)
+        : ((heroReady >= 1 && pct >= 98) || el > HARD_CAP);
       if (!ready) { requestAnimationFrame(tick); return; }
       if (finished) return; finished = true;
       outro();
