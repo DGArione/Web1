@@ -792,8 +792,11 @@
     var pre = document.getElementById("preloader");
     var seen = sessionStorage.getItem("excello-loaded");
     if (!pre || reduce || seen) {
-      if (pre) pre.remove();
-      done();
+      if (pre) { try { pre.remove(); } catch (e) {} }
+      try { done(); } catch (e) {}
+      /* Hero may have painted before layout settled (esp. on a cached refresh
+         where frames arrive instantly) — force a recompute + repaint. */
+      try { if (window.ScrollTrigger) ScrollTrigger.refresh(); } catch (e) {}
       return;
     }
     sessionStorage.setItem("excello-loaded", "1");
@@ -809,12 +812,39 @@
     gsap.from(pre.querySelectorAll(".preloader__top span, .preloader__roll, .preloader__bottom"), { autoAlpha: 0, y: 12, duration: 0.8, stagger: 0.08, ease: "power3.out", delay: 0.2 });
 
     /* Progress: follows real hero-frame loading (falls back to time on other pages) */
-    var start = performance.now(), shown = 0, finished = false;
+    var start = performance.now(), shown = 0, finished = false, torn = false;
     /* Never freeze the loader on screen: a slow host can't park it at 90% any
        more. The bar climbs honestly from the start on a gentle time floor
        (reaching ~97% only after ~9s) and real frame-load progress overrides
        that when it's faster; a hard cap guarantees the site appears regardless. */
     var HARD_CAP = 12000;
+
+    /* Remove the overlay for good — idempotent and fully guarded so a thrown
+       error in any single step can never leave the preloader covering the site,
+       and so the wall-clock safety net below can share the exact same path. */
+    function teardown() {
+      if (torn) return; torn = true;
+      try { if (pre && pre.parentNode) pre.remove(); } catch (e) {}
+      try { if (lenis) lenis.start(); } catch (e) {}
+      try { done(); } catch (e) {}
+      /* Force the pinned hero to recompute its size and repaint frame 0, so it's
+         never left blank when its first paint happened before layout settled. */
+      try { if (window.ScrollTrigger) { ScrollTrigger.refresh(); ScrollTrigger.update(); } } catch (e) {}
+      try { window.dispatchEvent(new Event("resize")); } catch (e) {}
+    }
+    function finish() {
+      if (finished) return; finished = true;
+      if (countEl) countEl.textContent = 100;
+      if (bar) { try { gsap.set(bar, { scaleX: 1 }); } catch (e) {} }
+      try {
+        var tl = gsap.timeline({ onComplete: teardown });
+        tl.to(pre.querySelectorAll(".preloader__word span"), { y: "-115%", duration: 0.7, stagger: 0.03, ease: "power4.in" }, 0)
+          .to(pre.querySelectorAll(".preloader__top, .preloader__roll, .preloader__bottom"), { autoAlpha: 0, y: -10, duration: 0.5, ease: "power2.in" }, 0)
+          .to(pre, { yPercent: -100, duration: 1, ease: "power4.inOut" }, "-=0.15");
+      } catch (e) { teardown(); return; }
+      /* If the outro timeline somehow never fires onComplete, tear down anyway. */
+      setTimeout(teardown, 1600);
+    }
     function tick(now) {
       var el = now - start;
       var heroReady = (typeof window.__heroReady === "number") ? window.__heroReady : null;
@@ -834,17 +864,12 @@
         ? (pct >= 99 && el > 1400)
         : ((heroReady >= 1 && pct >= 98) || el > HARD_CAP);
       if (!ready) { requestAnimationFrame(tick); return; }
-      if (finished) return; finished = true;
-      outro();
+      finish();
     }
-    function outro() {
-      if (countEl) countEl.textContent = 100;
-      if (bar) gsap.set(bar, { scaleX: 1 });
-      var tl = gsap.timeline({ onComplete: function () { pre.remove(); if (lenis) lenis.start(); done(); } });
-      tl.to(pre.querySelectorAll(".preloader__word span"), { y: "-115%", duration: 0.7, stagger: 0.03, ease: "power4.in" }, 0)
-        .to(pre.querySelectorAll(".preloader__top, .preloader__roll, .preloader__bottom"), { autoAlpha: 0, y: -10, duration: 0.5, ease: "power2.in" }, 0)
-        .to(pre, { yPercent: -100, duration: 1, ease: "power4.inOut" }, "-=0.15");
-    }
+    /* Wall-clock safety net, independent of requestAnimationFrame and
+       performance.now(): if rAF is throttled or stalls (backgrounded tab, a slow
+       device, a stutter), the preloader still tears down and the site shows. */
+    setTimeout(finish, HARD_CAP + 2500);
     requestAnimationFrame(tick);
   }
 

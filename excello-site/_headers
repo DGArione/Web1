@@ -1,0 +1,19 @@
+# Cache rules for static hosts that read a _headers file
+# (Netlify, Cloudflare Pages, etc.). The Node server sets the same rules
+# itself, so this only matters when the site is deployed as static files.
+
+# Heavy, content-stable assets — cache hard so refreshes are instant.
+/img/*
+  Cache-Control: public, max-age=2592000, immutable
+/js/vendor/*
+  Cache-Control: public, max-age=2592000, immutable
+/uploads/*
+  Cache-Control: public, max-age=604800
+
+# App code and pages — always revalidate so edits/redeploys show immediately.
+/*.css
+  Cache-Control: public, max-age=0, must-revalidate
+/*.js
+  Cache-Control: public, max-age=0, must-revalidate
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
